@@ -1,0 +1,52 @@
+{
+  "name": "@kv-orm/core",
+  "version": "0.0.1",
+  "description": "A Node.js ORM for key-value datastores",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "test": "jest --config=jest.config.js",
+    "clean": "rm -rf dist/",
+    "clean:node": "rm -rf package-lock.json node_modules/",
+    "build": "tsc",
+    "lint": "eslint 'src/**/*.ts' && prettier -c '*.md'",
+    "lint:fix": "eslint --fix 'src/**/*.ts' && prettier --write '*.md'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kv-orm/core.git"
+  },
+  "keywords": [
+    "kv",
+    "key-value",
+    "orm",
+    "model",
+    "nodejs",
+    "javascript"
+  ],
+  "author": {
+    "name": "Greg Brimble",
+    "email": "developer@gregbrimble.com",
+    "url": "https://gregbrimble.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kv-orm/core/issues"
+  },
+  "homepage": "https://github.com/kv-orm/core#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.6.2"
+  }
+}
