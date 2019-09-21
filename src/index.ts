@@ -1,3 +1,2 @@
-const greg = 'greg';
-
-export const boo = 'g';
+export { Datastore } from './Datastore'
+export { Entity } from './Entity'

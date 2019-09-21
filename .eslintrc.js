@@ -1,17 +1,17 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  parser: `@typescript-eslint/parser`,
+  plugins: [`@typescript-eslint`],
   extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'prettier/@typescript-eslint',
+    `plugin:@typescript-eslint/recommended`,
+    `plugin:prettier/recommended`,
+    `prettier/@typescript-eslint`,
   ],
   parserOptions: {
     ecmaVersion: 11,
-    sourceType: 'module',
+    sourceType: `module`,
   },
   rules: {
-    "quotes": ["error", "backtick"]
+    "quotes": [`error`, `backtick`]
   },
 }
 
