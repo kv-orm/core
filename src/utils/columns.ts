@@ -43,5 +43,8 @@ export const setPrimaryColumnValue = (
   const primaryColumn = getPrimaryColumn(instance)
   if (primaryColumn === undefined)
     throw new Error(`Primary Column not specified on instance`)
-  instance[primaryColumn.property] = value
+  primaryColumn.cachedValues.set(instance, {
+    isDirty: false,
+    cachedValue: value,
+  })
 }

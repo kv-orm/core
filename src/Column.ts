@@ -85,7 +85,7 @@ export function Column(options: ColumnOptions = {}) {
 
         if (cachedValue.cachedValue === undefined) {
           cachedValue.cachedValue = await datastore.read(
-            await generatePropertyKey(datastore, instance, columnMetadata)
+            await generatePropertyKey(datastore, this, columnMetadata)
           )
         }
 
