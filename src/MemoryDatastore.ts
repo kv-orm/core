@@ -5,7 +5,11 @@ import {
   Key,
   SearchOptions,
   SearchResult,
-} from '../Datastore'
+} from './Datastore'
+
+interface MemoryDatastoreOptions {
+  isCache?: boolean
+}
 
 export class MemoryDatastore extends Datastore {
   private SEARCH_FIRST_LIMIT = 1000
@@ -14,21 +18,21 @@ export class MemoryDatastore extends Datastore {
 
   public searchStrategies = [SearchStrategy.prefix]
 
-  read(key: Key): Promise<Value> {
+  _read(key: Key): Promise<Value> {
     return Promise.resolve(this.data.get(key) || null)
   }
 
-  write(key: Key, value: Value): Promise<void> {
+  _write(key: Key, value: Value): Promise<void> {
     this.data.set(key, value)
     return Promise.resolve()
   }
 
-  delete(key: Key): Promise<void> {
+  _delete(key: Key): Promise<void> {
     this.data.delete(key)
     return Promise.resolve()
   }
 
-  search({
+  _search({
     term,
     strategy,
     first = this.SEARCH_FIRST_DEFAULT,
@@ -56,5 +60,12 @@ export class MemoryDatastore extends Datastore {
       hasNextPage,
       cursor,
     })
+  }
+
+  public constructor({ isCache = false }: MemoryDatastoreOptions = {}) {
+    super()
+    if (!isCache) {
+      this.cache = new MemoryDatastore({ isCache: true })
+    }
   }
 }

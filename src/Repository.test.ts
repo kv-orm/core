@@ -1,6 +1,6 @@
 import { Datastore } from './Datastore'
 import { BaseEntity, Entity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+import { MemoryDatastore } from './MemoryDatastore'
 import { Column } from './Column'
 import { Repository, getRepository } from './Repository'
 
@@ -86,5 +86,9 @@ describe(`Repository`, () => {
     await singletonRepository.save(singletonInstance)
     loadedInstance = await singletonRepository.load()
     expect(await loadedInstance.myProperty).toEqual(`new value`)
+
+    await complexRepository.save(complexInstance)
+    loadedInstance = await complexRepository.load(12345)
+    // console.log(await loadedInstance.indexableProperty)
   })
 })

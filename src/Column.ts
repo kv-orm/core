@@ -1,3 +1,5 @@
+import './metadata'
+
 import { Key } from './Datastore'
 import {
   BaseEntity,
@@ -89,7 +91,7 @@ export function Column(options: ColumnOptions = {}) {
 
         return cachedValue.cachedValue
       },
-      set: async function set(this: BaseEntity, value: ColumnValue) {
+      set: function set(this: BaseEntity, value: ColumnValue) {
         const columnMetadata = Reflect.getMetadata(
           COLUMN_METADATA_KEY,
           this,

@@ -1,3 +1,5 @@
+import '../metadata'
+
 import { BaseEntity } from '../Entity'
 import {
   ColumnMetadata,

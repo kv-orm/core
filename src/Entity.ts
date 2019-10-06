@@ -1,4 +1,4 @@
-import 'reflect-metadata'
+import './metadata'
 
 import { Datastore, Key } from './Datastore'
 import { ColumnKey, ColumnValue } from './Column'
@@ -17,18 +17,6 @@ export interface EntityConstructorMetadata {
   instances: BaseEntity[]
 }
 
-const createEntityConstructorMetadata = ({
-  datastore,
-  key,
-}: {
-  datastore: Datastore
-  key: Key
-}): EntityConstructorMetadata => ({
-  datastore,
-  key,
-  instances: [], // TODO
-})
-
 interface EntityOptions {
   key?: Key
   datastore: Datastore
@@ -42,14 +30,18 @@ EntityOptions): (constructor: any) => any {
   return function<T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {
+    const entityConstructorMetadata: EntityConstructorMetadata = {
+      datastore,
+      key: key || constructor.name,
+      instances: [], // TODO
+    }
+
     Reflect.defineMetadata(
       ENTITY_METADATA_KEY,
-      createEntityConstructorMetadata({
-        datastore,
-        key: key || constructor.name,
-      }),
+      entityConstructorMetadata,
       constructor
     )
+
     return constructor
   }
 }

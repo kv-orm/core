@@ -1,10 +1,12 @@
 import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore, SearchStrategy } from '../Datastore'
+import { Datastore, SearchStrategy } from './Datastore'
 
 const readWriteWorks = async (datastore: Datastore): Promise<boolean> => {
   await datastore.write(`key`, `value`)
   return (await datastore.read(`key`)) === `value`
 }
+
+// TODO: Test cache
 
 describe(`MemoryDatastore`, () => {
   let datastore: Datastore
