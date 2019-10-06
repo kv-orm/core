@@ -5,7 +5,7 @@
     <img alt="License: MIT" src="https://img.shields.io/github/license/kv-orm/core?style=for-the-badge" />
   </a>
   <a href="https://github.com/kv-orm/core" target="_blank">
-    <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/gregbrimble/kv-orm.svg?logo=github&style=for-the-badge" />
+    <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/kv-orm/core.svg?logo=github&style=for-the-badge" />
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
     <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?style=for-the-badge&logo=lgtm">
