@@ -28,8 +28,11 @@ export abstract class Datastore {
   abstract delete(key: Key): Promise<void>
   abstract search(options: SearchOptions): Promise<SearchResult>
 
-  protected searchStrategyIsValid = (strategy: SearchStrategy): boolean => {
-    return strategy in this.searchStrategies
+  protected assertSearchStrategyIsValid = (strategy: SearchStrategy): void => {
+    if (!(strategy in this.searchStrategies))
+      throw new Error(
+        `Search strategy, ${SearchStrategy[strategy]}, is not implemented.`
+      )
   }
 
   public constructor(keySeparator = `:`) {
