@@ -1,33 +1,31 @@
 import { Datastore, Key } from '../Datastore'
 import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity'
-import { ColumnKey, COLUMN_METADATA_KEY } from '../Column'
+import { ColumnMetadata } from '../Column'
 import { getPrimaryColumn } from './columns'
 
-const getPropertyKey = (instance: BaseEntity, property: ColumnKey): Key =>
-  Reflect.getMetadata(COLUMN_METADATA_KEY, instance).get(property).key
+const getInstanceKey = (instance: BaseEntity): Key =>
+  Reflect.getMetadata(ENTITY_METADATA_KEY, instance.constructor).key
 
 const getPropertyValue = async (
   instance: BaseEntity,
-  property: ColumnKey
-): Promise<Key> => await instance[property]
+  columnMetadata: ColumnMetadata
+): Promise<Key> => await instance[columnMetadata.property]
 
 // Author:UUID-HERE:name
 // or, if singleton, ApplicationConfiguration:password
 export const generatePropertyKey = async (
   datastore: Datastore,
   instance: BaseEntity,
-  property: ColumnKey
+  columnMetadata: ColumnMetadata
 ): Promise<Key> => {
-  const { key } = Reflect.getMetadata(ENTITY_METADATA_KEY, instance.constructor)
-
-  const items = [key]
+  const items = [getInstanceKey(instance)]
   const primaryColumn = getPrimaryColumn(instance)
 
   if (primaryColumn) {
-    items.push(await getPropertyValue(instance, primaryColumn.property))
+    items.push(await getPropertyValue(instance, primaryColumn))
   }
 
-  items.push(getPropertyKey(instance, property))
+  items.push(columnMetadata.key)
 
   return items.join(datastore.keySeparator)
 }
@@ -36,12 +34,12 @@ export const generatePropertyKey = async (
 export const generateIndexablePropertyKey = async (
   datastore: Datastore,
   instance: BaseEntity,
-  property: ColumnKey
+  columnMetadata: ColumnMetadata
 ): Promise<Key> =>
   [
     Reflect.getMetadata(ENTITY_METADATA_KEY, instance.constructor).key,
-    getPropertyKey(instance, property),
-    getPropertyValue(instance, property),
+    columnMetadata.key,
+    await getPropertyValue(instance, columnMetadata),
   ].join(datastore.keySeparator)
 
 // UUID-HERE
@@ -52,7 +50,7 @@ const generateRelationshipKey = async (instance: BaseEntity): Promise<Key> => {
   const primaryColumn = getPrimaryColumn(instance)
 
   if (primaryColumn) {
-    return await getPropertyValue(instance, primaryColumn.property)
+    return await getPropertyValue(instance, primaryColumn)
   }
 
   return key
@@ -65,11 +63,11 @@ export const generateOneRelationshipKey = generatePropertyKey
 export const generateManyRelationshipKey = async (
   datastore: Datastore,
   instance: BaseEntity,
-  property: ColumnKey,
+  columnMetadata: ColumnMetadata,
   relationshipInstance: BaseEntity
 ): Promise<Key> => {
   return [
-    await generatePropertyKey(datastore, instance, property),
+    await generatePropertyKey(datastore, instance, columnMetadata),
     await generateRelationshipKey(relationshipInstance),
   ].join(datastore.keySeparator)
 }

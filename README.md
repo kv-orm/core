@@ -7,8 +7,11 @@
   <a href="https://github.com/kv-orm/core" target="_blank">
     <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/gregbrimble/kv-orm.svg?logo=github&style=for-the-badge" />
   </a>
-  <a href="https://www.typescriptlang.org/" target="_blank">
-    <img alt="Types: TypeScript" src="https://img.shields.io/npm/types/kv-orm.svg?style=for-the-badge">
+  <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
+    <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?style=for-the-badge&logo=lgtm">
+  </a>
+  <a href="https://lgtm.com/projects/g/kv-orm/core/context:javascript">
+    <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?style=for-the-badge&logo=lgtm">
   </a>
 </p>
 

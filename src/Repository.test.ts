@@ -6,29 +6,85 @@ import { Repository, getRepository } from './Repository'
 
 describe(`Repository`, () => {
   let datastore: Datastore
-  let instance: BaseEntity
-  let repository: Repository
+  let singletonInstance: BaseEntity
+  let singletonRepository: Repository
+  let complexInstance: BaseEntity
+  let complexRepository: Repository
 
   beforeEach(() => {
     datastore = new MemoryDatastore()
 
-    @Entity({ datastore })
-    class X {
-      @Column()
-      public xProp = `initial value`
+    @Entity({ datastore, key: `SingletonEntity` })
+    class SingletonEntity {
+      @Column({ key: `myProperty` })
+      public myProperty = `initial value`
     }
 
-    repository = getRepository(X)
-    instance = new X()
+    @Entity({ datastore, key: `ComplexEntity` })
+    class ComplexEntity {
+      @Column({ key: `myProperty` })
+      public myProperty = `initial value`
+
+      @Column({ key: `primaryProperty`, isPrimary: true })
+      public primaryProperty: number
+
+      @Column({ key: `indexableProperty`, isIndexable: true })
+      public indexableProperty: string
+
+      constructor(primaryProperty: number, indexableProperty: string) {
+        this.primaryProperty = primaryProperty
+        this.indexableProperty = indexableProperty
+      }
+    }
+
+    singletonRepository = getRepository(SingletonEntity)
+    singletonInstance = new SingletonEntity()
+
+    complexRepository = getRepository(ComplexEntity)
+    complexInstance = new ComplexEntity(12345, `abc@xyz.com`)
   })
 
   it(`can be initialized with a default value`, async () => {
-    expect(await repository.save(instance)).toBeTruthy()
-    expect(await repository.save(instance)).toBeFalsy()
+    expect(await datastore.read(`SingletonEntity:myProperty`)).toBeNull()
+    expect(await singletonRepository.save(singletonInstance)).toBeTruthy()
+    expect(await datastore.read(`SingletonEntity:myProperty`)).toEqual(
+      `initial value`
+    )
+    expect(await singletonRepository.save(singletonInstance)).toBeFalsy()
+
+    expect(await complexRepository.save(complexInstance)).toBeTruthy()
+    expect(await datastore.read(`ComplexEntity:myProperty`)).toBeNull()
+    expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toEqual(
+      `initial value`
+    )
+    expect(await datastore.read(`ComplexEntity:12345:primaryProperty`)).toEqual(
+      12345
+    )
+    expect(
+      await datastore.read(`ComplexEntity:12345:indexableProperty`)
+    ).toEqual(`abc@xyz.com`)
+    expect(
+      await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
+    ).toEqual(12345)
   })
 
   it(`can be written to, and subsequently read from`, async () => {
-    instance.xProp = `new value`
-    expect(await instance.xProp).toEqual(`new value`)
+    singletonInstance.myProperty = `new value`
+    expect(await singletonRepository.save(singletonInstance)).toBeTruthy()
+    expect(await datastore.read(`SingletonEntity:myProperty`)).toEqual(
+      `new value`
+    )
+    expect(await singletonInstance.myProperty).toEqual(`new value`)
+  })
+
+  it(`can load an instance`, async () => {
+    await singletonRepository.save(singletonInstance)
+    let loadedInstance = await singletonRepository.load()
+    expect(await loadedInstance.myProperty).toEqual(`initial value`)
+
+    singletonInstance.myProperty = `new value`
+    await singletonRepository.save(singletonInstance)
+    loadedInstance = await singletonRepository.load()
+    expect(await loadedInstance.myProperty).toEqual(`new value`)
   })
 })
