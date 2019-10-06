@@ -16,6 +16,9 @@
     "lint": "eslint 'src/**/*.ts' && prettier -c '*.md'",
     "lint:fix": "eslint --fix 'src/**/*.ts' && prettier --write '*.md'"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:kv-orm/core.git"

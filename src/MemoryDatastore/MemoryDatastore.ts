@@ -5,7 +5,6 @@ import {
   Key,
   SearchOptions,
   SearchResult,
-  Cursor,
 } from '../Datastore'
 
 export class MemoryDatastore extends Datastore {
@@ -35,10 +34,7 @@ export class MemoryDatastore extends Datastore {
     first = this.SEARCH_FIRST_DEFAULT,
     after = `-1`,
   }: SearchOptions): Promise<SearchResult> {
-    if (!this.searchStrategyIsValid(strategy))
-      throw new Error(
-        `Search strategy (${SearchStrategy[strategy]}) is not implemented!`
-      )
+    this.assertSearchStrategyIsValid(strategy)
 
     if (first > this.SEARCH_FIRST_LIMIT) first = this.SEARCH_FIRST_LIMIT
     if (first < 0) first = 0

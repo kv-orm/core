@@ -4,28 +4,54 @@ import {
   ENTITY_METADATA_KEY,
   EntityConstructorMetadata,
 } from './Entity'
-import { getColumns } from './utils/columns'
-import { ColumnMetadata, COLUMN_METADATA_KEY } from './Column'
-import { generatePropertyKey } from './utils/keyGeneration'
-import { Datastore } from './Datastore'
+import { ColumnMetadata, COLUMN_METADATA_KEY, CachedValue } from './Column'
+import {
+  generatePropertyKey,
+  generateIndexablePropertyKey,
+} from './utils/keyGeneration'
+import { Datastore, Value } from './Datastore'
+import {
+  getColumns,
+  setPrimaryColumnValue,
+  getPrimaryColumnValue,
+} from './utils/columns'
 
 export interface Repository {
-  // find(): Promise<BaseEntity[]>
-  // findOne(): Promise<BaseEntity>
+  load(identifier?: Value): Promise<BaseEntity>
   save(entity: BaseEntity): Promise<boolean>
+}
+
+const saveIndexableProperty = async (
+  datastore: Datastore,
+  instance: BaseEntity,
+  columnMetadata: ColumnMetadata
+): Promise<boolean> => {
+  const key = await generateIndexablePropertyKey(
+    datastore,
+    instance,
+    columnMetadata
+  )
+  const value = await getPrimaryColumnValue(instance)
+  await datastore.write(key, value)
+  return Promise.resolve(true)
 }
 
 const saveProperty = async (
   datastore: Datastore,
   instance: BaseEntity,
-  column: ColumnMetadata
+  columnMetadata: ColumnMetadata
 ): Promise<boolean> => {
-  const key = await generatePropertyKey(datastore, instance, column.property)
-  datastore.write(
-    key,
-    Reflect.getMetadata(COLUMN_METADATA_KEY, instance).get(column.property)
-      .cachedValue
-  )
+  if (columnMetadata.isIndexable) {
+    saveIndexableProperty(datastore, instance, columnMetadata)
+  }
+
+  const key = await generatePropertyKey(datastore, instance, columnMetadata)
+  const value = Reflect.getMetadata(
+    COLUMN_METADATA_KEY,
+    instance,
+    columnMetadata.property
+  ).cachedValues.get(instance).cachedValue
+  await datastore.write(key, value)
   return Promise.resolve(true)
 }
 
@@ -33,32 +59,35 @@ export const getRepository = (
   constructor: EntityConstructor<BaseEntity>
 ): Repository => {
   return {
-    // find(): Promise<BaseEntity[]> {
-    //   // TODO
-    //   return Promise.resolve([constructor])
-    // },
-    // findOne(): Promise<BaseEntity> {
-    //   // TODO
-    //   return Promise.resolve(constructor)
-    // },
+    async load(identifier?: Value): Promise<BaseEntity> {
+      const instance = Object.create(constructor.prototype)
+
+      if (identifier !== undefined) {
+        setPrimaryColumnValue(instance, identifier)
+      }
+      return instance
+    },
     async save(instance: BaseEntity): Promise<boolean> {
-      // TODO
       const { datastore } = Reflect.getMetadata(
         ENTITY_METADATA_KEY,
         constructor
       ) as EntityConstructorMetadata
 
-      const columns = Reflect.getMetadata(COLUMN_METADATA_KEY, instance)
-      const dirtyColumns = [...columns.values()].filter(
-        ({ isDirty }) => isDirty
-      )
+      const columns = getColumns(instance)
+      const dirtyColumns = []
+      for (const column of columns) {
+        const cachedValue = column.cachedValues.get(instance) as CachedValue
+        if (cachedValue.isDirty) {
+          dirtyColumns.push(column)
+        }
+      }
 
       if (dirtyColumns.length === 0) return Promise.resolve(false)
 
       for (const column of dirtyColumns) {
         await saveProperty(datastore, instance, column)
-        column.isDirty = false
-        columns.set(column.property, column)
+        const c = column.cachedValues.get(instance) as CachedValue
+        c.isDirty = false
       }
 
       Reflect.defineMetadata(COLUMN_METADATA_KEY, instance, columns)
