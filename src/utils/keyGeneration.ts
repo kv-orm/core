@@ -2,7 +2,7 @@ import '../metadata'
 
 import { Datastore, Key } from '../Datastore'
 import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity'
-import { ColumnMetadata } from '../Column'
+import { CachedValue, ColumnMetadata } from '../Column'
 import { getPrimaryColumn } from './columns'
 
 const getInstanceKey = (instance: BaseEntity): Key =>
@@ -24,7 +24,9 @@ export const generatePropertyKey = async (
   const primaryColumn = getPrimaryColumn(instance)
 
   if (primaryColumn) {
-    items.push(await getPropertyValue(instance, primaryColumn))
+    items.push(
+      (primaryColumn.cachedValues.get(instance) as CachedValue).cachedValue
+    )
   }
 
   items.push(columnMetadata.key)

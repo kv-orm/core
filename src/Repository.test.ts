@@ -75,6 +75,13 @@ describe(`Repository`, () => {
       `new value`
     )
     expect(await singletonInstance.myProperty).toEqual(`new value`)
+
+    complexInstance.myProperty = `new value`
+    expect(await singletonRepository.save(complexInstance)).toBeTruthy()
+    expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toEqual(
+      `new value`
+    )
+    expect(await complexInstance.myProperty).toEqual(`new value`)
   })
 
   it(`can load an instance`, async () => {
@@ -82,9 +89,18 @@ describe(`Repository`, () => {
     let loadedInstance = await singletonRepository.load()
     expect(await loadedInstance.myProperty).toEqual(`initial value`)
 
+    await complexRepository.save(complexInstance)
+    loadedInstance = await complexRepository.load(12345)
+    expect(await loadedInstance.myProperty).toEqual(`initial value`)
+
     singletonInstance.myProperty = `new value`
     await singletonRepository.save(singletonInstance)
     loadedInstance = await singletonRepository.load()
+    expect(await loadedInstance.myProperty).toEqual(`new value`)
+
+    complexInstance.myProperty = `new value`
+    await complexRepository.save(complexInstance)
+    loadedInstance = await complexRepository.load(12345)
     expect(await loadedInstance.myProperty).toEqual(`new value`)
   })
 })
