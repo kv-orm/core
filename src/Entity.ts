@@ -1,4 +1,4 @@
-import 'reflect-metadata'
+import './metadata'
 
 import { Datastore, Key } from './Datastore'
 import { ColumnKey, ColumnValue } from './Column'

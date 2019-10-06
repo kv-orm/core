@@ -1,6 +1,6 @@
 import { Datastore } from './Datastore'
 import { BaseEntity, Entity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+import { MemoryDatastore } from './MemoryDatastore'
 import { Column } from './Column'
 import { Repository, getRepository } from './Repository'
 

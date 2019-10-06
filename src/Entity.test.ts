@@ -1,5 +1,5 @@
 import { Entity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+import { MemoryDatastore } from './MemoryDatastore'
 import { Datastore } from './Datastore'
 
 describe(`Entity`, () => {

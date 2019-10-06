@@ -6,7 +6,7 @@ export {
   Key,
   Value,
 } from './Datastore'
-export { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+export { MemoryDatastore } from './MemoryDatastore'
 export { Entity } from './Entity'
 export { Column } from './Column'
 export { getRepository } from './Repository'

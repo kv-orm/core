@@ -1,3 +1,5 @@
+import './metadata'
+
 import { Key } from './Datastore'
 import {
   BaseEntity,

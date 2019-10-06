@@ -153,3 +153,16 @@ Copyright © 2019 [Greg Brimble](https://github.com/GregBrimble).<br />
 This project is [MIT](https://github.com/kv-orm/core/blob/master/LICENSE) licensed.
 
 [kv-orm]: https://github.com/kv-orm/core
+
+# FAQs
+
+### My Entity keys are getting mangled when they are saved into the datastore!
+
+If you're using a preprocessor that minifies class names, such as Babel, the class constructors names get shortened. kv-orm doesn't know the difference, and will always use the class name as a default. Either disable minification in the preprocessor, or manually set the `key` value when creating an Entity e.g.
+
+```typescript
+@Entity({ key: 'MyClass' })
+class MyClass {
+  // ...
+}
+```

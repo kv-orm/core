@@ -1,5 +1,5 @@
 import { Entity, BaseEntity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+import { MemoryDatastore } from './MemoryDatastore'
 import { Datastore } from './Datastore'
 import { Column } from './Column'
 
