@@ -29,23 +29,26 @@
 ## Install
 
 ```sh
-npm install # TODO
+npm install @kv-orm/core
 ```
 
 ## Usage
 
 ```typescript
-import { Datastore } from '@kv-orm/core'
+import {
+  Datastore,
+  MemoryDatastore,
+  Entity,
+  Column,
+  getRepository,
+} from '@kv-orm/core'
 
 // First, we need a datastore to save our data
 // A MemoryDatastore is a simple, in-memory key-value datastore
-import { MemoryDatastore } from '@kv-orm/core'
 const datastore: Datastore = new MemoryDatastore()
 
 // Next, we need to create an Entity
 // An Entity is a object which stores data about something e.g. a User
-import { Entity, Column } from '@kv-orm/core'
-
 // The Entity decorator needs a datastore to save the Entity instances into
 @Entity({ datastore })
 class User {
@@ -64,6 +67,7 @@ class User {
 
   // A Column can optionally be set as Indexable
   // This allows you to search for an instance of the Entity with an indexed value
+  // Like with Primary Columns, Indexable Column values should be unique
   @Column({ isIndexable: true })
   public phoneNumber: string | undefined
 
@@ -82,7 +86,6 @@ class User {
 
 // The final bit of setup is getting a Repository
 // This allows us to interact with the datastore for that Entity
-import { getRepository } from '@kv-orm/core'
 const userRepository = getRepository(User)
 
 // Now, we can create instances of the User class
