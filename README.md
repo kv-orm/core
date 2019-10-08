@@ -21,6 +21,8 @@
 
 # Supported Datastores
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kv-orm/core.svg)](https://greenkeeper.io/)
+
 - In-Memory
 - [Cloudflare Workers KV](https://github.com/kv-orm/cf-workers)
 
