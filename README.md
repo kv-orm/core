@@ -6,8 +6,8 @@
   <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
     <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm">
   </a>
-  <a href="" target="_blank">
-    <img alt="Codecov" src="https://codecov.io/gh/GregBrimble/kv-orm/branch/master/graph/badge.svg">
+  <a href="https://codecov.io/gh/kv-orm/core" target="_blank">
+    <img alt="Codecov" src="https://codecov.io/gh/kv-orm/core/branch/master/graph/badge.svg">
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/context:javascript" target="_blank">
     <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?logo=lgtm">
@@ -71,13 +71,13 @@ If there is any other datastore that you'd like to see supported, please [create
   ```typescript
   import { Column, Entity } from '@kv-orm/core'
 
-  @Entity({ libraryDatastore })
-  class Author extends BaseEntity {
+  @Entity({ datastore: libraryDatastore })
+  class Author {
     @Column()
-    public firstName!: string
+    public firstName: string
 
     @Column()
-    public lastName!: string
+    public lastName: string
 
     // ...
   }
@@ -86,7 +86,11 @@ If there is any other datastore that you'd like to see supported, please [create
 - On-demand, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
 
   ```typescript
-  let author = Author.get('bbed05da-594e-41d4-9b97-423343543e16') // 1ms - no properties of the author have been loaded
+  import { getRepository } from '@kv-orm/core'
+
+  const authorRepository = getRepository(Author)
+
+  let author = await authorRepository.load('william@shakespeare.com') // 1ms - no properties of the author have been loaded
 
   console.log(await author.firstName) // 60ms - author.firstName is fetched
   ```
@@ -94,7 +98,7 @@ If there is any other datastore that you'd like to see supported, please [create
 - No unnecessary reads: if a property is already in memory, [kv-orm] won't look it up again unless it needs to.
 
   ```typescript
-  let author = Author.get('0486b183-270d-408a-a274-49b45c418c48')
+  let author = await authorRepository.load('william@shakespeare.com')
 
   console.log(await author.lastName) // 60ms - author.lastName is fetched
   console.log(await author.lastName) // 1ms - author.lastName is retrieved from memory (no lookup performed)
@@ -135,7 +139,7 @@ You can initialize a new instance of the Entity as normal.
 ```typescript
 import { Entity } from '@kv-orm/core'
 
-@Entity({ libraryDatastore, key: 'Author' })
+@Entity({ datastore: libraryDatastore, key: 'Author' })
 class Author {
   // ...
 }
@@ -152,7 +156,7 @@ Like with Entities, you can optionally pass in a `key` to the decorator.
 ```typescript
 import { Column } from '@kv-orm/core'
 
-@Entity({ libraryDatastore })
+@Entity({ datastore: libraryDatastore })
 class Author {
   @Column({ key: 'givenName' })
   public firstName: string
@@ -199,7 +203,7 @@ author.lastName.then(lastName => {
 Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the `@Column()` decorator.
 
 ```typescript
-@Entity({ libraryDatastore })
+@Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
@@ -210,14 +214,16 @@ class Author {
 }
 ```
 
+An example of a singleton class where you do not need a Primary Column, might be a configuration Entity where you store application secrets (e.g. API keys).
+
 ### Indexable Columns
 
 Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
 
-TODO: Make searchable.
+> These will be searchable very shortly.
 
 ```typescript
-@Entity({ libraryDatastore })
+@Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
@@ -230,12 +236,12 @@ class Author {
 
 ### Property Getters/Setters
 
-If your property is particularly complex (can't be stored natively in the datastore), you may wish to use a property getter/setter for a Column, to allow you to serialize it before saving in the datastore.
+If your property is particularly complex (i.e. can't be stored natively in the datastore), you may wish to use a property getter/setter for a Column, to allow you to serialize it before saving in the datastore.
 
-For example, let's say you have a complex property, Author.somethingComplex:
+For example, let's say you have a complex property, `Author.somethingComplex`:
 
 ```typescript
-@Entity({ libraryDatastore })
+@Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
@@ -309,6 +315,7 @@ npm test
   <img alt="Features" src="https://img.shields.io/github/issues/kv-orm/core/enhancement?color=%2335a501&label=Features&logo=github" />
 </a>
 
+- Searching Indexable Columns
 - Relationships
 - Improved performance
 
