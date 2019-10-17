@@ -5,15 +5,21 @@ import {
   ColumnMetadata,
   COLUMN_METADATA_KEY,
   COLUMNS_ON_ENTITY_KEY,
-  ColumnKey,
-} from '../Column'
+  ConstantColumnMetadata,
+} from '../Column/Column'
 import { Value } from '../Datastore'
 
+export const getConstantColumns = (
+  instance: BaseEntity
+): ConstantColumnMetadata[] => {
+  return Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, instance) || []
+}
+
 export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
-  const properties = Reflect.getMetadata(
-    COLUMNS_ON_ENTITY_KEY,
-    instance
-  ) as ColumnKey[]
+  const constantColumns = getConstantColumns(instance)
+  const properties = constantColumns.map(
+    constantMetadata => constantMetadata.property
+  )
   return properties
     .map(property =>
       Reflect.getMetadata(COLUMN_METADATA_KEY, instance, property.toString())

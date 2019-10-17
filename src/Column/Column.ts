@@ -1,12 +1,14 @@
-import './metadata'
+import '../metadata'
 
-import { Key } from './Datastore'
+import { Key } from '../Datastore'
 import {
   BaseEntity,
   ENTITY_METADATA_KEY,
   EntityConstructorMetadata,
-} from './Entity'
-import { generatePropertyKey } from './utils/keyGeneration'
+} from '../Entity'
+import { generatePropertyKey } from '../utils/keyGeneration'
+import { ColumnSetupError } from './ColumnSetupError'
+import { getConstantColumns } from '../utils/columns'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string
@@ -14,16 +16,19 @@ export type ColumnKey = string
 export const COLUMNS_ON_ENTITY_KEY = Symbol(`columnOnEntity`)
 export const COLUMN_METADATA_KEY = Symbol(`columnMetadata`)
 
+export interface ConstantColumnMetadata {
+  key: Key
+  property: ColumnKey
+  isPrimary?: boolean
+  isIndexable?: boolean
+}
+
 export interface CachedValue {
   isDirty?: boolean
   cachedValue?: ColumnValue
 }
 
-export interface ColumnMetadata {
-  key: Key
-  property: ColumnKey
-  isPrimary?: boolean
-  isIndexable?: boolean
+export interface ColumnMetadata extends ConstantColumnMetadata {
   cachedValues: Map<BaseEntity, CachedValue>
 }
 
@@ -33,26 +38,47 @@ interface ColumnOptions {
   isIndexable?: boolean
 }
 
-// TODO: Stop overriding with constructor values if reloading
+const assertKeyNotInUse = (
+  constantColumnMetadata: ConstantColumnMetadata,
+  instance: BaseEntity
+): void => {
+  const constantColumns = getConstantColumns(instance)
+  const keysInUse = constantColumns.map(
+    constantColumnMetadata => constantColumnMetadata.key
+  )
+
+  if (keysInUse.indexOf(constantColumnMetadata.key) !== -1)
+    throw new ColumnSetupError(
+      instance,
+      constantColumnMetadata,
+      `Key is already in use`
+    )
+}
+
+const newDefaultCachedValue = (): CachedValue => ({
+  isDirty: false,
+  cachedValue: undefined,
+})
+
 export function Column(options: ColumnOptions = {}) {
   return (instance: BaseEntity, property: ColumnKey): void => {
-    // TOOD: Throw error if key already in use.
-    const columnMetadata: ColumnMetadata = {
+    const constantColumnMetadata: ConstantColumnMetadata = {
       key: options.key || property,
       property,
       isIndexable: options.isIndexable,
       isPrimary: options.isPrimary,
+    }
+
+    assertKeyNotInUse(constantColumnMetadata, instance)
+
+    const columnMetadata: ColumnMetadata = {
+      ...constantColumnMetadata,
       cachedValues: new Map<BaseEntity, {}>([
-        [
-          instance,
-          {
-            isDirty: false,
-            cachedValue: undefined,
-          },
-        ],
+        [instance, newDefaultCachedValue()],
       ]),
     }
 
+    // Set Column
     Reflect.defineMetadata(
       COLUMN_METADATA_KEY,
       columnMetadata,
@@ -60,12 +86,12 @@ export function Column(options: ColumnOptions = {}) {
       property
     )
 
-    const columnsOnEntity =
-      Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, instance) || []
+    // Set Constant Column
+    const constantColumns = getConstantColumns(instance)
+    constantColumns.push(constantColumnMetadata)
+    Reflect.defineMetadata(COLUMNS_ON_ENTITY_KEY, constantColumns, instance)
 
-    columnsOnEntity.push(property)
-    Reflect.defineMetadata(COLUMNS_ON_ENTITY_KEY, columnsOnEntity, instance)
-
+    // Override Property
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       get: async function get(this: BaseEntity) {
@@ -78,16 +104,16 @@ export function Column(options: ColumnOptions = {}) {
           instance,
           property
         ) as ColumnMetadata
-        const cachedValue = (columnMetadata.cachedValues.get(this) || {
-          isDirty: false,
-          cachedValue: undefined,
-        }) as CachedValue
+        const cachedValue =
+          columnMetadata.cachedValues.get(this) || newDefaultCachedValue()
 
         if (cachedValue.cachedValue === undefined) {
           cachedValue.cachedValue = await datastore.read(
             await generatePropertyKey(datastore, this, columnMetadata)
           )
         }
+
+        columnMetadata.cachedValues.set(this, cachedValue)
 
         return cachedValue.cachedValue
       },
@@ -97,10 +123,8 @@ export function Column(options: ColumnOptions = {}) {
           this,
           property
         ) as ColumnMetadata
-        const cachedValue = (columnMetadata.cachedValues.get(this) || {
-          isDirty: false,
-          cachedValue: undefined,
-        }) as CachedValue
+        const cachedValue =
+          columnMetadata.cachedValues.get(this) || newDefaultCachedValue()
 
         cachedValue.cachedValue = value
         cachedValue.isDirty = true
