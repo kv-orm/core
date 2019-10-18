@@ -1,6 +1,6 @@
 import { SetupError } from '../utils/errors'
 import { ConstantColumnMetadata } from './Column'
-import { BaseEntity } from '../Entity'
+import { BaseEntity } from '../Entity/Entity'
 
 export class ColumnSetupError extends SetupError {
   constructor(

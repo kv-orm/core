@@ -1,7 +1,7 @@
-import './metadata'
+import '../metadata'
 
-import { Datastore, Key } from './Datastore'
-import { ColumnKey, ColumnValue } from './Column/Column'
+import { Datastore, Key } from '../Datastore/Datastore'
+import { ColumnKey, ColumnValue } from '../Column/Column'
 
 export const ENTITY_METADATA_KEY = Symbol(`entityMetadata`)
 

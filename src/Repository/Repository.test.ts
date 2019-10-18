@@ -1,7 +1,7 @@
-import { Datastore } from './Datastore'
-import { BaseEntity, Entity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore'
-import { Column } from './Column/Column'
+import { Datastore } from '../Datastore/Datastore'
+import { BaseEntity, Entity } from '../Entity/Entity'
+import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
+import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
 
 describe(`Repository`, () => {

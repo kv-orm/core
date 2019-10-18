@@ -1,6 +1,6 @@
 import { Entity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore } from './Datastore'
+import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
+import { Datastore } from '../Datastore/Datastore'
 
 describe(`Entity`, () => {
   let datastore: Datastore
