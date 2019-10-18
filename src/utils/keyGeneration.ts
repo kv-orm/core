@@ -17,7 +17,7 @@ const getInstanceKey = (instance: BaseEntity): Key => {
   if (entityMetadata === undefined) {
     throw new EntityMetadataError(
       instance,
-      `Could not find Metadata. Has it been defined yet?`
+      `Could not find metadata. Has it been defined yet?`
     )
   }
 
@@ -66,7 +66,7 @@ export const generatePropertyKey = async (
       throw new ColumnMetadataError(
         instance,
         primaryColumn,
-        `Primary Column value is undefined`
+        `Primary Column value is undefined. Did the repository load fail somehow?`
       )
     }
 
@@ -92,7 +92,10 @@ export const generateIndexablePropertyKey = async (
 
 // UUID-HERE
 // or, if singleton, ApplicationConfiguration
-const generateRelationshipKey = async (instance: BaseEntity): Promise<Key> => {
+const generateRelationshipKey = async (
+  datastore: Datastore,
+  instance: BaseEntity
+): Promise<Key> => {
   const primaryColumn = getPrimaryColumn(instance)
 
   if (primaryColumn) {
@@ -102,6 +105,7 @@ const generateRelationshipKey = async (instance: BaseEntity): Promise<Key> => {
   return getInstanceKey(instance)
 }
 
+// TODO: Probably want some sort of RelationshipMetadata object
 // Author:UUID-HERE:passport
 export const generateOneRelationshipKey = generatePropertyKey
 
@@ -114,6 +118,6 @@ export const generateManyRelationshipKey = async (
 ): Promise<Key> => {
   return [
     await generatePropertyKey(datastore, instance, columnMetadata),
-    await generateRelationshipKey(relationshipInstance),
+    await generateRelationshipKey(datastore, relationshipInstance),
   ].join(datastore.keySeparator)
 }
