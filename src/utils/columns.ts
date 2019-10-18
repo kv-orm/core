@@ -1,13 +1,13 @@
 import '../metadata'
 
-import { BaseEntity } from '../Entity'
+import { BaseEntity } from '../Entity/Entity'
 import {
   ColumnMetadata,
   COLUMN_METADATA_KEY,
   COLUMNS_ON_ENTITY_KEY,
   ConstantColumnMetadata,
 } from '../Column/Column'
-import { Value } from '../Datastore'
+import { Value } from '../Datastore/Datastore'
 
 export const getConstantColumns = (
   instance: BaseEntity

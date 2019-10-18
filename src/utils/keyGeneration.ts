@@ -1,7 +1,7 @@
 import '../metadata'
 
-import { Datastore, Key } from '../Datastore'
-import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity'
+import { Datastore, Key } from '../Datastore/Datastore'
+import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity/Entity'
 import { CachedValue, ColumnMetadata } from '../Column/Column'
 import { getPrimaryColumn } from './columns'
 

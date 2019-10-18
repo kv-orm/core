@@ -1,6 +1,6 @@
-import { Entity, BaseEntity } from '../Entity'
-import { MemoryDatastore } from '../MemoryDatastore'
-import { Datastore } from '../Datastore'
+import { Entity, BaseEntity } from '../Entity/Entity'
+import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
+import { Datastore } from '../Datastore/Datastore'
 import { Column } from '../Column/Column'
 import { ColumnSetupError } from './ColumnSetupError'
 

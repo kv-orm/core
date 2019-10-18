@@ -1,11 +1,11 @@
 import '../metadata'
 
-import { Key } from '../Datastore'
+import { Key } from '../Datastore/Datastore'
 import {
   BaseEntity,
   ENTITY_METADATA_KEY,
   EntityConstructorMetadata,
-} from '../Entity'
+} from '../Entity/Entity'
 import { generatePropertyKey } from '../utils/keyGeneration'
 import { ColumnSetupError } from './ColumnSetupError'
 import { getConstantColumns } from '../utils/columns'

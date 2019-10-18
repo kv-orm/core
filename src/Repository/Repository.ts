@@ -1,26 +1,26 @@
-import './metadata'
+import '../metadata'
 
 import {
   BaseEntity,
   EntityConstructor,
   ENTITY_METADATA_KEY,
   EntityConstructorMetadata,
-} from './Entity'
+} from '../Entity/Entity'
 import {
   ColumnMetadata,
   COLUMN_METADATA_KEY,
   CachedValue,
-} from './Column/Column'
+} from '../Column/Column'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
-} from './utils/keyGeneration'
-import { Datastore, Value } from './Datastore'
+} from '../utils/keyGeneration'
+import { Datastore, Value } from '../Datastore/Datastore'
 import {
   getColumns,
   setPrimaryColumnValue,
   getPrimaryColumnValue,
-} from './utils/columns'
+} from '../utils/columns'
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>

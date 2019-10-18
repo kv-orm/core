@@ -5,8 +5,8 @@ export {
   SearchStrategy,
   Key,
   Value,
-} from './Datastore'
-export { MemoryDatastore } from './MemoryDatastore'
-export { Entity } from './Entity'
+} from './Datastore/Datastore'
+export { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
+export { Entity } from './Entity/Entity'
 export { Column } from './Column/Column'
-export { getRepository } from './Repository'
+export { getRepository } from './Repository/Repository'

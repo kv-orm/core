@@ -5,7 +5,7 @@ import {
   Key,
   SearchOptions,
   SearchResult,
-} from './Datastore'
+} from '../Datastore/Datastore'
 
 export class MemoryDatastore extends Datastore {
   private SEARCH_FIRST_LIMIT = 1000
