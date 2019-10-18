@@ -4,28 +4,28 @@
     <img alt="GitHub Actions Checks" src="https://github.com/kv-orm/core/workflows/Test/badge.svg">
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
-    <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm">
+    <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm&style=plastic">
   </a>
   <a href="https://codecov.io/gh/kv-orm/core" target="_blank">
-    <img alt="Codecov" src="https://codecov.io/gh/kv-orm/core/branch/master/graph/badge.svg">
+    <img alt="Codecov" src="https://img.shields.io/codecov/c/github/kv-orm/core?logo=codecov&style=plastic">
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/context:javascript" target="_blank">
-    <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?logo=lgtm">
+    <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?logo=lgtm&style=plastic">
   </a>
   <a href="https://github.com/kv-orm/core/packages" target="_blank">
-    <img alt="Version" src="https://img.shields.io/github/package-json/v/kv-orm/core" />
+    <img alt="Version" src="https://img.shields.io/github/package-json/v/kv-orm/core?style=plastic" />
   </a>
   <a href="https://github.com/kv-orm/core/blob/master/LICENSE" target="_blank">
-    <img alt="License" src="https://img.shields.io/github/license/kv-orm/core" />
+    <img alt="License" src="https://img.shields.io/github/license/kv-orm/core?style=plastic" />
   </a>
   <a href="https://greenkeeper.io" target="_blank">
-    <img alt="Greenkeeper" src="https://badges.greenkeeper.io/kv-orm/core.svg">
+    <img alt="Greenkeeper" src="https://badges.greenkeeper.io/kv-orm/core.svg?style=plastic">
   </a>
   <a href="https://www.typescriptlang.org/" target="_blank">
-    <img alt="Types" src="https://img.shields.io/npm/types/kv-orm.svg">
+    <img alt="Types" src="https://img.shields.io/npm/types/kv-orm.svg?style=plastic">
   </a>
   <a href="https://github.com/kv-orm/core" target="_blank">
-    <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/kv-orm/core.svg?logo=github" />
+    <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/kv-orm/core.svg?logo=github&style=plastic" />
   </a>
 </p>
 
@@ -312,7 +312,7 @@ npm test
 ## 🚎 Roadmap
 
 <a href="https://github.com/kv-orm/core/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement" target="_blank">
-  <img alt="Features" src="https://img.shields.io/github/issues/kv-orm/core/enhancement?color=%2335a501&label=Features&logo=github" />
+  <img alt="Features" src="https://img.shields.io/github/issues/kv-orm/core/enhancement?color=%2335a501&label=Features&logo=github&style=plastic" />
 </a>
 
 - Searching Indexable Columns
@@ -320,7 +320,7 @@ npm test
 - Improved performance
 
 <a href="https://github.com/kv-orm/core/issues?q=is%3Aopen+is%3Aissue+label%3Abug" target="_blank">
-  <img alt="Bugs" src="https://img.shields.io/github/issues/kv-orm/core/bug?color=%23d73a4a&label=Bugs&logo=github" />
+  <img alt="Bugs" src="https://img.shields.io/github/issues/kv-orm/core/bug?color=%23d73a4a&label=Bugs&logo=github&style=plastic" />
 </a>
 
 ## 📝 License
