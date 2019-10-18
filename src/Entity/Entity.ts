@@ -38,7 +38,7 @@ export function Entity({
   datastore,
   key,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-EntityOptions): (constructor: any) => any {
+EntityOptions): (constructor: EntityConstructor<BaseEntity>) => any {
   return function<T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {

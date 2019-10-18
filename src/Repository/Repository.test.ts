@@ -3,6 +3,7 @@ import { BaseEntity, Entity } from '../Entity/Entity'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
+import { RepositoryLoadError } from './RepositoryLoadError'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -102,5 +103,21 @@ describe(`Repository`, () => {
     await complexRepository.save(complexInstance)
     loadedInstance = await complexRepository.load(12345)
     expect(await loadedInstance.myProperty).toEqual(`new value`)
+  })
+  describe(`RepositoryLoadError`, () => {
+    it(`is thrown when loading a singleton Entity with an identifier`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await singletonRepository.load(12345)
+        })()
+      ).rejects.toThrow(RepositoryLoadError)
+    })
+    it(`is thrown when loading a non-singleton Entity without an identifier`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.load()
+        })()
+      ).rejects.toThrow(RepositoryLoadError)
+    })
   })
 })

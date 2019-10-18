@@ -20,7 +20,10 @@ import {
   getColumns,
   setPrimaryColumnValue,
   getPrimaryColumnValue,
+  getPrimaryColumn,
 } from '../utils/columns'
+import { ColumnMetadataError } from '../utils/errors'
+import { RepositoryLoadError } from './RepositoryLoadError'
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>
@@ -48,15 +51,19 @@ const saveProperty = async (
   columnMetadata: ColumnMetadata
 ): Promise<boolean> => {
   if (columnMetadata.isIndexable) {
-    saveIndexableProperty(datastore, instance, columnMetadata)
+    await saveIndexableProperty(datastore, instance, columnMetadata)
   }
 
   const key = await generatePropertyKey(datastore, instance, columnMetadata)
-  const value = Reflect.getMetadata(
-    COLUMN_METADATA_KEY,
-    instance,
-    columnMetadata.property
-  ).cachedValues.get(instance).cachedValue
+  const cachedValue = columnMetadata.cachedValues.get(instance)
+  if (cachedValue === undefined) {
+    throw new ColumnMetadataError(
+      instance,
+      columnMetadata,
+      `Entity instance's property has no cached value.`
+    )
+  }
+  const value = cachedValue.cachedValue
   await datastore.write(key, value)
   return Promise.resolve(true)
 }
@@ -67,6 +74,19 @@ export const getRepository = (
   return {
     async load(identifier?: Value): Promise<BaseEntity> {
       const instance = Object.create(constructor.prototype)
+
+      const primaryColumn = getPrimaryColumn(instance)
+      if (primaryColumn === undefined && identifier !== undefined) {
+        throw new RepositoryLoadError(
+          instance.constructor,
+          `Entity is a singleton, so cannot load with an identifier.`
+        )
+      } else if (primaryColumn !== undefined && identifier === undefined) {
+        throw new RepositoryLoadError(
+          instance.constructor,
+          `Entity is not a singleton, and so requires an identifier to load with.`
+        )
+      }
 
       if (identifier !== undefined) {
         setPrimaryColumnValue(instance, identifier)
@@ -92,8 +112,8 @@ export const getRepository = (
 
       for (const column of dirtyColumns) {
         await saveProperty(datastore, instance, column)
-        const c = column.cachedValues.get(instance) as CachedValue
-        c.isDirty = false
+        const cachedValue = column.cachedValues.get(instance) as CachedValue
+        cachedValue.isDirty = false
       }
 
       Reflect.defineMetadata(COLUMN_METADATA_KEY, instance, columns)

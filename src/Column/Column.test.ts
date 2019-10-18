@@ -39,6 +39,7 @@ describe(`Column`, () => {
     it(`is thrown with a duplicate key`, () => {
       expect(() => {
         @Entity({ datastore, key: `MyOtherEntity` })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         class MyOtherEntity {
           @Column({ key: `myDuplicatedProperty` })
           public myProperty1 = `initial value`

@@ -3,20 +3,18 @@ import { Column, ColumnMetadata } from '../Column/Column'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
-  generateOneRelationshipKey,
 } from './keyGeneration'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
 import { getColumns, getPrimaryColumn } from './columns'
-import { Entity } from '../Entity/Entity'
-import generate from '@babel/generator'
+import { Entity, BaseEntity, EntityConstructor } from '../Entity/Entity'
 
 describe(`keyGeneration`, () => {
   let datastore: Datastore
-  let singletonEntityConstructor: any
-  let singletonEntityWithCustomKeysConstructor: any
-  let complexEntityConstructor: any
-  let complexEntityWithCustomKeysConstructor: any
+  let singletonEntityConstructor: EntityConstructor<BaseEntity>
+  let singletonEntityWithCustomKeysConstructor: EntityConstructor<BaseEntity>
+  let complexEntityConstructor: EntityConstructor<BaseEntity>
+  let complexEntityWithCustomKeysConstructor: EntityConstructor<BaseEntity>
 
   beforeEach(() => {
     datastore = new MemoryDatastore()
