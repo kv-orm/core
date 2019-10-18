@@ -2,7 +2,7 @@ import '../metadata'
 
 import { Datastore, Key } from '../Datastore'
 import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity'
-import { CachedValue, ColumnMetadata } from '../Column'
+import { CachedValue, ColumnMetadata } from '../Column/Column'
 import { getPrimaryColumn } from './columns'
 
 const getInstanceKey = (instance: BaseEntity): Key =>

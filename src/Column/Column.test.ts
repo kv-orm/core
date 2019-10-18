@@ -1,7 +1,8 @@
-import { Entity, BaseEntity } from './Entity'
-import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore } from './Datastore'
-import { Column } from './Column'
+import { Entity, BaseEntity } from '../Entity'
+import { MemoryDatastore } from '../MemoryDatastore'
+import { Datastore } from '../Datastore'
+import { Column } from '../Column/Column'
+import { ColumnSetupError } from './ColumnSetupError'
 
 describe(`Column`, () => {
   let datastore: Datastore
@@ -32,5 +33,20 @@ describe(`Column`, () => {
     instance.myProperty = `new value`
     expect(await instance.myProperty).toEqual(`new value`)
     expect(await otherInstance.myProperty).toEqual(`initial value`)
+  })
+
+  describe(`ColumnSetupError`, () => {
+    it(`is thrown with a duplicate key`, () => {
+      expect(() => {
+        @Entity({ datastore, key: `MyOtherEntity` })
+        class MyOtherEntity {
+          @Column({ key: `myDuplicatedProperty` })
+          public myProperty1 = `initial value`
+
+          @Column({ key: `myDuplicatedProperty` })
+          public myProperty2 = `other initial value`
+        }
+      }).toThrow(ColumnSetupError)
+    })
   })
 })

@@ -6,7 +6,11 @@ import {
   ENTITY_METADATA_KEY,
   EntityConstructorMetadata,
 } from './Entity'
-import { ColumnMetadata, COLUMN_METADATA_KEY, CachedValue } from './Column'
+import {
+  ColumnMetadata,
+  COLUMN_METADATA_KEY,
+  CachedValue,
+} from './Column/Column'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
