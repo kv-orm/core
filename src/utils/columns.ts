@@ -28,7 +28,7 @@ export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
     .filter(metadata => metadata !== undefined)
 }
 
-export const setColumn = (instance: BaseEntity, column: ColumnMetadata) =>
+export const setColumn = (instance: BaseEntity, column: ColumnMetadata): void =>
   Reflect.defineMetadata(COLUMN_METADATA_KEY, column, instance, column.property)
 
 export const getPrimaryColumn = (

@@ -10,11 +10,11 @@ import {
 import {
   ColumnMetadata,
   ColumnValue,
-  ColumnKey,
   ConstantColumnMetadata,
 } from '../Column/Column'
 import { getPrimaryColumn } from './columns'
 import { EntityMetadataError, ColumnMetadataError } from './errors'
+import { getDatastore } from './datastore'
 
 // TODO: Look at the difference of using the cached Primary Column Value vs. looking it up with getPropertyValue
 
@@ -101,11 +101,11 @@ export const generateIndexablePropertyKey = async (
   ].join(datastore.keySeparator)
 
 export const generateIndexablePropertySearchKey = async (
-  datastore: Datastore,
   constructor: EntityConstructor<BaseEntity>,
   indexableProperty: ConstantColumnMetadata,
   identifier: Value
 ): Promise<Key> => {
+  const datastore = getDatastore(constructor)
   const entityMetadata = Reflect.getMetadata(
     ENTITY_METADATA_KEY,
     constructor
