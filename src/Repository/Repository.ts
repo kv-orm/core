@@ -10,24 +10,27 @@ import {
   ColumnMetadata,
   COLUMN_METADATA_KEY,
   CachedValue,
+  ColumnKey,
 } from '../Column/Column'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
+  generateIndexablePropertySearchKey,
 } from '../utils/keyGeneration'
 import { Datastore, Value } from '../Datastore/Datastore'
 import {
   getColumns,
-  setPrimaryColumnValue,
   getPrimaryColumnValue,
-  getPrimaryColumn,
+  getConstantColumns,
 } from '../utils/columns'
 import { ColumnMetadataError } from '../utils/errors'
-import { RepositoryLoadError } from './RepositoryLoadError'
+import { RepositorySearchError } from './RepositorySearchError'
+import { repositoryLoad } from './repositoryLoad'
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>
   save(entity: BaseEntity): Promise<boolean>
+  search(property: ColumnKey, identifier: Value): Promise<BaseEntity | null>
 }
 
 const saveIndexableProperty = async (
@@ -68,30 +71,12 @@ const saveProperty = async (
   return Promise.resolve(true)
 }
 
-export const getRepository = (
-  constructor: EntityConstructor<BaseEntity>
+export const getRepository = <T extends BaseEntity>(
+  constructor: EntityConstructor<T>
 ): Repository => {
   return {
-    async load(identifier?: Value): Promise<BaseEntity> {
-      const instance = Object.create(constructor.prototype)
-
-      const primaryColumn = getPrimaryColumn(instance)
-      if (primaryColumn === undefined && identifier !== undefined) {
-        throw new RepositoryLoadError(
-          instance.constructor,
-          `Entity is a singleton, so cannot load with an identifier.`
-        )
-      } else if (primaryColumn !== undefined && identifier === undefined) {
-        throw new RepositoryLoadError(
-          instance.constructor,
-          `Entity is not a singleton, and so requires an identifier to load with.`
-        )
-      }
-
-      if (identifier !== undefined) {
-        setPrimaryColumnValue(instance, identifier)
-      }
-      return instance
+    async load(identifier?: Value): Promise<T> {
+      return await repositoryLoad(constructor, identifier)
     },
     async save(instance: BaseEntity): Promise<boolean> {
       const { datastore } = Reflect.getMetadata(
@@ -119,6 +104,33 @@ export const getRepository = (
       Reflect.defineMetadata(COLUMN_METADATA_KEY, instance, columns)
 
       return Promise.resolve(true)
+    },
+    async search(property: ColumnKey, identifier: Value): Promise<T | null> {
+      const { datastore } = Reflect.getMetadata(
+        ENTITY_METADATA_KEY,
+        constructor
+      ) as EntityConstructorMetadata
+
+      const columns = getConstantColumns(constructor)
+      const indexableProperty = columns.find(
+        column => column.property === property
+      )
+
+      if (indexableProperty === undefined)
+        throw new RepositorySearchError(
+          constructor,
+          property,
+          `Property is not indexable, or does not exist.`
+        )
+
+      const key = await generateIndexablePropertySearchKey(
+        datastore,
+        constructor,
+        indexableProperty,
+        identifier
+      )
+      const primaryIdentifier = await datastore.read(key)
+      return await repositoryLoad(constructor, primaryIdentifier)
     },
   }
 }

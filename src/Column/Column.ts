@@ -8,7 +8,9 @@ import {
 } from '../Entity/Entity'
 import { generatePropertyKey } from '../utils/keyGeneration'
 import { ColumnSetupError } from './ColumnSetupError'
-import { getConstantColumns } from '../utils/columns'
+import { getConstantColumns, setColumn } from '../utils/columns'
+import { getEntityConstructor } from '../utils/entity'
+import { ColumnMetadataError } from '../utils/errors'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string
@@ -42,7 +44,7 @@ const assertKeyNotInUse = (
   constantColumnMetadata: ConstantColumnMetadata,
   instance: BaseEntity
 ): void => {
-  const constantColumns = getConstantColumns(instance)
+  const constantColumns = getConstantColumns(getEntityConstructor(instance))
   const keysInUse = constantColumns.map(
     constantColumnMetadata => constantColumnMetadata.key
   )
@@ -71,25 +73,23 @@ export function Column(options: ColumnOptions = {}) {
 
     assertKeyNotInUse(constantColumnMetadata, instance)
 
+    // Set Constant Column
+    const constantColumns = getConstantColumns(getEntityConstructor(instance))
+    constantColumns.push(constantColumnMetadata)
+    Reflect.defineMetadata(
+      COLUMNS_ON_ENTITY_KEY,
+      constantColumns,
+      instance.constructor
+    )
+
+    // Set Column
     const columnMetadata: ColumnMetadata = {
       ...constantColumnMetadata,
       cachedValues: new Map<BaseEntity, {}>([
         [instance, newDefaultCachedValue()],
       ]),
     }
-
-    // Set Column
-    Reflect.defineMetadata(
-      COLUMN_METADATA_KEY,
-      columnMetadata,
-      instance,
-      property
-    )
-
-    // Set Constant Column
-    const constantColumns = getConstantColumns(instance)
-    constantColumns.push(constantColumnMetadata)
-    Reflect.defineMetadata(COLUMNS_ON_ENTITY_KEY, constantColumns, instance)
+    setColumn(instance, columnMetadata)
 
     // Override Property
     Reflect.defineProperty(instance, property, {
@@ -122,14 +122,19 @@ export function Column(options: ColumnOptions = {}) {
           COLUMN_METADATA_KEY,
           this,
           property
-        ) as ColumnMetadata
-        const cachedValue =
-          columnMetadata.cachedValues.get(this) || newDefaultCachedValue()
+        )
+        if (columnMetadata === undefined)
+          throw new ColumnMetadataError(
+            this,
+            columnMetadata,
+            `Could not find metadata of Column to set value. Has it been defined yet?`
+          )
 
-        cachedValue.cachedValue = value
-        cachedValue.isDirty = true
-
-        columnMetadata.cachedValues.set(this, cachedValue)
+        columnMetadata.cachedValues.set(this, {
+          cachedValue: value,
+          isDirty: true,
+        })
+        setColumn(this, columnMetadata)
       },
     })
   }

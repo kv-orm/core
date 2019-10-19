@@ -1,6 +1,6 @@
 import '../metadata'
 
-import { BaseEntity } from '../Entity/Entity'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import {
   ColumnMetadata,
   COLUMN_METADATA_KEY,
@@ -8,15 +8,16 @@ import {
   ConstantColumnMetadata,
 } from '../Column/Column'
 import { Value } from '../Datastore/Datastore'
+import { getEntityConstructor } from './entity'
 
 export const getConstantColumns = (
-  instance: BaseEntity
+  entityConstructor: EntityConstructor<BaseEntity>
 ): ConstantColumnMetadata[] => {
-  return Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, instance) || []
+  return Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, entityConstructor) || []
 }
 
 export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
-  const constantColumns = getConstantColumns(instance)
+  const constantColumns = getConstantColumns(getEntityConstructor(instance))
   const properties = constantColumns.map(
     constantMetadata => constantMetadata.property
   )
@@ -26,6 +27,9 @@ export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
     )
     .filter(metadata => metadata !== undefined)
 }
+
+export const setColumn = (instance: BaseEntity, column: ColumnMetadata) =>
+  Reflect.defineMetadata(COLUMN_METADATA_KEY, column, instance, column.property)
 
 export const getPrimaryColumn = (
   instance: BaseEntity
@@ -53,4 +57,5 @@ export const setPrimaryColumnValue = (
     isDirty: false,
     cachedValue: value,
   })
+  setColumn(instance, primaryColumn)
 }

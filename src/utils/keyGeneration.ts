@@ -1,8 +1,18 @@
 import '../metadata'
 
-import { Datastore, Key } from '../Datastore/Datastore'
-import { BaseEntity, ENTITY_METADATA_KEY } from '../Entity/Entity'
-import { ColumnMetadata, ColumnValue } from '../Column/Column'
+import { Datastore, Key, Value } from '../Datastore/Datastore'
+import {
+  BaseEntity,
+  ENTITY_METADATA_KEY,
+  EntityConstructor,
+  EntityConstructorMetadata,
+} from '../Entity/Entity'
+import {
+  ColumnMetadata,
+  ColumnValue,
+  ColumnKey,
+  ConstantColumnMetadata,
+} from '../Column/Column'
 import { getPrimaryColumn } from './columns'
 import { EntityMetadataError, ColumnMetadataError } from './errors'
 
@@ -16,7 +26,7 @@ const getInstanceKey = (instance: BaseEntity): Key => {
 
   if (entityMetadata === undefined) {
     throw new EntityMetadataError(
-      instance,
+      instance.constructor as EntityConstructor<BaseEntity>,
       `Could not find metadata. Has it been defined yet?`
     )
   }
@@ -89,6 +99,25 @@ export const generateIndexablePropertyKey = async (
     columnMetadata.key,
     await getPropertyValue(instance, columnMetadata),
   ].join(datastore.keySeparator)
+
+export const generateIndexablePropertySearchKey = async (
+  datastore: Datastore,
+  constructor: EntityConstructor<BaseEntity>,
+  indexableProperty: ConstantColumnMetadata,
+  identifier: Value
+): Promise<Key> => {
+  const entityMetadata = Reflect.getMetadata(
+    ENTITY_METADATA_KEY,
+    constructor
+  ) as EntityConstructorMetadata
+  if (entityMetadata === undefined) {
+    throw new EntityMetadataError(constructor) // TODO
+  }
+
+  return [entityMetadata.key, indexableProperty.key, identifier].join(
+    datastore.keySeparator
+  )
+}
 
 // UUID-HERE
 // or, if singleton, ApplicationConfiguration

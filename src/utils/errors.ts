@@ -1,4 +1,4 @@
-import { BaseEntity } from '../Entity/Entity'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import { ColumnMetadata } from '../Column/Column'
 
 export class KVORMError extends Error {
@@ -23,10 +23,11 @@ export class MetadataError extends KVORMError {
 }
 
 export class EntityMetadataError extends MetadataError {
-  constructor(instance: BaseEntity, message = `Unknown Error`) {
-    super(
-      `Error with Entity Metadata, ${instance.constructor.name}: ${message}`
-    )
+  constructor(
+    constructor: EntityConstructor<BaseEntity>,
+    message = `Unknown Error`
+  ) {
+    super(`Error with Entity Metadata, ${constructor.name}: ${message}`)
     this.name = `EntityMetadataError`
   }
 }

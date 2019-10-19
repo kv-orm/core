@@ -6,7 +6,7 @@ export class RepositoryLoadError extends KVORMError {
     entityConstructor: EntityConstructor<BaseEntity>,
     message = `Unknown Error`
   ) {
-    super(`Could not load Entity, ${entityConstructor.name},: ${message}`)
+    super(`Could not load Entity, ${entityConstructor.name}: ${message}`)
     this.name = `RepositoryLoadError`
   }
 }

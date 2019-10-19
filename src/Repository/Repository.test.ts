@@ -104,6 +104,25 @@ describe(`Repository`, () => {
     loadedInstance = await complexRepository.load(12345)
     expect(await loadedInstance.myProperty).toEqual(`new value`)
   })
+
+  it(`can search for an instance`, async () => {
+    await complexRepository.save(complexInstance)
+    const loadedInstance = await complexRepository.load(12345)
+    const searchedInstance = (await complexRepository.search(
+      `indexableProperty`,
+      `abc@xyz.com`
+    )) as BaseEntity
+    expect(await searchedInstance.myProperty).toEqual(
+      await loadedInstance.myProperty
+    )
+    expect(await searchedInstance.primaryProperty).toEqual(
+      await loadedInstance.primaryProperty
+    )
+    expect(await searchedInstance.indexableProperty).toEqual(
+      await loadedInstance.indexableProperty
+    )
+  })
+
   describe(`RepositoryLoadError`, () => {
     it(`is thrown when loading a singleton Entity with an identifier`, async () => {
       await expect(
