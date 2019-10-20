@@ -4,6 +4,7 @@ import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
 import { RepositoryLoadError } from './RepositoryLoadError'
+import { RepositorySearchError } from './RepositorySearchError'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -137,6 +138,16 @@ describe(`Repository`, () => {
           await complexRepository.load()
         })()
       ).rejects.toThrow(RepositoryLoadError)
+    })
+  })
+
+  describe(`RepositorySearchError`, () => {
+    it(`is thrown when searching a non-existent property`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.search(`fakeProperty`, 1)
+        })()
+      ).rejects.toThrow(RepositorySearchError)
     })
   })
 })
