@@ -2,12 +2,11 @@ import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
 import { BaseEntity } from '../Entity/Entity'
-import { generatePropertyKey } from '../utils/keyGeneration'
 import { ColumnSetupError } from './ColumnSetupError'
-import { getConstantColumns, setColumn, getColumn } from '../utils/columns'
+import { getConstantColumns, setColumn } from '../utils/columns'
 import { getEntityConstructor } from '../utils/entity'
-import { getDatastore } from '../utils/datastore'
 import { columnGet } from './columnGet'
+import { columnSet } from './columnSet'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string
@@ -96,13 +95,7 @@ export function Column(options: ColumnOptions = {}) {
         return await columnGet(this, property)
       },
       set: async function set(this: BaseEntity, value: ColumnValue) {
-        const columnMetadata = getColumn(this, property)
-
-        columnMetadata.cachedValues.set(this, {
-          cachedValue: value,
-          isDirty: true,
-        })
-        setColumn(this, columnMetadata)
+        return await columnSet(this, property, value)
       },
     })
   }
