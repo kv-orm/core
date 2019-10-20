@@ -7,6 +7,7 @@ import { ColumnSetupError } from './ColumnSetupError'
 import { getConstantColumns, setColumn, getColumn } from '../utils/columns'
 import { getEntityConstructor } from '../utils/entity'
 import { getDatastore } from '../utils/datastore'
+import { columnGet } from './columnGet'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string
@@ -53,7 +54,7 @@ const assertKeyNotInUse = (
     )
 }
 
-const newDefaultCachedValue = (): CachedValue => ({
+export const newDefaultCachedValue = (): CachedValue => ({
   isDirty: false,
   cachedValue: undefined,
 })
@@ -92,22 +93,7 @@ export function Column(options: ColumnOptions = {}) {
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       get: async function get(this: BaseEntity) {
-        const constructor = getEntityConstructor(this)
-        const datastore = getDatastore(constructor)
-        const columnMetadata = getColumn(this, property)
-        const cachedValue =
-          columnMetadata.cachedValues.get(this) || newDefaultCachedValue()
-
-        if (cachedValue.cachedValue === undefined) {
-          cachedValue.cachedValue = await datastore.read(
-            await generatePropertyKey(datastore, this, columnMetadata)
-          )
-        }
-
-        columnMetadata.cachedValues.set(this, cachedValue)
-        setColumn(instance, columnMetadata)
-
-        return cachedValue.cachedValue
+        return await columnGet(this, property)
       },
       set: async function set(this: BaseEntity, value: ColumnValue) {
         const columnMetadata = getColumn(this, property)

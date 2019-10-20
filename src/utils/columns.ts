@@ -10,7 +10,7 @@ import {
 } from '../Column/Column'
 import { Value } from '../Datastore/Datastore'
 import { getEntityConstructor } from './entity'
-import { ColumnMetadataError, ColumnMetadataLookupError } from './errors'
+import { ColumnMetadataLookupError } from './errors'
 
 export const getConstantColumns = (
   entityConstructor: EntityConstructor<BaseEntity>
