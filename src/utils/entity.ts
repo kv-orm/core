@@ -4,7 +4,7 @@ import {
   EntityConstructorMetadata,
   ENTITY_METADATA_KEY,
 } from '../Entity/Entity'
-import { EntityMetadataError } from './errors'
+import { EntityMetadataLookupError } from './errors'
 
 export const getEntityMetadata = (
   constructor: EntityConstructor<BaseEntity>
@@ -15,7 +15,7 @@ export const getEntityMetadata = (
   ) as EntityConstructorMetadata
 
   if (entityMetadata === undefined)
-    throw new EntityMetadataError(
+    throw new EntityMetadataLookupError(
       constructor,
       `Could not find metadata on Entity. Has it been defined yet?`
     )

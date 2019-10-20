@@ -13,20 +13,18 @@ import {
   ConstantColumnMetadata,
 } from '../Column/Column'
 import { getPrimaryColumn } from './columns'
-import { EntityMetadataError, ColumnMetadataError } from './errors'
+import { EntityMetadataLookupError, ColumnMetadataError } from './errors'
 import { getDatastore } from './datastore'
 
 // TODO: Look at the difference of using the cached Primary Column Value vs. looking it up with getPropertyValue
 
 const getInstanceKey = (instance: BaseEntity): Key => {
-  const entityMetadata = Reflect.getMetadata(
-    ENTITY_METADATA_KEY,
-    instance.constructor
-  )
+  const constructor = instance.constructor as EntityConstructor<BaseEntity>
+  const entityMetadata = Reflect.getMetadata(ENTITY_METADATA_KEY, constructor)
 
   if (entityMetadata === undefined) {
-    throw new EntityMetadataError(
-      instance.constructor as EntityConstructor<BaseEntity>,
+    throw new EntityMetadataLookupError(
+      constructor,
       `Could not find metadata. Has it been defined yet?`
     )
   }
@@ -111,7 +109,7 @@ export const generateIndexablePropertySearchKey = async (
     constructor
   ) as EntityConstructorMetadata
   if (entityMetadata === undefined) {
-    throw new EntityMetadataError(constructor) // TODO
+    throw new EntityMetadataLookupError(constructor) // TODO
   }
 
   return [entityMetadata.key, indexableProperty.key, identifier].join(

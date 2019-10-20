@@ -1,16 +1,12 @@
 import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
-import {
-  BaseEntity,
-  ENTITY_METADATA_KEY,
-  EntityConstructorMetadata,
-} from '../Entity/Entity'
+import { BaseEntity } from '../Entity/Entity'
 import { generatePropertyKey } from '../utils/keyGeneration'
 import { ColumnSetupError } from './ColumnSetupError'
-import { getConstantColumns, setColumn } from '../utils/columns'
+import { getConstantColumns, setColumn, getColumn } from '../utils/columns'
 import { getEntityConstructor } from '../utils/entity'
-import { ColumnMetadataError } from '../utils/errors'
+import { getDatastore } from '../utils/datastore'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string
@@ -74,12 +70,13 @@ export function Column(options: ColumnOptions = {}) {
     assertKeyNotInUse(constantColumnMetadata, instance)
 
     // Set Constant Column
-    const constantColumns = getConstantColumns(getEntityConstructor(instance))
+    const entityConstructor = getEntityConstructor(instance)
+    const constantColumns = getConstantColumns(entityConstructor)
     constantColumns.push(constantColumnMetadata)
     Reflect.defineMetadata(
       COLUMNS_ON_ENTITY_KEY,
       constantColumns,
-      instance.constructor
+      entityConstructor
     )
 
     // Set Column
@@ -95,15 +92,9 @@ export function Column(options: ColumnOptions = {}) {
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       get: async function get(this: BaseEntity) {
-        const { datastore } = Reflect.getMetadata(
-          ENTITY_METADATA_KEY,
-          instance.constructor
-        ) as EntityConstructorMetadata
-        const columnMetadata = Reflect.getMetadata(
-          COLUMN_METADATA_KEY,
-          instance,
-          property
-        ) as ColumnMetadata
+        const constructor = getEntityConstructor(this)
+        const datastore = getDatastore(constructor)
+        const columnMetadata = getColumn(this, property)
         const cachedValue =
           columnMetadata.cachedValues.get(this) || newDefaultCachedValue()
 
@@ -114,21 +105,12 @@ export function Column(options: ColumnOptions = {}) {
         }
 
         columnMetadata.cachedValues.set(this, cachedValue)
+        setColumn(instance, columnMetadata)
 
         return cachedValue.cachedValue
       },
       set: async function set(this: BaseEntity, value: ColumnValue) {
-        const columnMetadata = Reflect.getMetadata(
-          COLUMN_METADATA_KEY,
-          this,
-          property
-        )
-        if (columnMetadata === undefined)
-          throw new ColumnMetadataError(
-            this,
-            columnMetadata,
-            `Could not find metadata of Column to set value. Has it been defined yet?`
-          )
+        const columnMetadata = getColumn(this, property)
 
         columnMetadata.cachedValues.set(this, {
           cachedValue: value,

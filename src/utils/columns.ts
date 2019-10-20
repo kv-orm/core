@@ -6,9 +6,11 @@ import {
   COLUMN_METADATA_KEY,
   COLUMNS_ON_ENTITY_KEY,
   ConstantColumnMetadata,
+  ColumnKey,
 } from '../Column/Column'
 import { Value } from '../Datastore/Datastore'
 import { getEntityConstructor } from './entity'
+import { ColumnMetadataError, ColumnMetadataLookupError } from './errors'
 
 export const getConstantColumns = (
   entityConstructor: EntityConstructor<BaseEntity>
@@ -30,6 +32,25 @@ export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
 
 export const setColumn = (instance: BaseEntity, column: ColumnMetadata): void =>
   Reflect.defineMetadata(COLUMN_METADATA_KEY, column, instance, column.property)
+
+export const getColumn = (
+  instance: BaseEntity,
+  property: ColumnKey
+): ColumnMetadata => {
+  const columnMetadata = Reflect.getMetadata(
+    COLUMN_METADATA_KEY,
+    instance,
+    property
+  )
+  if (columnMetadata === undefined)
+    throw new ColumnMetadataLookupError(
+      instance,
+      property,
+      `Could not find metadata of Column. Has it been defined yet?`
+    )
+
+  return columnMetadata
+}
 
 export const getPrimaryColumn = (
   instance: BaseEntity

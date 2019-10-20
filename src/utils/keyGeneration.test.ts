@@ -1,4 +1,4 @@
-import { EntityMetadataError } from './errors'
+import { EntityMetadataLookupError } from './errors'
 import { Column, ColumnMetadata } from '../Column/Column'
 import {
   generatePropertyKey,
@@ -134,7 +134,7 @@ describe(`keyGeneration`, () => {
           const columnMetadata = getColumns(instance)[0]
           await generatePropertyKey(datastore, instance, columnMetadata)
         })()
-      ).rejects.toThrow(EntityMetadataError)
+      ).rejects.toThrow(EntityMetadataLookupError)
     })
   })
   describe(`generateIndexablePropertyKey`, () => {
