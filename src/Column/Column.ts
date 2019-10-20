@@ -70,14 +70,10 @@ export function Column(options: ColumnOptions = {}) {
     assertKeyNotInUse(constantColumnMetadata, instance)
 
     // Set Constant Column
-    const entityConstructor = getEntityConstructor(instance)
-    const constantColumns = getConstantColumns(entityConstructor)
+    const constructor = getEntityConstructor(instance)
+    const constantColumns = getConstantColumns(constructor)
     constantColumns.push(constantColumnMetadata)
-    Reflect.defineMetadata(
-      COLUMNS_ON_ENTITY_KEY,
-      constantColumns,
-      entityConstructor
-    )
+    Reflect.defineMetadata(COLUMNS_ON_ENTITY_KEY, constantColumns, constructor)
 
     // Set Column
     const columnMetadata: ColumnMetadata = {

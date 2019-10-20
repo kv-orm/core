@@ -3,10 +3,10 @@ import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 
 export class RepositoryLoadError extends KVORMError {
   constructor(
-    entityConstructor: EntityConstructor<BaseEntity>,
+    constructor: EntityConstructor<BaseEntity>,
     message = `Unknown Error`
   ) {
-    super(`Could not load Entity, ${entityConstructor.name}: ${message}`)
+    super(`Could not load Entity, ${constructor.name}: ${message}`)
     this.name = `RepositoryLoadError`
   }
 }

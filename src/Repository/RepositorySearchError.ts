@@ -4,12 +4,12 @@ import { ColumnKey } from '../Column/Column'
 
 export class RepositorySearchError extends KVORMError {
   constructor(
-    entityConstructor: EntityConstructor<BaseEntity>,
+    constructor: EntityConstructor<BaseEntity>,
     property: ColumnKey,
     message = `Unknown Error`
   ) {
     super(
-      `Could not search Entity, ${entityConstructor.name}, for property, ${property}: ${message}`
+      `Could not search Entity, ${constructor.name}, for property, ${property}: ${message}`
     )
     this.name = `RepositorySearchError`
   }

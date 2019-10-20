@@ -13,9 +13,9 @@ import { getEntityConstructor } from './entity'
 import { ColumnMetadataLookupError } from './errors'
 
 export const getConstantColumns = (
-  entityConstructor: EntityConstructor<BaseEntity>
+  constructor: EntityConstructor<BaseEntity>
 ): ConstantColumnMetadata[] => {
-  return Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, entityConstructor) || []
+  return Reflect.getMetadata(COLUMNS_ON_ENTITY_KEY, constructor) || []
 }
 
 export const getColumns = (instance: BaseEntity): ColumnMetadata[] => {
