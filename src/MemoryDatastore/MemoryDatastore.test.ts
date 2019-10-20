@@ -48,12 +48,20 @@ describe(`MemoryDatastore`, () => {
     })
 
     it(`has limits the number of keys returned`, async () => {
-      const results = await datastore.search({
+      let results = await datastore.search({
         ...defaultSearchTerms,
         first: 2000,
       })
       expect(results.keys.length).toBe(1000)
       expect(results.cursor).toBe(`999`)
+      expect(results.hasNextPage).toBeTruthy()
+
+      results = await datastore.search({
+        ...defaultSearchTerms,
+        first: -99,
+      })
+      expect(results.keys.length).toBe(0)
+      expect(results.cursor).toBe(`-1`)
       expect(results.hasNextPage).toBeTruthy()
     })
 
