@@ -1,0 +1,18 @@
+version: '2'
+plugins:
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  git-legal:
+    enabled: true
+  markdownlint:
+    enabled: true
+    checks:
+      MD033:
+        enabled: false
+  nodesecurity:
+    enabled: true
+exclude_patterns:
+  - '**/*.test.ts'
+  - '*.js'
