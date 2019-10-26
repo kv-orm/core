@@ -78,20 +78,19 @@ export function Column(options: ColumnOptions = {}) {
     // Set Column
     const columnMetadata: ColumnMetadata = {
       ...constantColumnMetadata,
-      cachedValues: new Map<BaseEntity, {}>([
-        [instance, newDefaultCachedValue()],
-      ]),
+      cachedValues: new Map<BaseEntity, {}>(),
     }
     setColumn(instance, columnMetadata)
 
     // Override Property
     Reflect.defineProperty(instance, property, {
       enumerable: true,
+      configurable: true,
       get: async function get(this: BaseEntity) {
         return await columnGet(this, property)
       },
-      set: async function set(this: BaseEntity, value: ColumnValue) {
-        return await columnSet(this, property, value)
+      set: function set(this: BaseEntity, value: ColumnValue) {
+        return columnSet(this, property, value)
       },
     })
   }

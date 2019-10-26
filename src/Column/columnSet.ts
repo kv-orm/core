@@ -3,11 +3,11 @@ import { ColumnKey } from './Column'
 import { Value } from '../Datastore/Datastore'
 import { getColumn, setColumn } from '../utils/columns'
 
-export const columnSet = async (
+export const columnSet = (
   instance: BaseEntity,
   property: ColumnKey,
   value: Value
-): Promise<void> => {
+): void => {
   const columnMetadata = getColumn(instance, property)
 
   columnMetadata.cachedValues.set(instance, {

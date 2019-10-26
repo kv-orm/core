@@ -58,13 +58,19 @@ export const getPrimaryColumn = (
   return getColumns(instance).find(({ isPrimary }) => isPrimary)
 }
 
-export const getPrimaryColumnValue = async (
-  instance: BaseEntity
-): Promise<Value> => {
+export const getConstantPrimaryColumn = (
+  constructor: EntityConstructor<BaseEntity>
+): ConstantColumnMetadata | undefined => {
+  return getConstantColumns(constructor).find(({ isPrimary }) => isPrimary)
+}
+
+export const getPrimaryColumnValue = (instance: BaseEntity): Value => {
   const primaryColumn = getPrimaryColumn(instance)
   if (primaryColumn === undefined)
     throw new Error(`Primary Column not specified on instance`)
-  return await instance[primaryColumn.property]
+  const cachedValue = primaryColumn.cachedValues.get(instance)
+  if (cachedValue === undefined) throw new Error(`boo`)
+  return cachedValue.cachedValue
 }
 
 export const setPrimaryColumnValue = (
