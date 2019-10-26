@@ -1,16 +1,19 @@
 <h1 align="center">Welcome to @kv-orm/core 👋</h1>
 <p>
   <a href="https://github.com/kv-orm/core/actions" target="_blank">
-    <img alt="GitHub Actions Checks" src="https://github.com/kv-orm/core/workflows/Test/badge.svg">
+    <img alt="GitHub Actions Checks" src="https://github.com/kv-orm/core/workflows/Test/badge.svg" />
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
-    <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm&style=plastic">
+    <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm&style=plastic" />
   </a>
   <a href="https://codecov.io/gh/kv-orm/core" target="_blank">
-    <img alt="Codecov" src="https://img.shields.io/codecov/c/github/kv-orm/core?logo=codecov&style=plastic">
+    <img alt="Codecov" src="https://img.shields.io/codecov/c/github/kv-orm/core?logo=codecov&style=plastic" />
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/context:javascript" target="_blank">
-    <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?logo=lgtm&style=plastic">
+    <img alt="LGTM Code Quality" src="https://img.shields.io/lgtm/grade/javascript/g/kv-orm/core.svg?logo=lgtm&style=plastic" />
+  </a>
+  <a href="https://codeclimate.com/github/kv-orm/core/maintainability" target="_blank">
+    <img alt="Code Climate Maintainability" src="https://img.shields.io/codeclimate/maintainability/kv-orm/core.svg?style=plastic">
   </a>
   <a href="https://github.com/kv-orm/core/packages" target="_blank">
     <img alt="Version" src="https://img.shields.io/github/package-json/v/kv-orm/core?style=plastic" />
@@ -19,10 +22,10 @@
     <img alt="License" src="https://img.shields.io/github/license/kv-orm/core?style=plastic" />
   </a>
   <a href="https://greenkeeper.io" target="_blank">
-    <img alt="Greenkeeper" src="https://badges.greenkeeper.io/kv-orm/core.svg?style=plastic">
+    <img alt="Greenkeeper" src="https://badges.greenkeeper.io/kv-orm/core.svg?style=plastic" />
   </a>
   <a href="https://www.typescriptlang.org/" target="_blank">
-    <img alt="Types" src="https://img.shields.io/npm/types/kv-orm.svg?style=plastic">
+    <img alt="Types" src="https://img.shields.io/npm/types/kv-orm.svg?style=plastic" />
   </a>
   <a href="https://github.com/kv-orm/core" target="_blank">
     <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/kv-orm/core.svg?logo=github&style=plastic" />

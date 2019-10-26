@@ -23,7 +23,7 @@ export const repositoryLoad = async <T extends BaseEntity>(
     )
   }
 
-  if (identifier !== undefined) {
+  if (primaryColumn !== undefined && identifier !== undefined) {
     setPrimaryColumnValue(instance, identifier)
   }
   return instance

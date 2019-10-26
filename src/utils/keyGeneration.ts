@@ -12,7 +12,7 @@ import {
   ColumnValue,
   ConstantColumnMetadata,
 } from '../Column/Column'
-import { getPrimaryColumn } from './columns'
+import { getPrimaryColumn, getPrimaryColumnValue } from './columns'
 import { EntityMetadataLookupError, ColumnMetadataError } from './errors'
 import { getDatastore } from './datastore'
 
@@ -119,14 +119,11 @@ export const generateIndexablePropertySearchKey = async (
 
 // UUID-HERE
 // or, if singleton, ApplicationConfiguration
-const generateRelationshipKey = async (
-  datastore: Datastore,
-  instance: BaseEntity
-): Promise<Key> => {
+export const generateRelationshipKey = (instance: BaseEntity): Key => {
   const primaryColumn = getPrimaryColumn(instance)
 
   if (primaryColumn) {
-    return await getPropertyValue(instance, primaryColumn)
+    return getPrimaryColumnValue(instance)
   }
 
   return getInstanceKey(instance)
@@ -145,6 +142,6 @@ export const generateManyRelationshipKey = async (
 ): Promise<Key> => {
   return [
     await generatePropertyKey(datastore, instance, columnMetadata),
-    await generateRelationshipKey(datastore, relationshipInstance),
+    await generateRelationshipKey(relationshipInstance),
   ].join(datastore.keySeparator)
 }
