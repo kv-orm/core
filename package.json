@@ -45,7 +45,7 @@
     "@babel/core": "7.6.0",
     "@babel/preset-env": "7.6.0",
     "@types/jest": "24.0.18",
-    "@typescript-eslint/eslint-plugin": "2.0.0",
+    "@typescript-eslint/eslint-plugin": "2.6.0",
     "@typescript-eslint/parser": "2.0.0",
     "babel-jest": "24.9.0",
     "codecov": "3.6.1",
