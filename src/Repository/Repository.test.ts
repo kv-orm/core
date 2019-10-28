@@ -33,6 +33,9 @@ describe(`Repository`, () => {
       @Column({ key: `indexableProperty`, isIndexable: true })
       public indexableProperty: string
 
+      @Column()
+      public arrayProperty: number[] = []
+
       constructor(primaryProperty: number, indexableProperty: string) {
         this.primaryProperty = primaryProperty
         this.indexableProperty = indexableProperty
@@ -122,6 +125,16 @@ describe(`Repository`, () => {
     expect(await searchedInstance.indexableProperty).toEqual(
       await loadedInstance.indexableProperty
     )
+  })
+
+  it(`can save and load a Column with an array type`, async () => {
+    const values = [1, 2, 3, 4, 5]
+    complexInstance.arrayProperty = values
+    expect(await complexInstance.arrayProperty).toEqual(values)
+    await complexRepository.save(complexInstance)
+
+    const loadedInstance = await complexRepository.load(12345)
+    expect(await loadedInstance.arrayProperty).toEqual(values)
   })
 
   describe(`RepositoryLoadError`, () => {

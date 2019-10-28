@@ -90,7 +90,7 @@ export function Column(options: ColumnOptions = {}) {
         return await columnGet(this, property)
       },
       set: function set(this: BaseEntity, value: ColumnValue) {
-        return columnSet(this, property, value)
+        columnSet(this, property, value)
       },
     })
   }

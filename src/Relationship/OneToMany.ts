@@ -6,12 +6,12 @@ import { getHydrator } from './hydrate'
 import { columnSet } from '../Column/columnSet'
 import { getDehydrator } from './dehydrate'
 
-interface OneToOneOptions {
+interface OneToManyOptions {
   key?: Key
   type: EntityConstructor<BaseEntity>
 }
 
-export function OneToOne(options: OneToOneOptions) {
+export function OneToMany(options: OneToManyOptions) {
   return (instance: BaseEntity, property: ColumnKey): void => {
     Column({ key: options.key })(instance, property)
 
@@ -23,11 +23,13 @@ export function OneToOne(options: OneToOneOptions) {
       enumerable: true,
       configurable: true,
       get: async function get(this: BaseEntity) {
-        return await hydrator(await columnGet(this, property))
+        return [await hydrator((await columnGet(this, property))[0])]
       },
-      set: function set(this: BaseEntity, value: BaseEntity) {
-        const dehydratedValue = dehydrator(value)
-        columnSet(this, property, dehydratedValue)
+      set: function set(this: BaseEntity, values: BaseEntity[]) {
+        if (values) {
+          const dehydratedValues = values.map(dehydrator)
+          return columnSet(this, property, dehydratedValues)
+        }
       },
     })
   }
