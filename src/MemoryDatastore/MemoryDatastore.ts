@@ -5,6 +5,10 @@ import {
   SearchResult,
 } from '../Datastore/databaseSearch'
 
+interface MemoryDatastoreOptions {
+  isCache?: boolean
+}
+
 export class MemoryDatastore extends Datastore {
   private SEARCH_FIRST_LIMIT = 1000
   private SEARCH_FIRST_DEFAULT = 1000
@@ -51,5 +55,9 @@ export class MemoryDatastore extends Datastore {
       hasNextPage,
       cursor,
     })
+  }
+
+  public constructor({ isCache = false }: MemoryDatastoreOptions = {}) {
+    super(!isCache ? { cache: new MemoryDatastore({ isCache: true }) } : {})
   }
 }

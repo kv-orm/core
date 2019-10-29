@@ -1,6 +1,6 @@
 import { databaseRead, ReadOptions } from './databaseRead'
-import { databaseWrite, WriteOptions } from './databaseWrite'
-import { databaseDelete, DeleteOptions } from './databaseDelete'
+import { databaseWrite } from './databaseWrite'
+import { databaseDelete } from './databaseDelete'
 import {
   SearchOptions,
   databaseSearch,
@@ -19,22 +19,27 @@ interface DatastoreOptions {
 export abstract class Datastore {
   public abstract searchStrategies: SearchStrategy[]
   public readonly keySeparator: Key
-  protected cache: Datastore | undefined
+  public readonly cache: Datastore | undefined
+  private cacheMetadata = {
+    dirtyKeys: [],
+  }
 
-  abstract _read(key: Key): Promise<Value>
-  abstract _write(key: Key, value: Value): Promise<void>
-  abstract _delete(key: Key): Promise<void>
-  abstract _search(options: SearchOptions): Promise<SearchResult>
+  // TODO: Lock down control access
+  public abstract _read(key: Key): Promise<Value>
+  public abstract _write(key: Key, value: Value): Promise<void>
+  public abstract _delete(key: Key): Promise<void>
+  public abstract _search(options: SearchOptions): Promise<SearchResult>
 
   public read(key: Key, options?: ReadOptions): Promise<Value> {
     return databaseRead(this, key, options)
   }
 
-  public write(key: Key, value: Value, options?: WriteOptions): Promise<Value> {
+  // TODO: Make sync
+  public write(key: Key, value: Value, options = {}): Promise<void> {
     return databaseWrite(this, key, value, options)
   }
 
-  public delete(key: Key, options?: DeleteOptions): Promise<Value> {
+  public delete(key: Key, options = {}): Promise<void> {
     return databaseDelete(this, key, options)
   }
 
@@ -46,7 +51,7 @@ export abstract class Datastore {
   protected assertSearchStrategyIsValid = (strategy: SearchStrategy): void => {
     if (!(strategy in this.searchStrategies))
       throw new Error(
-        `Search strategy, ${SearchStrategy[strategy]}, is not implemented.`
+        `Search strategy, ${SearchStrategy[strategy]}, is not implemented on this type of Datastore.`
       )
   }
 

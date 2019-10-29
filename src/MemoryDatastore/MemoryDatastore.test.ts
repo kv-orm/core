@@ -1,5 +1,5 @@
 import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore } from '../Datastore/Datastore'
+import { Datastore, Key, Value } from '../Datastore/Datastore'
 import { SearchStrategy } from '../Datastore/databaseSearch'
 
 const readWriteWorks = async (datastore: Datastore): Promise<boolean> => {
@@ -25,8 +25,61 @@ describe(`MemoryDatastore`, () => {
 
   it(`can delete key-values`, async () => {
     expect(await readWriteWorks(datastore)).toBeTruthy()
-    await datastore._delete(`key`)
+    await datastore.delete(`key`)
     expect(await datastore.read(`key`)).toBeNull()
+  })
+
+  describe(`cache`, () => {
+    let data: Map<Key, Value>
+    let cacheData: Map<Key, Value>
+
+    beforeEach(async () => {
+      cacheData = (datastore.cache as any).data
+      data = (datastore as any).data
+
+      await datastore.write(`a key`, `a value`)
+    })
+
+    it(`is written to`, async () => {
+      await datastore._write(`abc`, `def`)
+      expect(data.size).toBeGreaterThan(cacheData.size)
+
+      await datastore.write(`ghi`, `jkl`)
+      expect(data.size).toBeGreaterThan(cacheData.size)
+    })
+
+    it(`is read from`, async () => {
+      expect(await datastore._read(`a key`)).toEqual(`a value`)
+
+      await (datastore.cache as Datastore)._write(`new key`, `new value`)
+      expect(cacheData.size).toBeGreaterThan(data.size)
+      expect(await datastore.read(`new key`)).toEqual(`new value`)
+      expect(cacheData.size).toBeGreaterThan(data.size)
+
+      expect(await datastore.read(`new key`, { skipCache: true })).toBeNull()
+      expect(await datastore.read(`new key`)).toBeNull()
+    })
+
+    it(`is deleted from`, async () => {
+      await datastore.delete(`a key`)
+      expect(cacheData.size).toBe(0)
+      expect(data.size).toBe(0)
+    })
+
+    it(`is NOT searched from`, async () => {
+      await datastore._write(`a key only in the main datastore`, `hello!`)
+      await (datastore.cache as Datastore)._write(
+        `a key only in the cache datastore`,
+        `hello as well!`
+      )
+
+      expect(
+        (await datastore.search({
+          term: `a key`,
+          strategy: SearchStrategy.prefix,
+        })).keys
+      ).toEqual([`a key`, `a key only in the main datastore`])
+    })
   })
 
   describe(`search`, () => {

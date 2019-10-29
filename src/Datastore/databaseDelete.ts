@@ -1,13 +1,10 @@
-import { Value, Datastore, Key } from './Datastore'
-
-export interface DeleteOptions {
-  skipCache?: boolean
-}
+import { Datastore, Key } from './Datastore'
 
 export const databaseDelete = async (
   datastore: Datastore,
   key: Key,
-  { skipCache = false }: DeleteOptions = {}
-): Promise<Value> => {
+  {}
+): Promise<void> => {
+  if (datastore.cache !== undefined) await datastore.cache._delete(key)
   return await datastore._delete(key)
 }
