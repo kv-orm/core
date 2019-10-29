@@ -1,5 +1,6 @@
 import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore, SearchStrategy } from '../Datastore/Datastore'
+import { Datastore } from '../Datastore/Datastore'
+import { SearchStrategy } from '../Datastore/databaseSearch'
 
 const readWriteWorks = async (datastore: Datastore): Promise<boolean> => {
   await datastore.write(`key`, `value`)
@@ -24,7 +25,7 @@ describe(`MemoryDatastore`, () => {
 
   it(`can delete key-values`, async () => {
     expect(await readWriteWorks(datastore)).toBeTruthy()
-    await datastore.delete(`key`)
+    await datastore._delete(`key`)
     expect(await datastore.read(`key`)).toBeNull()
   })
 

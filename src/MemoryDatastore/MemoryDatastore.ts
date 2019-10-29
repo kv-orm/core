@@ -1,11 +1,9 @@
+import { Datastore, Value, Key } from '../Datastore/Datastore'
 import {
-  Datastore,
-  Value,
   SearchStrategy,
-  Key,
   SearchOptions,
   SearchResult,
-} from '../Datastore/Datastore'
+} from '../Datastore/databaseSearch'
 
 export class MemoryDatastore extends Datastore {
   private SEARCH_FIRST_LIMIT = 1000
@@ -14,28 +12,25 @@ export class MemoryDatastore extends Datastore {
 
   public searchStrategies = [SearchStrategy.prefix]
 
-  read(key: Key): Promise<Value> {
+  _read(key: Key): Promise<Value> {
     return Promise.resolve(this.data.get(key) || null)
   }
 
-  write(key: Key, value: Value): Promise<void> {
+  _write(key: Key, value: Value): Promise<void> {
     this.data.set(key, value)
     return Promise.resolve()
   }
 
-  delete(key: Key): Promise<void> {
+  _delete(key: Key): Promise<void> {
     this.data.delete(key)
     return Promise.resolve()
   }
 
-  search({
+  _search({
     term,
-    strategy,
     first = this.SEARCH_FIRST_DEFAULT,
     after = `-1`,
   }: SearchOptions): Promise<SearchResult> {
-    this.assertSearchStrategyIsValid(strategy)
-
     if (first > this.SEARCH_FIRST_LIMIT) first = this.SEARCH_FIRST_LIMIT
     if (first < 0) first = 0
 
