@@ -74,10 +74,12 @@ describe(`MemoryDatastore`, () => {
       )
 
       expect(
-        (await datastore.search({
-          term: `a key`,
-          strategy: SearchStrategy.prefix,
-        })).keys
+        (
+          await datastore.search({
+            term: `a key`,
+            strategy: SearchStrategy.prefix,
+          })
+        ).keys
       ).toEqual([`a key`, `a key only in the main datastore`])
     })
   })

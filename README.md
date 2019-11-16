@@ -86,7 +86,7 @@ If there is any other datastore that you'd like to see supported, please [create
   }
   ```
 
-- On-demand, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
+- On-demand, async, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
 
   ```typescript
   import { getRepository } from '@kv-orm/core'
@@ -135,7 +135,7 @@ See [`@kv-orm/cf-workers`](https://github.com/kv-orm/cf-workers) for more inform
 
 An Entity is an object which stores data about something e.g. an Author. The Entity decorator takes a datastore to save the Entity instances into.
 
-Optionally, you can also pass in a `key` to the decorator, to rename the value in the datastore.
+Optionally, you can also pass in a `key` to the decorator, to rename the key name in the datastore.
 
 You can initialize a new instance of the Entity as normal.
 
@@ -152,7 +152,7 @@ const authorInstance = new Author()
 
 ## Columns
 
-Using the `@Column()` decorator on an Entity property is how you mark it as a savable property. You must `await` their value. This is because it might need to query the datastore, if it doesn't have the value in memory.
+Using the `@Column()` decorator on an Entity property is how you mark it as a savable property. You must `await` their value. This is because it might need to asynchronously query the datastore, if it doesn't have the value in memory.
 
 Like with Entities, you can optionally pass in a `key` to the decorator.
 
@@ -243,6 +243,7 @@ If your property is particularly complex (i.e. can't be stored natively in the d
 
 For example, let's say you have a complex property, `Author.somethingComplex`:
 
+<!-- prettier-ignore-start -->
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
@@ -261,6 +262,7 @@ class Author {
   // ...
 }
 ```
+<!-- prettier-ignore-end -->
 
 ## Repositories
 
