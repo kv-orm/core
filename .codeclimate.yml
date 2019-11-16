@@ -11,6 +11,8 @@ plugins:
     checks:
       MD033:
         enabled: false
+      MD013:
+        enabled: false
   nodesecurity:
     enabled: true
 exclude_patterns:
