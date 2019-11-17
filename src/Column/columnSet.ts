@@ -1,18 +1,33 @@
 import { BaseEntity } from '../Entity/Entity'
-import { ColumnKey } from './Column'
-import { Value } from '../Datastore/Datastore'
-import { getColumn, setColumn } from '../utils/columns'
+import { ColumnMetadata } from './Column'
+import { Key, Value } from '../Datastore/Datastore'
+import { getConstructor } from '../utils/entity'
+import { getDatastore } from '../utils/datastore'
+import { getCache } from '../utils/cache'
+import {
+  generatePropertyKey,
+  generateIndexablePropertyKey,
+} from '../utils/keyGeneration'
+import { getPrimaryColumnValue, setPrimaryColumnValue } from '../utils/columns'
 
 export const columnSet = (
   instance: BaseEntity,
-  property: ColumnKey,
+  columnMetadata: ColumnMetadata,
   value: Value
 ): void => {
-  const columnMetadata = getColumn(instance, property)
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+  const cache = getCache(datastore)
 
-  columnMetadata.cachedValues.set(instance, {
-    cachedValue: value,
-    isDirty: true,
-  })
-  setColumn(instance, columnMetadata)
+  if (columnMetadata.isPrimary) setPrimaryColumnValue(instance, value)
+
+  if (columnMetadata.isIndexable) {
+    const indexableKeyGenerator = (): Key =>
+      generateIndexablePropertyKey(constructor, columnMetadata, value)
+    const primaryColumnValue = getPrimaryColumnValue(instance)
+    cache.write(instance, indexableKeyGenerator, primaryColumnValue)
+  }
+
+  const keyGenerator = (): Key => generatePropertyKey(instance, columnMetadata)
+  cache.write(instance, keyGenerator, value)
 }

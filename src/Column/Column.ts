@@ -1,33 +1,23 @@
 import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
-import { BaseEntity } from '../Entity/Entity'
-import { ColumnSetupError } from './ColumnSetupError'
-import { getConstantColumns, setColumn } from '../utils/columns'
-import { getEntityConstructor } from '../utils/entity'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
+import { setColumn, getColumns } from '../utils/columns'
+import { getConstructor } from '../utils/entity'
 import { columnGet } from './columnGet'
 import { columnSet } from './columnSet'
+import { ColumnSetupError } from './ColumnSetupError'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
-export type ColumnKey = string
+export type ColumnKey = string | number | symbol
 
-export const COLUMNS_ON_ENTITY_KEY = Symbol(`columnOnEntity`)
-export const COLUMN_METADATA_KEY = Symbol(`columnMetadata`)
+export const COLUMN_KEY = Symbol(`Column`)
 
-export interface ConstantColumnMetadata {
+export interface ColumnMetadata {
   key: Key
   property: ColumnKey
   isPrimary?: boolean
   isIndexable?: boolean
-}
-
-export interface CachedValue {
-  isDirty?: boolean
-  cachedValue?: ColumnValue
-}
-
-export interface ColumnMetadata extends ConstantColumnMetadata {
-  cachedValues: Map<BaseEntity, CachedValue>
 }
 
 interface ColumnOptions {
@@ -37,60 +27,41 @@ interface ColumnOptions {
 }
 
 const assertKeyNotInUse = (
-  constantColumnMetadata: ConstantColumnMetadata,
-  instance: BaseEntity
+  constructor: EntityConstructor,
+  columnMetadata: ColumnMetadata
 ): void => {
-  const constantColumns = getConstantColumns(getEntityConstructor(instance))
-  const keysInUse = constantColumns.map(
-    constantColumnMetadata => constantColumnMetadata.key
-  )
+  const constantColumns = getColumns(constructor)
+  const keysInUse = constantColumns.map(columnMetadata => columnMetadata.key)
 
-  if (keysInUse.indexOf(constantColumnMetadata.key) !== -1)
+  if (keysInUse.indexOf(columnMetadata.key) !== -1)
     throw new ColumnSetupError(
-      instance,
-      constantColumnMetadata,
+      constructor,
+      columnMetadata,
       `Key is already in use`
     )
 }
 
-export const newDefaultCachedValue = (): CachedValue => ({
-  isDirty: false,
-  cachedValue: undefined,
-})
-
-export function Column(options: ColumnOptions = {}) {
-  return (instance: BaseEntity, property: ColumnKey): void => {
-    const constantColumnMetadata: ConstantColumnMetadata = {
-      key: options.key || property,
+export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
+  return (instance: T, property: keyof T): void => {
+    const columnMetadata: ColumnMetadata = {
+      key: options.key || property.toString(),
       property,
       isIndexable: options.isIndexable,
       isPrimary: options.isPrimary,
     }
 
-    assertKeyNotInUse(constantColumnMetadata, instance)
+    const constructor = getConstructor(instance)
+    assertKeyNotInUse(constructor, columnMetadata)
+    setColumn(constructor, columnMetadata)
 
-    // Set Constant Column
-    const constructor = getEntityConstructor(instance)
-    const constantColumns = getConstantColumns(constructor)
-    constantColumns.push(constantColumnMetadata)
-    Reflect.defineMetadata(COLUMNS_ON_ENTITY_KEY, constantColumns, constructor)
-
-    // Set Column
-    const columnMetadata: ColumnMetadata = {
-      ...constantColumnMetadata,
-      cachedValues: new Map<BaseEntity, {}>(),
-    }
-    setColumn(instance, columnMetadata)
-
-    // Override Property
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: async function get(this: BaseEntity) {
-        return await columnGet(this, property)
+        return await columnGet(this, columnMetadata)
       },
       set: function set(this: BaseEntity, value: ColumnValue) {
-        columnSet(this, property, value)
+        columnSet(this, columnMetadata, value)
       },
     })
   }

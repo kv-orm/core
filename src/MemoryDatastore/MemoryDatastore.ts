@@ -3,11 +3,7 @@ import {
   SearchStrategy,
   SearchOptions,
   SearchResult,
-} from '../Datastore/databaseSearch'
-
-interface MemoryDatastoreOptions {
-  isCache?: boolean
-}
+} from '../Datastore/Datastore'
 
 export class MemoryDatastore extends Datastore {
   private SEARCH_FIRST_LIMIT = 1000
@@ -55,9 +51,5 @@ export class MemoryDatastore extends Datastore {
       hasNextPage,
       cursor,
     })
-  }
-
-  public constructor({ isCache = false }: MemoryDatastoreOptions = {}) {
-    super(!isCache ? { cache: new MemoryDatastore({ isCache: true }) } : {})
   }
 }

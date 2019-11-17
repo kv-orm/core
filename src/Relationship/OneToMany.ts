@@ -1,34 +1,43 @@
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { ColumnKey, Column } from '../Column/Column'
+import { ColumnKey } from '../Column/Column'
 import { Key } from '../Datastore/Datastore'
-import { columnGet } from '../Column/columnGet'
 import { getHydrator } from './hydrate'
-import { columnSet } from '../Column/columnSet'
-import { getDehydrator } from './dehydrate'
+import { getConstructor } from '../utils/entity'
+import { oneToManySet } from './oneToManySet'
+import { RelationshipMetadata } from './relationshipMetadata'
+import { setRelationship } from '../utils/relationships'
+import { oneToManyGet } from './oneToManyGet'
 
 interface OneToManyOptions {
   key?: Key
-  type: EntityConstructor<BaseEntity>
+  type: EntityConstructor
 }
 
 export function OneToMany(options: OneToManyOptions) {
   return (instance: BaseEntity, property: ColumnKey): void => {
-    Column({ key: options.key })(instance, property)
+    const relationshipMetadata: RelationshipMetadata = {
+      key: options.key || property.toString(),
+      property,
+      type: options.type,
+    }
+
+    const constructor = getConstructor(instance)
+    // TODO: Assert key not in use
+    setRelationship(constructor, relationshipMetadata)
 
     const hydrator = getHydrator(options.type)
-    const dehydrator = getDehydrator(options.type)
 
     // Override Property
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: async function get(this: BaseEntity) {
-        return [await hydrator((await columnGet(this, property))[0])]
+        const values = await oneToManyGet(this, relationshipMetadata)
+        return Promise.all(values.map(hydrator))
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
         if (values) {
-          const dehydratedValues = values.map(dehydrator)
-          return columnSet(this, property, dehydratedValues)
+          oneToManySet(this, relationshipMetadata, values)
         }
       },
     })

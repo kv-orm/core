@@ -1,15 +1,15 @@
 import { SetupError } from '../utils/errors'
-import { ConstantColumnMetadata } from './Column'
-import { BaseEntity } from '../Entity/Entity'
+import { ColumnMetadata } from './Column'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 
 export class ColumnSetupError extends SetupError {
   constructor(
-    instance: BaseEntity,
-    column: ConstantColumnMetadata,
+    constructor: EntityConstructor<BaseEntity>,
+    column: ColumnMetadata,
     message = `Unknown error`
   ) {
     super(
-      `Could not setup the Column, ${column.key}, on Entity, ${instance.constructor.name}: ${message}`
+      `Could not setup the Column, ${column.key}, on Entity, ${constructor.name}: ${message}`
     )
     this.name = `ColumnSetupError`
   }

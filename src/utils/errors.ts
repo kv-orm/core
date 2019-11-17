@@ -1,9 +1,5 @@
-import {
-  BaseEntity,
-  EntityConstructor,
-  EntityConstructorMetadata,
-} from '../Entity/Entity'
-import { ColumnMetadata, ColumnKey } from '../Column/Column'
+import { EntityConstructor } from '../Entity/Entity'
+import { ColumnKey } from '../Column/Column'
 
 export class KVORMError extends Error {
   constructor(message: string) {
@@ -26,50 +22,49 @@ export class MetadataError extends KVORMError {
   }
 }
 
-export class EntityMetadataLookupError extends MetadataError {
-  constructor(
-    constructor: EntityConstructor<BaseEntity>,
-    message = `Unknown Error`
-  ) {
-    super(
-      `Error looking up Entity Metadata for Entity, ${constructor.name}: ${message}`
-    )
-    this.name = `EntityMetadataLookupError`
+export class EntityLookupError extends MetadataError {
+  constructor(constructor: EntityConstructor, message = `Unknown Error`) {
+    super(`Error looking up Entity, ${constructor.name}: ${message}`)
+    this.name = `EntityLookupError`
   }
 }
 
-export class EntityMetadataError extends MetadataError {
+export class ColumnLookupError extends MetadataError {
   constructor(
-    entityMetadata: EntityConstructorMetadata,
-    message = `Unknown Error`
-  ) {
-    super(`Error with Entity Metadata, ${entityMetadata.key}: ${message}`)
-    this.name = `EntityMetadataError`
-  }
-}
-
-export class ColumnMetadataLookupError extends MetadataError {
-  constructor(
-    instance: BaseEntity,
+    constructor: EntityConstructor,
     property: ColumnKey,
     message = `Unknown Error`
   ) {
     super(
-      `Error looking up Column Metadata for Column, ${property}, on Entity, ${instance.constructor.name}: ${message}`
+      `Error looking up Column, ${property.toString()}, on Entity, ${
+        constructor.name
+      }: ${message}`
     )
-    this.name = `ColumnMetadataLookupError`
+    this.name = `ColumnLookupError`
   }
 }
 
-export class ColumnMetadataError extends MetadataError {
+export class RelationshipLookupError extends MetadataError {
   constructor(
-    instance: BaseEntity,
-    column: ColumnMetadata,
+    constructor: EntityConstructor,
+    property: ColumnKey,
     message = `Unknown Error`
   ) {
     super(
-      `Error with Column Metadata, ${column.key}, on Entity, ${instance.constructor.name}: ${message}`
+      `Error looking up Relationship, ${property.toString()}, on Entity, ${
+        constructor.name
+      }: ${message}`
     )
-    this.name = `ColumnMetadataError`
+    this.name = `RelationshipLookupError`
+  }
+}
+
+export class PrimaryColumnMissingError extends MetadataError {
+  constructor(
+    constructor: EntityConstructor,
+    message = `Primary Column Missing`
+  ) {
+    super(`Primary Column not found on Entity, ${constructor.name}: ${message}`)
+    this.name = `PrimaryColumnMissingError`
   }
 }

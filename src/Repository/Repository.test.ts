@@ -4,7 +4,7 @@ import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
 import { RepositoryLoadError } from './RepositoryLoadError'
-import { RepositorySearchError } from './RepositorySearchError'
+import { ColumnLookupError } from '../utils/errors'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -160,7 +160,7 @@ describe(`Repository`, () => {
         (async (): Promise<void> => {
           await complexRepository.search(`fakeProperty`, 1)
         })()
-      ).rejects.toThrow(RepositorySearchError)
+      ).rejects.toThrow(ColumnLookupError)
     })
   })
 })

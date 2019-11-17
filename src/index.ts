@@ -3,7 +3,7 @@ export {
   SearchOptions,
   SearchResult,
   SearchStrategy,
-} from './Datastore/databaseSearch'
+} from './Datastore/Datastore'
 
 export { MemoryDatastore } from './MemoryDatastore/MemoryDatastore'
 export { Entity } from './Entity/Entity'

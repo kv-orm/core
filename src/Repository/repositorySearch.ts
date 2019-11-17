@@ -1,9 +1,8 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
-import { getConstantColumns } from '../utils/columns'
+import { getColumn } from '../utils/columns'
 import { ColumnKey } from '../Column/Column'
-import { RepositorySearchError } from './RepositorySearchError'
-import { generateIndexablePropertySearchKey } from '../utils/keyGeneration'
+import { generateIndexablePropertyKey } from '../utils/keyGeneration'
 import { repositoryLoad } from './repositoryLoad'
 import { getDatastore } from '../utils/datastore'
 
@@ -13,21 +12,18 @@ export const repositorySearch = async <T extends BaseEntity>(
   identifier: Value
 ): Promise<T | null> => {
   const datastore = getDatastore(constructor)
-  const columns = getConstantColumns(constructor)
-  const indexableProperty = columns.find(column => column.property === property)
+  const columnMetadata = getColumn(constructor, property)
 
-  if (indexableProperty === undefined)
-    throw new RepositorySearchError(
-      constructor,
-      property,
-      `Property is not indexable, or does not exist.`
-    )
+  // TODO: Assert Column isIndexable
 
-  const key = await generateIndexablePropertySearchKey(
+  const key = generateIndexablePropertyKey(
     constructor,
-    indexableProperty,
+    columnMetadata,
     identifier
   )
   const primaryIdentifier = await datastore.read(key)
+
+  // TODO: Failure check
+
   return await repositoryLoad(constructor, primaryIdentifier)
 }

@@ -1,63 +1,69 @@
-import { databaseRead, ReadOptions } from './databaseRead'
-import { databaseWrite } from './databaseWrite'
-import { databaseDelete } from './databaseDelete'
-import {
-  SearchOptions,
-  databaseSearch,
-  SearchResult,
-  SearchStrategy,
-} from './databaseSearch'
+import { Cache } from '../Cache/Cache'
 
 export type Value = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type Key = string
 
 interface DatastoreOptions {
   keySeparator?: string
-  cache?: Datastore
+  cache?: Cache
+}
+
+export type Cursor = string
+
+export enum SearchStrategy {
+  prefix,
+}
+
+export interface SearchOptions {
+  term: Key
+  strategy: SearchStrategy
+  first?: number
+  after?: Cursor
+}
+
+export interface SearchResult {
+  keys: Key[]
+  hasNextPage: boolean
+  cursor: Cursor
 }
 
 export abstract class Datastore {
   public abstract searchStrategies: SearchStrategy[]
   public readonly keySeparator: Key
-  public readonly cache: Datastore | undefined
-  private cacheMetadata = {
-    dirtyKeys: [],
+  public readonly cache: Cache
+
+  protected abstract _read(key: Key): Promise<Value> | Value
+  protected abstract _write(key: Key, value: Value): Promise<void>
+  protected abstract _delete(key: Key): Promise<void>
+  protected abstract _search(options: SearchOptions): Promise<SearchResult>
+
+  public read(key: Key): Promise<Value> {
+    return this._read(key)
   }
 
-  // TODO: Lock down control access
-  public abstract _read(key: Key): Promise<Value>
-  public abstract _write(key: Key, value: Value): Promise<void>
-  public abstract _delete(key: Key): Promise<void>
-  public abstract _search(options: SearchOptions): Promise<SearchResult>
-
-  public read(key: Key, options?: ReadOptions): Promise<Value> {
-    return databaseRead(this, key, options)
+  public write(key: Key, value: Value): Promise<void> {
+    return this._write(key, value)
   }
 
-  // TODO: Make sync
-  public write(key: Key, value: Value, options = {}): Promise<void> {
-    return databaseWrite(this, key, value, options)
-  }
-
-  public delete(key: Key, options = {}): Promise<void> {
-    return databaseDelete(this, key, options)
+  public delete(key: Key): Promise<void> {
+    return this._delete(key)
   }
 
   public search(options: SearchOptions): Promise<SearchResult> {
     this.assertSearchStrategyIsValid(options.strategy)
-    return databaseSearch(this, options)
+    return this._search(options)
   }
 
   protected assertSearchStrategyIsValid = (strategy: SearchStrategy): void => {
     if (!(strategy in this.searchStrategies))
       throw new Error(
-        `Search strategy, ${SearchStrategy[strategy]}, is not implemented on this type of Datastore.`
+        `Search Strategy, ${SearchStrategy[strategy]}, is not implemented on this type of Datastore.`
       )
   }
 
   public constructor({
     keySeparator = `:`,
-    cache = undefined,
+    cache = new Cache(),
   }: DatastoreOptions = {}) {
     this.keySeparator = keySeparator
     this.cache = cache

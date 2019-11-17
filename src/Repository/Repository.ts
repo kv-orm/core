@@ -21,7 +21,7 @@ export const getRepository = <T extends BaseEntity>(
       return await repositoryLoad(constructor, identifier)
     },
     async save(instance: BaseEntity): Promise<boolean> {
-      return await repositorySave(constructor, instance)
+      return await repositorySave(instance)
     },
     async search(property: ColumnKey, identifier: Value): Promise<T | null> {
       return await repositorySearch(constructor, property, identifier)

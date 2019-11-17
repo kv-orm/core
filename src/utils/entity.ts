@@ -2,20 +2,20 @@ import {
   EntityConstructor,
   BaseEntity,
   EntityConstructorMetadata,
-  ENTITY_METADATA_KEY,
+  ENTITY_KEY,
 } from '../Entity/Entity'
-import { EntityMetadataLookupError } from './errors'
+import { EntityLookupError } from './errors'
 
 export const getEntityMetadata = (
-  constructor: EntityConstructor<BaseEntity>
+  constructor: EntityConstructor
 ): EntityConstructorMetadata => {
   const entityMetadata = Reflect.getMetadata(
-    ENTITY_METADATA_KEY,
+    ENTITY_KEY,
     constructor
   ) as EntityConstructorMetadata
 
   if (entityMetadata === undefined)
-    throw new EntityMetadataLookupError(
+    throw new EntityLookupError(
       constructor,
       `Could not find metadata on Entity. Has it been defined yet?`
     )
@@ -23,10 +23,8 @@ export const getEntityMetadata = (
   return entityMetadata
 }
 
-export const getEntityConstructor = (
-  instance: BaseEntity
-): EntityConstructor<BaseEntity> =>
-  instance.constructor as EntityConstructor<BaseEntity>
+export const getConstructor = (instance: BaseEntity): EntityConstructor =>
+  instance.constructor as EntityConstructor
 
 export const createEmptyInstance = <T extends BaseEntity>(
   constructor: EntityConstructor<T>
