@@ -310,7 +310,31 @@ console.log(await loadedWilliamShakespeare.nickName) // Bill
 
 ### Search
 
-> Coming soon!
+If a property has been set as `isIndexable`, you can load an instance by a saved value. If no results are found, `null` is returned.
+
+```typescript
+const searchedWilliamShakespeare = await authorRepository.search(
+  'phoneNumber',
+  '+1234567890'
+)
+console.log(await searchedWilliamShakespeare.nickName) // Bill
+
+const searchedNonexistent = await authorRepository.search(
+  'phoneNumber',
+  '+9999999999'
+)
+console.log(searchedNonexistent) // null
+```
+
+## Relationships
+
+### One To One
+
+> TODO: Documentation
+
+### One To Many
+
+> TODO: Documentation
 
 # Development
 
