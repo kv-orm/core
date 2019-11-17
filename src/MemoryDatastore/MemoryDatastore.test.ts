@@ -1,5 +1,6 @@
 import { MemoryDatastore } from './MemoryDatastore'
-import { Datastore, SearchStrategy } from '../Datastore/Datastore'
+import { Datastore } from '../Datastore/Datastore'
+import { SearchStrategy } from '../Datastore/Datastore'
 
 const readWriteWorks = async (datastore: Datastore): Promise<boolean> => {
   await datastore.write(`key`, `value`)

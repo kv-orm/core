@@ -35,6 +35,23 @@ describe(`Column`, () => {
     expect(await otherInstance.myProperty).toEqual(`initial value`)
   })
 
+  it(`can write and read an array value`, async () => {
+    @Entity({ datastore })
+    class EntityWithArrayColumn {
+      @Column()
+      public arrayColumn: number[]
+
+      constructor(arrayValues: number[]) {
+        this.arrayColumn = arrayValues
+      }
+    }
+
+    const values = [1, 2, 3, 4, 5]
+    instance = new EntityWithArrayColumn(values)
+
+    expect(await instance.arrayColumn).toEqual(values)
+  })
+
   describe(`ColumnSetupError`, () => {
     it(`is thrown with a duplicate key`, () => {
       expect(() => {

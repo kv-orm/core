@@ -3,23 +3,24 @@ import { ColumnKey } from '../Column/Column'
 import { Key } from '../Datastore/Datastore'
 import { getHydrator } from './hydrate'
 import { getConstructor } from '../utils/entity'
-import { oneToOneSet } from './oneToOneSet'
+import { oneToManySet } from './oneToManySet'
 import { RelationshipMetadata } from './relationshipMetadata'
 import { setRelationship } from '../utils/relationships'
-import { oneToOneGet } from './oneToOneGet'
+import { oneToManyGet } from './oneToManyGet'
 
-interface OneToOneOptions {
+interface OneToManyOptions {
   key?: Key
   type: EntityConstructor
 }
 
-export function OneToOne(options: OneToOneOptions) {
+export function OneToMany(options: OneToManyOptions) {
   return (instance: BaseEntity, property: ColumnKey): void => {
     const relationshipMetadata: RelationshipMetadata = {
       key: options.key || property.toString(),
       property,
       type: options.type,
     }
+
     const constructor = getConstructor(instance)
     // TODO: Assert key not in use
     setRelationship(constructor, relationshipMetadata)
@@ -31,10 +32,13 @@ export function OneToOne(options: OneToOneOptions) {
       enumerable: true,
       configurable: true,
       get: async function get(this: BaseEntity) {
-        return await hydrator(await oneToOneGet(this, relationshipMetadata))
+        const values = await oneToManyGet(this, relationshipMetadata)
+        return Promise.all(values.map(hydrator))
       },
-      set: function set(this: BaseEntity, value: BaseEntity) {
-        if (value) oneToOneSet(this, relationshipMetadata, value)
+      set: function set(this: BaseEntity, values: BaseEntity[]) {
+        if (values) {
+          oneToManySet(this, relationshipMetadata, values)
+        }
       },
     })
   }

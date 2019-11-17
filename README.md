@@ -86,7 +86,7 @@ If there is any other datastore that you'd like to see supported, please [create
   }
   ```
 
-- On-demand, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
+- On-demand, asynchronous, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
 
   ```typescript
   import { getRepository } from '@kv-orm/core'
@@ -135,7 +135,7 @@ See [`@kv-orm/cf-workers`](https://github.com/kv-orm/cf-workers) for more inform
 
 An Entity is an object which stores data about something e.g. an Author. The Entity decorator takes a datastore to save the Entity instances into.
 
-Optionally, you can also pass in a `key` to the decorator, to rename the value in the datastore.
+Optionally, you can also pass in a `key` to the decorator, to rename the key name in the datastore.
 
 You can initialize a new instance of the Entity as normal.
 
@@ -152,7 +152,7 @@ const authorInstance = new Author()
 
 ## Columns
 
-Using the `@Column()` decorator on an Entity property is how you mark it as a savable property. You must `await` their value. This is because it might need to query the datastore, if it doesn't have the value in memory.
+Using the `@Column()` decorator on an Entity property is how you mark it as a savable property. You must `await` their value. This is because it might need to asynchronously query the datastore, if it doesn't have the value in memory.
 
 Like with Entities, you can optionally pass in a `key` to the decorator.
 
@@ -173,19 +173,24 @@ class Author {
   @Column({ isPrimary: true })  // More on this in a moment
   public emailAddress: string
 
+  @Column({ isIndexable: true })  // More on this in a moment
+  public phoneNumber: string
+
   public someUnsavedProperty: any
 
-  public constructor(firstName: string, lastName: string, emailAddress: string) {
+  public constructor(firstName: string, lastName: string, emailAddress: string, phoneNumber: string) {
     this.firstName = firstName
     this.lastName = lastName
     this.emailAddress = emailAddress
+    this.phoneNumber = phoneNumber
   }
 }
 
 const williamShakespeare = new Author(
   'William',
   'Shakespeare',
-  'william@shakespeare.com'
+  'william@shakespeare.com',
+  '+1234567890'
 )
 williamShakespeare.nickName = 'Bill'
 williamShakespeare.someUnsavedProperty = "Won't get saved!"
@@ -203,7 +208,7 @@ author.lastName.then(lastName => {
 
 ### Primary Columns
 
-Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the `@Column()` decorator.
+Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -217,7 +222,7 @@ class Author {
 }
 ```
 
-An example of a singleton class where you do not need a Primary Column, might be a configuration Entity where you store application secrets (e.g. API keys).
+An example of a singleton class where you do not need a Primary Column, might be a global configuration Entity where you store application secrets (e.g. API keys).
 
 ### Indexable Columns
 
@@ -231,7 +236,7 @@ class Author {
   // ...
 
   @Column({ isIndexable: true })
-  public phoneNumber: string | undefined
+  public phoneNumber: string
 
   // ...
 }
@@ -241,7 +246,9 @@ class Author {
 
 If your property is particularly complex (i.e. can't be stored natively in the datastore), you may wish to use a property getter/setter for a Column, to allow you to serialize it before saving in the datastore.
 
-For example, let's say you have a complex property, `Author.somethingComplex`:
+For example, let's say you have a complex property on `Author`, `somethingComplex`:
+
+<!-- prettier-ignore-start -->
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -249,18 +256,22 @@ class Author {
   // ...
 
   @Column()
-  private _complex: string // place to store serialized value of somethingComplex
+  private _complex: string  // place to store serialized value of somethingComplex
 
   set somethingComplex(value: any) {
-    this._complex = serialize(value) // function serialize(value: any): string
+    // function serialize(value: any): string
+    this._complex = serialize(value)
   }
   async get somethingComplex(): any {
-    return deserialize(await this._complex) // function deserialize(serializedValue: string): any
+    // function deserialize(serializedValue: string): any
+    return deserialize(await this._complex)
   }
 
   // ...
 }
 ```
+
+<!-- prettier-ignore-end -->
 
 ## Repositories
 
@@ -280,7 +291,8 @@ You can then save Entity instances.
 const williamShakespeare = new Author(
   'William',
   'Shakespeare',
-  'william@shakespeare.com'
+  'william@shakespeare.com',
+  '+1234567890'
 )
 await authorRepository.save(williamShakepseare)
 ```
@@ -296,6 +308,10 @@ const loadedWilliamShakespeare = await authorRepository.load(
 console.log(await loadedWilliamShakespeare.nickName) // Bill
 ```
 
+### Search
+
+> Coming soon!
+
 # Development
 
 ## Clone and Install Dependencies
@@ -308,7 +324,7 @@ npm install
 ## Run tests
 
 ```sh
-npm run lint  # 'npm run format' will automatically fix most problems
+npm run lint  # 'npm run lint:fix' will automatically fix most problems
 npm test
 ```
 
@@ -333,7 +349,7 @@ This project is [MIT](https://github.com/kv-orm/core/blob/master/LICENSE) licens
 
 # FAQs
 
-### My Entity keys are getting mangled when they are saved into the datastore!
+## My Entity keys are getting mangled when they are saved into the datastore
 
 If you're using a preprocessor that minifies class names, such as Babel, the class constructors names often get shortened. kv-orm will always use this class name, so, either disable minification in the preprocessor, or manually set the `key` value when creating an Entity e.g.
 

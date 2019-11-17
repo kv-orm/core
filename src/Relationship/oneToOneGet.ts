@@ -1,20 +1,20 @@
 import { BaseEntity } from '../Entity/Entity'
-import { ColumnMetadata } from './Column'
 import { Value } from '../Datastore/Datastore'
 import { getConstructor } from '../utils/entity'
 import { getDatastore } from '../utils/datastore'
-import { generatePropertyKey } from '../utils/keyGeneration'
+import { generateOneRelationshipKey } from '../utils/keyGeneration'
+import { RelationshipMetadata } from './relationshipMetadata'
 import { getCache } from '../utils/cache'
 
-export const columnGet = async (
+export const oneToOneGet = async (
   instance: BaseEntity,
-  columnMetadata: ColumnMetadata
+  relationshipMetadata: RelationshipMetadata
 ): Promise<Value> => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
   const cache = getCache(datastore)
 
-  const key = generatePropertyKey(instance, columnMetadata)
+  const key = generateOneRelationshipKey(instance, relationshipMetadata)
 
   return await cache.read(instance, key)
 }

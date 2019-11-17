@@ -4,7 +4,7 @@ import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
 import { RepositoryLoadError } from './RepositoryLoadError'
-import { RepositorySearchError } from './RepositorySearchError'
+import { ColumnLookupError } from '../utils/errors'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -32,6 +32,9 @@ describe(`Repository`, () => {
 
       @Column({ key: `indexableProperty`, isIndexable: true })
       public indexableProperty: string
+
+      @Column()
+      public arrayProperty: number[] = []
 
       constructor(primaryProperty: number, indexableProperty: string) {
         this.primaryProperty = primaryProperty
@@ -124,6 +127,16 @@ describe(`Repository`, () => {
     )
   })
 
+  it(`can save and load a Column with an array type`, async () => {
+    const values = [1, 2, 3, 4, 5]
+    complexInstance.arrayProperty = values
+    expect(await complexInstance.arrayProperty).toEqual(values)
+    await complexRepository.save(complexInstance)
+
+    const loadedInstance = await complexRepository.load(12345)
+    expect(await loadedInstance.arrayProperty).toEqual(values)
+  })
+
   describe(`RepositoryLoadError`, () => {
     it(`is thrown when loading a singleton Entity with an identifier`, async () => {
       await expect(
@@ -147,7 +160,7 @@ describe(`Repository`, () => {
         (async (): Promise<void> => {
           await complexRepository.search(`fakeProperty`, 1)
         })()
-      ).rejects.toThrow(RepositorySearchError)
+      ).rejects.toThrow(ColumnLookupError)
     })
   })
 })

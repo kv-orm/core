@@ -9,7 +9,7 @@ export const repositoryLoad = async <T extends BaseEntity>(
   identifier?: Value
 ): Promise<T> => {
   const instance = createEmptyInstance(constructor)
-  const primaryColumn = getPrimaryColumn(instance)
+  const primaryColumn = getPrimaryColumn(constructor)
 
   if (primaryColumn === undefined && identifier !== undefined) {
     throw new RepositoryLoadError(

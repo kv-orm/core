@@ -1,118 +1,46 @@
 import '../metadata'
 
-import { Datastore, Key, Value } from '../Datastore/Datastore'
-import {
-  BaseEntity,
-  ENTITY_METADATA_KEY,
-  EntityConstructor,
-  EntityConstructorMetadata,
-} from '../Entity/Entity'
-import {
-  ColumnMetadata,
-  ColumnValue,
-  ConstantColumnMetadata,
-} from '../Column/Column'
+import { Key, Value } from '../Datastore/Datastore'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
+import { ColumnMetadata } from '../Column/Column'
 import { getPrimaryColumn, getPrimaryColumnValue } from './columns'
-import { EntityMetadataLookupError, ColumnMetadataError } from './errors'
 import { getDatastore } from './datastore'
+import { getConstructor, getEntityMetadata } from './entity'
+import { RelationshipMetadata } from '../Relationship/relationshipMetadata'
 
-// TODO: Look at the difference of using the cached Primary Column Value vs. looking it up with getPropertyValue
-
-const getInstanceKey = (instance: BaseEntity): Key => {
-  const constructor = instance.constructor as EntityConstructor<BaseEntity>
-  const entityMetadata = Reflect.getMetadata(ENTITY_METADATA_KEY, constructor)
-
-  if (entityMetadata === undefined) {
-    throw new EntityMetadataLookupError(
-      constructor,
-      `Could not find metadata. Has it been defined yet?`
-    )
-  }
-
+const getEntityKey = (constructor: EntityConstructor): Key => {
+  const entityMetadata = getEntityMetadata(constructor)
   return entityMetadata.key
 }
 
-const getPrimaryColumnCachedValue = (
-  primaryColumn: ColumnMetadata,
-  instance: BaseEntity
-): ColumnValue => {
-  const cachedValue = primaryColumn.cachedValues.get(instance)
-
-  if (cachedValue === undefined) {
-    throw new ColumnMetadataError(
-      instance,
-      primaryColumn,
-      `Primary Column has no value`
-    )
-  }
-
-  return cachedValue.cachedValue
-}
-
-const getPropertyValue = async (
-  instance: BaseEntity,
-  columnMetadata: ColumnMetadata
-): Promise<Key> => await instance[columnMetadata.property]
-
 // Author:UUID-HERE:name
 // or, if singleton, ApplicationConfiguration:password
-export const generatePropertyKey = async (
-  datastore: Datastore,
+export const generatePropertyKey = (
   instance: BaseEntity,
-  columnMetadata: ColumnMetadata
-): Promise<Key> => {
-  const items = [getInstanceKey(instance)]
-  const primaryColumn = getPrimaryColumn(instance)
+  metadata: ColumnMetadata | RelationshipMetadata
+): Key => {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+  const items = [getEntityKey(constructor)]
+  const primaryColumn = getPrimaryColumn(constructor)
 
   if (primaryColumn) {
-    const primaryColumnCachedValue = getPrimaryColumnCachedValue(
-      primaryColumn,
-      instance
-    )
-
-    if (primaryColumnCachedValue === undefined) {
-      throw new ColumnMetadataError(
-        instance,
-        primaryColumn,
-        `Primary Column value is undefined. Did the repository load fail somehow?`
-      )
-    }
-
-    items.push(primaryColumnCachedValue)
+    items.push(getPrimaryColumnValue(instance))
   }
 
-  items.push(columnMetadata.key)
+  items.push(metadata.key)
 
   return items.join(datastore.keySeparator)
 }
 
 // Author:email:abc@xyz.com
-export const generateIndexablePropertyKey = async (
-  datastore: Datastore,
-  instance: BaseEntity,
-  columnMetadata: ColumnMetadata
-): Promise<Key> =>
-  [
-    getInstanceKey(instance),
-    columnMetadata.key,
-    await getPropertyValue(instance, columnMetadata),
-  ].join(datastore.keySeparator)
-
-export const generateIndexablePropertySearchKey = async (
-  constructor: EntityConstructor<BaseEntity>,
-  indexableProperty: ConstantColumnMetadata,
-  identifier: Value
-): Promise<Key> => {
+export const generateIndexablePropertyKey = (
+  constructor: EntityConstructor,
+  columnMetadata: ColumnMetadata,
+  value: Value
+): Key => {
   const datastore = getDatastore(constructor)
-  const entityMetadata = Reflect.getMetadata(
-    ENTITY_METADATA_KEY,
-    constructor
-  ) as EntityConstructorMetadata
-  if (entityMetadata === undefined) {
-    throw new EntityMetadataLookupError(constructor) // TODO
-  }
-
-  return [entityMetadata.key, indexableProperty.key, identifier].join(
+  return [getEntityKey(constructor), columnMetadata.key, value].join(
     datastore.keySeparator
   )
 }
@@ -120,28 +48,58 @@ export const generateIndexablePropertySearchKey = async (
 // UUID-HERE
 // or, if singleton, ApplicationConfiguration
 export const generateRelationshipKey = (instance: BaseEntity): Key => {
-  const primaryColumn = getPrimaryColumn(instance)
+  const constructor = getConstructor(instance)
+  const primaryColumn = getPrimaryColumn(constructor)
 
   if (primaryColumn) {
     return getPrimaryColumnValue(instance)
   }
 
-  return getInstanceKey(instance)
+  return getEntityKey(constructor)
 }
 
-// TODO: Probably want some sort of RelationshipMetadata object
 // Author:UUID-HERE:passport
-export const generateOneRelationshipKey = generatePropertyKey
+export const generateOneRelationshipKey = (
+  instance: BaseEntity,
+  relationshipMetadata: RelationshipMetadata
+): Key => {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+  const items = [getEntityKey(constructor)]
+  const primaryColumn = getPrimaryColumn(constructor)
+
+  if (primaryColumn) {
+    items.push(getPrimaryColumnValue(instance))
+  }
+
+  items.push(relationshipMetadata.key)
+
+  return items.join(datastore.keySeparator)
+}
 
 // Author:UUID-HERE:books:UUID-HERE
-export const generateManyRelationshipKey = async (
-  datastore: Datastore,
+export const generateManyRelationshipKey = (
   instance: BaseEntity,
-  columnMetadata: ColumnMetadata,
+  relationshipMetadata: RelationshipMetadata,
   relationshipInstance: BaseEntity
-): Promise<Key> => {
+): Key => {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+
   return [
-    await generatePropertyKey(datastore, instance, columnMetadata),
-    await generateRelationshipKey(relationshipInstance),
+    generatePropertyKey(instance, relationshipMetadata),
+    generateRelationshipKey(relationshipInstance),
   ].join(datastore.keySeparator)
+}
+
+export const generateManyRelationshipSearchKey = (
+  instance: BaseEntity,
+  relationshipMetadata: RelationshipMetadata
+): Key => {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+
+  return `${generatePropertyKey(instance, relationshipMetadata)}${
+    datastore.keySeparator
+  }`
 }
