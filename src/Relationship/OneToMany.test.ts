@@ -71,9 +71,14 @@ describe(`OneToMany`, () => {
     await parentRepository.save(parentInstance)
 
     const loadedRelations = await parentInstance.myProperty
-    expect(loadedRelations.length).toBe(2)
-    expect(await loadedRelations[0].id).toEqual(await childInstance.id)
-    expect(await loadedRelations[1].id).toEqual(await otherChildInstance.id)
+
+    const expectedIDs = [`abc`, `def`]
+    let i = 0
+    for await (const loadedRelation of loadedRelations) {
+      expect(await loadedRelation.id).toEqual(expectedIDs[i])
+      i++
+    }
+    expect(i).toBe(2)
   })
 
   it(`can save and load a relationship to a singleton entity`, async () => {
@@ -81,7 +86,12 @@ describe(`OneToMany`, () => {
     await singletonParentRepository.save(singletonParentInstance)
 
     const loadedRelations = await singletonParentInstance.myProperty
-    expect(loadedRelations.length).toBe(1)
-    expect(await loadedRelations[0].constantProperty).toEqual(`Never change!`)
+
+    let i = 0
+    for await (const loadedRelation of loadedRelations) {
+      expect(await loadedRelation.constantProperty).toEqual(`Never change!`)
+      i++
+    }
+    expect(i).toBe(1)
   })
 })
