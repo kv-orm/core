@@ -1,19 +1,21 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { Value } from '../Datastore/Datastore'
+import { Value, Datastore } from '../Datastore/Datastore'
 import { createEmptyInstance } from '../utils/entities'
 import {
   getPrimaryColumnMetadata,
   setPrimaryColumnValue,
 } from '../utils/columns'
 import { RepositoryLoadError } from './RepositoryLoadError'
+import { getDatastore } from '../utils/datastore'
+import { generatePropertyKey } from '../utils/keyGeneration'
+import { EntityNotFoundError } from './EntityNotFoundError'
+import { ColumnMetadata } from '../Column/columnMetadata'
 
-export const repositoryLoad = async <T extends BaseEntity>(
-  constructor: EntityConstructor<T>,
-  identifier?: Value
-): Promise<T> => {
-  const instance = createEmptyInstance(constructor)
-  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
-
+const assertIdentifierValid = (
+  constructor: EntityConstructor,
+  primaryColumnMetadata: ColumnMetadata | undefined,
+  identifier: Value
+): void => {
   if (primaryColumnMetadata === undefined && identifier !== undefined) {
     throw new RepositoryLoadError(
       constructor,
@@ -25,11 +27,42 @@ export const repositoryLoad = async <T extends BaseEntity>(
       `Entity is not a singleton, and so requires an identifier to load with.`
     )
   }
+}
 
-  // TODO: Throw error if does not exist
+const loadNonSingleton = async (
+  datastore: Datastore,
+  constructor: EntityConstructor,
+  instance: BaseEntity,
+  primaryColumnMetadata: ColumnMetadata,
+  identifier: Value
+): Promise<void> => {
+  setPrimaryColumnValue(instance, identifier)
+  const key = generatePropertyKey(instance, primaryColumnMetadata)
+  if ((await datastore.read(key)) !== identifier)
+    throw new EntityNotFoundError(constructor, identifier)
+}
+
+export const repositoryLoad = async <T extends BaseEntity>(
+  constructor: EntityConstructor<T>,
+  identifier?: Value
+): Promise<T> => {
+  const datastore = getDatastore(constructor)
+  const instance = createEmptyInstance(constructor)
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
+
+  assertIdentifierValid(constructor, primaryColumnMetadata, identifier)
 
   if (primaryColumnMetadata !== undefined && identifier !== undefined) {
-    setPrimaryColumnValue(instance, identifier)
+    await loadNonSingleton(
+      datastore,
+      constructor,
+      instance,
+      primaryColumnMetadata,
+      identifier
+    )
+  } else {
+    // Entity is a singleton
+    // Should we still somehow check if it has been saved before and throw a notfound error?
   }
 
   return instance

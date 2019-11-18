@@ -5,6 +5,7 @@ import { Column } from '../Column/Column'
 import { Repository, getRepository } from './Repository'
 import { RepositoryLoadError } from './RepositoryLoadError'
 import { ColumnLookupError } from '../utils/errors'
+import { EntityNotFoundError } from './EntityNotFoundError'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -161,6 +162,25 @@ describe(`Repository`, () => {
           await complexRepository.search(`fakeProperty`, 1)
         })()
       ).rejects.toThrow(ColumnLookupError)
+    })
+  })
+
+  describe(`EntityNotFoundError`, () => {
+    it(`is thrown when loading a non-existent non-singleton entity`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.load(`99999`)
+        })()
+      ).rejects.toThrow(EntityNotFoundError)
+    })
+
+    it(`is [not?] thrown when loading a non-existent singleton entity`, async () => {
+      // TODO: Should we throw an EntityNotFoundError here?
+      // await expect(
+      //   (async (): Promise<void> => {
+      //     await singletonRepository.load()
+      //   })()
+      // ).rejects.toThrow(EntityNotFoundError)
     })
   })
 })
