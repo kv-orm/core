@@ -1,7 +1,10 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
 import { createEmptyInstance } from '../utils/entities'
-import { getPrimaryColumn, setPrimaryColumnValue } from '../utils/columns'
+import {
+  getPrimaryColumnMetadata,
+  setPrimaryColumnValue,
+} from '../utils/columns'
 import { RepositoryLoadError } from './RepositoryLoadError'
 
 export const repositoryLoad = async <T extends BaseEntity>(
@@ -9,7 +12,7 @@ export const repositoryLoad = async <T extends BaseEntity>(
   identifier?: Value
 ): Promise<T> => {
   const instance = createEmptyInstance(constructor)
-  const primaryColumn = getPrimaryColumn(constructor)
+  const primaryColumn = getPrimaryColumnMetadata(constructor)
 
   if (primaryColumn === undefined && identifier !== undefined) {
     throw new RepositoryLoadError(

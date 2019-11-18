@@ -5,7 +5,7 @@ import { getHydrator } from './hydrate'
 import { getConstructor } from '../utils/entities'
 import { oneToOneSet } from './oneToOneSet'
 import { RelationshipMetadata } from './relationshipMetadata'
-import { setRelationship } from '../utils/relationships'
+import { setRelationshipMetadata } from '../utils/relationships'
 import { oneToOneGet } from './oneToOneGet'
 
 interface OneToOneOptions {
@@ -22,7 +22,7 @@ export function OneToOne(options: OneToOneOptions) {
     }
     const constructor = getConstructor(instance)
     // TODO: Assert key not in use
-    setRelationship(constructor, relationshipMetadata)
+    setRelationshipMetadata(constructor, relationshipMetadata)
 
     const hydrator = getHydrator(options.type)
 

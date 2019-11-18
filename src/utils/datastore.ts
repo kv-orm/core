@@ -1,4 +1,4 @@
-import { EntityConstructor, BaseEntity } from '../Entity/Entity'
+import { EntityConstructor } from '../Entity/Entity'
 import { Datastore } from '../Datastore/Datastore'
 import { getEntityMetadata } from './entities'
 

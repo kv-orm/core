@@ -3,15 +3,13 @@ import '../metadata'
 import { Key, Value } from '../Datastore/Datastore'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import { ColumnMetadata } from '../Column/columnMetadata'
-import { getPrimaryColumn, getPrimaryColumnValue } from './columns'
+import { getPrimaryColumnMetadata, getPrimaryColumnValue } from './columns'
 import { getDatastore } from './datastore'
 import { getConstructor, getEntityMetadata } from './entities'
 import { RelationshipMetadata } from '../Relationship/relationshipMetadata'
 
-const getEntityKey = (constructor: EntityConstructor): Key => {
-  const entityMetadata = getEntityMetadata(constructor)
-  return entityMetadata.key
-}
+const getEntityKey = (constructor: EntityConstructor): Key =>
+  getEntityMetadata(constructor).key
 
 // Author:UUID-HERE:name
 // or, if singleton, ApplicationConfiguration:password
@@ -22,9 +20,9 @@ export const generatePropertyKey = (
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
   const items = [getEntityKey(constructor)]
-  const primaryColumn = getPrimaryColumn(constructor)
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
-  if (primaryColumn) {
+  if (primaryColumnMetadata) {
     items.push(getPrimaryColumnValue(instance))
   }
 
@@ -49,9 +47,9 @@ export const generateIndexablePropertyKey = (
 // or, if singleton, ApplicationConfiguration
 export const generateRelationshipKey = (instance: BaseEntity): Key => {
   const constructor = getConstructor(instance)
-  const primaryColumn = getPrimaryColumn(constructor)
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
-  if (primaryColumn) {
+  if (primaryColumnMetadata) {
     return getPrimaryColumnValue(instance)
   }
 
@@ -66,9 +64,9 @@ export const generateOneRelationshipKey = (
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
   const items = [getEntityKey(constructor)]
-  const primaryColumn = getPrimaryColumn(constructor)
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
-  if (primaryColumn) {
+  if (primaryColumnMetadata) {
     items.push(getPrimaryColumnValue(instance))
   }
 
@@ -99,7 +97,7 @@ export const generateManyRelationshipSearchKey = (
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
 
-  return `${generatePropertyKey(instance, relationshipMetadata)}${
-    datastore.keySeparator
-  }`
+  return (
+    generatePropertyKey(instance, relationshipMetadata) + datastore.keySeparator
+  )
 }

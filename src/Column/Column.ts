@@ -2,7 +2,7 @@ import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { setColumnMetadata, getColumns } from '../utils/columns'
+import { setColumnMetadata, getColumnMetadatas } from '../utils/columns'
 import { getConstructor } from '../utils/entities'
 import { columnGet } from './columnGet'
 import { columnSet } from './columnSet'
@@ -24,7 +24,7 @@ const assertKeyNotInUse = (
   constructor: EntityConstructor,
   columnMetadata: ColumnMetadata
 ): void => {
-  const constantColumns = getColumns(constructor)
+  const constantColumns = getColumnMetadatas(constructor)
   const keysInUse = constantColumns.map(columnMetadata => columnMetadata.key)
 
   if (keysInUse.indexOf(columnMetadata.key) !== -1)
