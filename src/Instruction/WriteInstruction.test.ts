@@ -9,7 +9,7 @@ describe(`WriteInstruction`, () => {
   })
 
   it(`should generate keys`, async () => {
-    expect(await instruction.key).toEqual(`key`)
+    expect(instruction.key).toEqual(`key`)
   })
 
   it(`should hold values`, () => {
