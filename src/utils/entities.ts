@@ -1,6 +1,10 @@
+import { Cache } from '../Cache/Cache'
 import { EntityConstructor, BaseEntity, ENTITY_KEY } from '../Entity/Entity'
 import { EntityLookupError } from './errors'
 import { EntityMetadata } from '../Entity/entityMetadata'
+import { getDatastore } from './datastore'
+import { getCache } from './cache'
+import { Datastore } from '../Datastore/Datastore'
 
 export const getEntityMetadata = (
   constructor: EntityConstructor
@@ -30,3 +34,17 @@ export const getConstructor = (instance: BaseEntity): EntityConstructor =>
 export const createEmptyInstance = <T extends BaseEntity>(
   constructor: EntityConstructor<T>
 ): T => Object.create(constructor.prototype)
+
+export const getConstructorDatastoreCache = (
+  instance: BaseEntity
+): { constructor: EntityConstructor; datastore: Datastore; cache: Cache } => {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+  const cache = getCache(datastore)
+
+  return {
+    constructor,
+    datastore,
+    cache,
+  }
+}

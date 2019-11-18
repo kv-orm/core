@@ -1,9 +1,7 @@
 import { BaseEntity } from '../Entity/Entity'
 import { ColumnMetadata } from './columnMetadata'
 import { Key, Value } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entities'
-import { getDatastore } from '../utils/datastore'
-import { getCache } from '../utils/cache'
+import { getConstructorDatastoreCache } from '../utils/entities'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
@@ -15,9 +13,7 @@ export const columnSet = (
   columnMetadata: ColumnMetadata,
   value: Value
 ): void => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-  const cache = getCache(datastore)
+  const { constructor, cache } = getConstructorDatastoreCache(instance)
 
   if (columnMetadata.isPrimary) setPrimaryColumnValue(instance, value)
 

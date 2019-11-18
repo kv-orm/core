@@ -4,6 +4,7 @@ import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 import { generateManyRelationshipSearchKey } from '../utils/keyGeneration'
 import { RelationshipMetadata } from './relationshipMetadata'
+import { SearchStrategyError } from '../Datastore/SearchStrategyError'
 
 // TODO: Cache?
 export const oneToManyGet = async (
@@ -17,6 +18,18 @@ export const oneToManyGet = async (
     instance,
     relationshipMetadata
   )
+
+  let strategy
+  if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
+    strategy = SearchStrategy.prefix
+  }
+
+  if (strategy === undefined) {
+    throw new SearchStrategyError(
+      SearchStrategy.prefix,
+      `Datastore does not support searching`
+    )
+  }
 
   // TODO: Yield and paginate
   const searchResults = await datastore.search({

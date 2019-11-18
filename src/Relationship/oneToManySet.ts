@@ -1,8 +1,6 @@
 import { BaseEntity } from '../Entity/Entity'
 import { Key } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entities'
-import { getDatastore } from '../utils/datastore'
-import { getCache } from '../utils/cache'
+import { getConstructorDatastoreCache } from '../utils/entities'
 import {
   generateManyRelationshipKey,
   generateRelationshipKey,
@@ -14,9 +12,7 @@ export const oneToManySet = (
   relationshipMetadata: RelationshipMetadata,
   values: BaseEntity[]
 ): void => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-  const cache = getCache(datastore)
+  const { cache } = getConstructorDatastoreCache(instance)
 
   for (const value of values) {
     const keyGenerator = (): Key =>
