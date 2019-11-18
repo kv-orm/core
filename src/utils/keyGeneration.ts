@@ -2,7 +2,7 @@ import '../metadata'
 
 import { Key, Value } from '../Datastore/Datastore'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { ColumnMetadata } from '../Column/Column'
+import { ColumnMetadata } from '../Column/columnMetadata'
 import { getPrimaryColumn, getPrimaryColumnValue } from './columns'
 import { getDatastore } from './datastore'
 import { getConstructor, getEntityMetadata } from './entity'

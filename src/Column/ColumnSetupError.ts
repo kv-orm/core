@@ -1,5 +1,5 @@
 import { SetupError } from '../utils/errors'
-import { ColumnMetadata } from './Column'
+import { ColumnMetadata } from './columnMetadata'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 
 export class ColumnSetupError extends SetupError {

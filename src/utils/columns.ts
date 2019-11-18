@@ -1,7 +1,8 @@
 import '../metadata'
 
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { COLUMN_KEY, ColumnMetadata, ColumnKey } from '../Column/Column'
+import { COLUMN_KEY, ColumnKey } from '../Column/Column'
+import { ColumnMetadata } from '../Column/columnMetadata'
 import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
 import { getConstructor } from './entity'
 import { getDatastore } from './datastore'

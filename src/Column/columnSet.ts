@@ -1,5 +1,5 @@
 import { BaseEntity } from '../Entity/Entity'
-import { ColumnMetadata } from './Column'
+import { ColumnMetadata } from './columnMetadata'
 import { Key, Value } from '../Datastore/Datastore'
 import { getConstructor } from '../utils/entity'
 import { getDatastore } from '../utils/datastore'

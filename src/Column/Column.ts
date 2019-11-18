@@ -7,18 +7,12 @@ import { getConstructor } from '../utils/entity'
 import { columnGet } from './columnGet'
 import { columnSet } from './columnSet'
 import { ColumnSetupError } from './ColumnSetupError'
+import { ColumnMetadata, createColumnMetadata } from './columnMetadata'
 
 export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ColumnKey = string | number | symbol
 
 export const COLUMN_KEY = Symbol(`Column`)
-
-export interface ColumnMetadata {
-  key: Key
-  property: ColumnKey
-  isPrimary?: boolean
-  isIndexable?: boolean
-}
 
 interface ColumnOptions {
   key?: Key
@@ -43,12 +37,10 @@ const assertKeyNotInUse = (
 
 export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
   return (instance: T, property: keyof T): void => {
-    const columnMetadata: ColumnMetadata = {
-      key: options.key || property.toString(),
+    const columnMetadata: ColumnMetadata = createColumnMetadata({
+      options,
       property,
-      isIndexable: options.isIndexable,
-      isPrimary: options.isPrimary,
-    }
+    })
 
     const constructor = getConstructor(instance)
     assertKeyNotInUse(constructor, columnMetadata)

@@ -1,4 +1,5 @@
-import { Column, ColumnMetadata } from '../Column/Column'
+import { Column } from '../Column/Column'
+import { ColumnMetadata } from '../Column/columnMetadata'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
