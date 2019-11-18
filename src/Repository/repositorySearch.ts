@@ -1,14 +1,14 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
 import { getColumnMetadata } from '../utils/columns'
-import { ColumnKey } from '../Column/Column'
+import { PropertyKey } from '../Entity/Entity'
 import { generateIndexablePropertyKey } from '../utils/keyGeneration'
 import { repositoryLoad } from './repositoryLoad'
 import { getDatastore } from '../utils/datastore'
 
 export const repositorySearch = async <T extends BaseEntity>(
   constructor: EntityConstructor<T>,
-  property: ColumnKey,
+  property: PropertyKey,
   identifier: Value
 ): Promise<T | null> => {
   const datastore = getDatastore(constructor)

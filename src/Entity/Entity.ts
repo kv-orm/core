@@ -1,12 +1,14 @@
 import '../metadata'
 
 import { Datastore, Key } from '../Datastore/Datastore'
-import { ColumnKey, ColumnValue } from '../Column/Column'
 import { createEntityMetadata, EntityMetadata } from './entityMetadata'
 
 export const ENTITY_KEY = Symbol(`entityMetadata`)
 
-export type BaseEntity = Record<ColumnKey, ColumnValue> // TODO: improve
+export type PropertyValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
+export type PropertyKey = string | number | symbol
+
+export type BaseEntity = Record<PropertyKey, PropertyValue>
 
 export type EntityConstructor<T extends BaseEntity = BaseEntity> = {
   new (...args: any[]): T // eslint-disable-line @typescript-eslint/no-explicit-any

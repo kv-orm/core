@@ -1,7 +1,7 @@
 import '../metadata'
 
-import { EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { COLUMN_KEY, ColumnKey } from '../Column/Column'
+import { EntityConstructor, BaseEntity, PropertyKey } from '../Entity/Entity'
+import { COLUMN_KEY } from '../Column/Column'
 import { ColumnMetadata } from '../Column/columnMetadata'
 import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
 import { getConstructor } from './entities'
@@ -24,7 +24,7 @@ const setColumnMetadatas = (
 
 export const getColumnMetadata = (
   constructor: EntityConstructor,
-  property: ColumnKey
+  property: PropertyKey
 ): ColumnMetadata => {
   const columnMetadatas = getColumnMetadatas(constructor)
   const columnMetadata = columnMetadatas.find(

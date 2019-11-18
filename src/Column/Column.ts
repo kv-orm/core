@@ -1,16 +1,13 @@
 import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
-import { BaseEntity, EntityConstructor } from '../Entity/Entity'
+import { BaseEntity, EntityConstructor, PropertyValue } from '../Entity/Entity'
 import { setColumnMetadata, getColumnMetadatas } from '../utils/columns'
 import { getConstructor } from '../utils/entities'
 import { columnGet } from './columnGet'
 import { columnSet } from './columnSet'
 import { ColumnSetupError } from './ColumnSetupError'
 import { ColumnMetadata, createColumnMetadata } from './columnMetadata'
-
-export type ColumnValue = any // eslint-disable-line @typescript-eslint/no-explicit-any
-export type ColumnKey = string | number | symbol
 
 export const COLUMN_KEY = Symbol(`Column`)
 
@@ -52,7 +49,7 @@ export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
       get: async function get(this: BaseEntity) {
         return await columnGet(this, columnMetadata)
       },
-      set: function set(this: BaseEntity, value: ColumnValue) {
+      set: function set(this: BaseEntity, value: PropertyValue) {
         columnSet(this, columnMetadata, value)
       },
     })

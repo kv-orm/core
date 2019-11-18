@@ -1,9 +1,8 @@
-import { EntityConstructor } from '../Entity/Entity'
+import { EntityConstructor, PropertyKey } from '../Entity/Entity'
 import {
   RelationshipMetadata,
   RELATIONSHIP_KEY,
 } from '../Relationship/relationshipMetadata'
-import { ColumnKey } from '../Column/Column'
 import { RelationshipLookupError } from './errors'
 
 export const getRelationshipMetadatas = (
@@ -21,7 +20,7 @@ const setRelationshipMetadatas = (
 
 export const getRelationshipMetadata = (
   constructor: EntityConstructor,
-  property: ColumnKey
+  property: PropertyKey
 ): RelationshipMetadata => {
   const relationshipMetadatas = getRelationshipMetadatas(constructor)
   const relationshipMetadata = relationshipMetadatas.find(

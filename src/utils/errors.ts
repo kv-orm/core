@@ -1,5 +1,4 @@
-import { EntityConstructor } from '../Entity/Entity'
-import { ColumnKey } from '../Column/Column'
+import { EntityConstructor, PropertyKey } from '../Entity/Entity'
 
 export class KVORMError extends Error {
   constructor(message: string) {
@@ -32,7 +31,7 @@ export class EntityLookupError extends MetadataError {
 export class ColumnLookupError extends MetadataError {
   constructor(
     constructor: EntityConstructor,
-    property: ColumnKey,
+    property: PropertyKey,
     message = `Unknown Error`
   ) {
     super(
@@ -47,7 +46,7 @@ export class ColumnLookupError extends MetadataError {
 export class RelationshipLookupError extends MetadataError {
   constructor(
     constructor: EntityConstructor,
-    property: ColumnKey,
+    property: PropertyKey,
     message = `Unknown Error`
   ) {
     super(

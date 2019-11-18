@@ -1,11 +1,11 @@
 import { Key } from '../Datastore/Datastore'
-import { ColumnKey } from '../Column/Column'
+import { PropertyKey } from '../Entity/Entity'
 import { EntityConstructor } from '../Entity/Entity'
 
 export const RELATIONSHIP_KEY = Symbol(`Relationship`)
 
 export interface RelationshipMetadata {
   key: Key
-  property: ColumnKey
+  property: PropertyKey
   type: EntityConstructor
 }

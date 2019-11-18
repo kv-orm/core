@@ -1,5 +1,5 @@
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { ColumnKey } from '../Column/Column'
+import { PropertyKey } from '../Entity/Entity'
 import { Key } from '../Datastore/Datastore'
 import { getHydrator } from './hydrate'
 import { getConstructor } from '../utils/entities'
@@ -14,7 +14,7 @@ interface OneToOneOptions {
 }
 
 export function OneToOne(options: OneToOneOptions) {
-  return (instance: BaseEntity, property: ColumnKey): void => {
+  return (instance: BaseEntity, property: PropertyKey): void => {
     const relationshipMetadata: RelationshipMetadata = {
       key: options.key || property.toString(),
       property,
