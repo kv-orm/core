@@ -1,4 +1,5 @@
-import { Column, ColumnMetadata } from '../Column/Column'
+import { Column } from '../Column/Column'
+import { ColumnMetadata } from '../Column/columnMetadata'
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
@@ -7,8 +8,12 @@ import {
 } from './keyGeneration'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
-import { getPrimaryColumn, getColumns, getColumn } from './columns'
-import { getRelationship } from './relationships'
+import {
+  getPrimaryColumnMetadata,
+  getColumnMetadatas,
+  getColumnMetadata,
+} from './columns'
+import { getRelationshipMetadata } from './relationships'
 import { Entity, EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { EntityLookupError } from './errors'
 import { OneToOne } from '../Relationship/OneToOne'
@@ -89,14 +94,17 @@ describe(`keyGeneration`, () => {
   describe(`generatePropertyKey`, () => {
     it(`generates a key for a singleton with default keys`, async () => {
       const instance = new singletonEntityConstructor()
-      const columnMetadata = getColumn(singletonEntityConstructor, `myProperty`)
+      const columnMetadata = getColumnMetadata(
+        singletonEntityConstructor,
+        `myProperty`
+      )
       expect(generatePropertyKey(instance, columnMetadata)).toEqual(
         `SingletonEntity:myProperty`
       )
     })
     it(`generates a key for a singleton with custom keys`, async () => {
       const instance = new singletonEntityWithCustomKeysConstructor()
-      const columnMetadata = getColumn(
+      const columnMetadata = getColumnMetadata(
         singletonEntityWithCustomKeysConstructor,
         `myProperty`
       )
@@ -106,14 +114,14 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with default keys`, async () => {
       const instance = new complexEntityConstructor()
-      const primaryColumnMetadata = getPrimaryColumn(
+      const primaryColumnMetadata = getPrimaryColumnMetadata(
         complexEntityConstructor
       ) as ColumnMetadata
-      const otherColumnMetadata = getColumn(
+      const otherColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `myProperty`
       )
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `indexable`
       )
@@ -130,14 +138,14 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with custom keys`, async () => {
       const instance = new complexEntityWithCustomKeysConstructor()
-      const primaryColumnMetadata = getPrimaryColumn(
+      const primaryColumnMetadata = getPrimaryColumnMetadata(
         complexEntityWithCustomKeysConstructor
       ) as ColumnMetadata
-      const otherColumnMetadata = getColumn(
+      const otherColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `myProperty`
       )
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `indexable`
       )
@@ -162,7 +170,7 @@ describe(`keyGeneration`, () => {
           }
 
           const instance = new MyInvalidEntity()
-          const columnMetadata = getColumns(MyInvalidEntity)[0]
+          const columnMetadata = getColumnMetadatas(MyInvalidEntity)[0]
           generatePropertyKey(instance, columnMetadata)
         })()
       ).rejects.toThrow(EntityLookupError)
@@ -170,7 +178,7 @@ describe(`keyGeneration`, () => {
   })
   describe(`generateIndexablePropertyKey`, () => {
     it(`generates a key`, () => {
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `indexable`
       )
@@ -183,7 +191,7 @@ describe(`keyGeneration`, () => {
       ).toEqual(`ComplexEntity:indexable:abc@xyz.com`)
     })
     it(`generates a key with custom keys`, () => {
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `indexable`
       )
@@ -199,7 +207,7 @@ describe(`keyGeneration`, () => {
   describe(`generateOneRelationshipKey`, () => {
     it(`generates a key for a singleton`, async () => {
       const instance = new singletonEntityConstructor()
-      const relationshipMetadata = getRelationship(
+      const relationshipMetadata = getRelationshipMetadata(
         singletonEntityConstructor,
         `relationshipProperty`
       )
@@ -209,7 +217,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key for a singleton with custom keys`, async () => {
       const instance = new singletonEntityWithCustomKeysConstructor()
-      const relationshipMetadata = getRelationship(
+      const relationshipMetadata = getRelationshipMetadata(
         singletonEntityWithCustomKeysConstructor,
         `relationshipProperty`
       )
@@ -219,7 +227,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with default keys`, async () => {
       const instance = new complexEntityConstructor()
-      const otherRelationshipMetadata = getRelationship(
+      const otherRelationshipMetadata = getRelationshipMetadata(
         complexEntityConstructor,
         `relationshipProperty`
       )
@@ -230,7 +238,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with custom keys`, async () => {
       const instance = new complexEntityWithCustomKeysConstructor()
-      const otherRelationshipMetadata = getRelationship(
+      const otherRelationshipMetadata = getRelationshipMetadata(
         complexEntityWithCustomKeysConstructor,
         `relationshipProperty`
       )
@@ -249,7 +257,7 @@ describe(`keyGeneration`, () => {
 
     it(`generates a key for a singleton`, async () => {
       const instance = new singletonEntityConstructor()
-      const relationshipMetadata = getRelationship(
+      const relationshipMetadata = getRelationshipMetadata(
         singletonEntityConstructor,
         `relationshipProperty`
       )
@@ -263,7 +271,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key for a singleton with custom keys`, async () => {
       const instance = new singletonEntityWithCustomKeysConstructor()
-      const relationshipMetadata = getRelationship(
+      const relationshipMetadata = getRelationshipMetadata(
         singletonEntityWithCustomKeysConstructor,
         `relationshipProperty`
       )
@@ -277,7 +285,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with default keys`, async () => {
       const instance = new complexEntityConstructor()
-      const otherRelationshipMetadata = getRelationship(
+      const otherRelationshipMetadata = getRelationshipMetadata(
         complexEntityConstructor,
         `relationshipProperty`
       )
@@ -292,7 +300,7 @@ describe(`keyGeneration`, () => {
     })
     it(`generates a key with custom keys`, async () => {
       const instance = new complexEntityWithCustomKeysConstructor()
-      const otherRelationshipMetadata = getRelationship(
+      const otherRelationshipMetadata = getRelationshipMetadata(
         complexEntityWithCustomKeysConstructor,
         `relationshipProperty`
       )

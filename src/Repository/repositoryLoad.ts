@@ -1,7 +1,10 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
-import { createEmptyInstance } from '../utils/entity'
-import { getPrimaryColumn, setPrimaryColumnValue } from '../utils/columns'
+import { createEmptyInstance } from '../utils/entities'
+import {
+  getPrimaryColumnMetadata,
+  setPrimaryColumnValue,
+} from '../utils/columns'
 import { RepositoryLoadError } from './RepositoryLoadError'
 
 export const repositoryLoad = async <T extends BaseEntity>(
@@ -9,22 +12,25 @@ export const repositoryLoad = async <T extends BaseEntity>(
   identifier?: Value
 ): Promise<T> => {
   const instance = createEmptyInstance(constructor)
-  const primaryColumn = getPrimaryColumn(constructor)
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
-  if (primaryColumn === undefined && identifier !== undefined) {
+  if (primaryColumnMetadata === undefined && identifier !== undefined) {
     throw new RepositoryLoadError(
       constructor,
       `Entity is a singleton, so cannot load with an identifier.`
     )
-  } else if (primaryColumn !== undefined && identifier === undefined) {
+  } else if (primaryColumnMetadata !== undefined && identifier === undefined) {
     throw new RepositoryLoadError(
       constructor,
       `Entity is not a singleton, and so requires an identifier to load with.`
     )
   }
 
-  if (primaryColumn !== undefined && identifier !== undefined) {
+  // TODO: Throw error if does not exist
+
+  if (primaryColumnMetadata !== undefined && identifier !== undefined) {
     setPrimaryColumnValue(instance, identifier)
   }
+
   return instance
 }

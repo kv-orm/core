@@ -1,45 +1,46 @@
-import { EntityConstructor } from '../Entity/Entity'
+import { EntityConstructor, PropertyKey } from '../Entity/Entity'
 import {
   RelationshipMetadata,
   RELATIONSHIP_KEY,
 } from '../Relationship/relationshipMetadata'
-import { ColumnKey } from '../Column/Column'
 import { RelationshipLookupError } from './errors'
 
-export const getRelationships = (
+export const getRelationshipMetadatas = (
   constructor: EntityConstructor
 ): RelationshipMetadata[] => {
   return Reflect.getMetadata(RELATIONSHIP_KEY, constructor) || []
 }
 
-const setRelationships = (
+const setRelationshipMetadatas = (
   constructor: EntityConstructor,
-  relationships: RelationshipMetadata[]
+  relationshipMetadatas: RelationshipMetadata[]
 ): void => {
-  Reflect.defineMetadata(RELATIONSHIP_KEY, relationships, constructor)
+  Reflect.defineMetadata(RELATIONSHIP_KEY, relationshipMetadatas, constructor)
 }
 
-export const getRelationship = (
+export const getRelationshipMetadata = (
   constructor: EntityConstructor,
-  property: ColumnKey
+  property: PropertyKey
 ): RelationshipMetadata => {
-  const relationships = getRelationships(constructor)
-  const relationship = relationships.find(({ property: p }) => p === property)
-  if (relationship === undefined)
+  const relationshipMetadatas = getRelationshipMetadatas(constructor)
+  const relationshipMetadata = relationshipMetadatas.find(
+    ({ property: p }) => p === property
+  )
+  if (relationshipMetadata === undefined)
     throw new RelationshipLookupError(
       constructor,
       property,
       `Could not find Relationship. Has it been defined yet?`
     )
 
-  return relationship
+  return relationshipMetadata
 }
 
-export const setRelationship = (
+export const setRelationshipMetadata = (
   constructor: EntityConstructor,
-  relationship: RelationshipMetadata
+  relationshipMetadata: RelationshipMetadata
 ): void => {
-  const relationships = getRelationships(constructor)
-  relationships.push(relationship)
-  setRelationships(constructor, relationships)
+  const relationshipMetadatas = getRelationshipMetadatas(constructor)
+  relationshipMetadatas.push(relationshipMetadata)
+  setRelationshipMetadatas(constructor, relationshipMetadatas)
 }

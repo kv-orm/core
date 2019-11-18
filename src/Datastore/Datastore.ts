@@ -1,4 +1,5 @@
 import { Cache } from '../Cache/Cache'
+import { SearchStrategyError } from './SearchStrategyError'
 
 export type Value = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type Key = string
@@ -54,10 +55,13 @@ export abstract class Datastore {
     return this._search(options)
   }
 
-  protected assertSearchStrategyIsValid = (strategy: SearchStrategy): void => {
-    if (!(strategy in this.searchStrategies))
-      throw new Error(
-        `Search Strategy, ${SearchStrategy[strategy]}, is not implemented on this type of Datastore.`
+  protected assertSearchStrategyIsValid = (
+    searchStrategy: SearchStrategy
+  ): void => {
+    if (!(searchStrategy in this.searchStrategies))
+      throw new SearchStrategyError(
+        searchStrategy,
+        `Search Strategy is not implemented on this type of Datastore.`
       )
   }
 

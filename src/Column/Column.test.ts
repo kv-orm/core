@@ -2,7 +2,7 @@ import { Entity, BaseEntity } from '../Entity/Entity'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
 import { Column } from '../Column/Column'
-import { ColumnSetupError } from './ColumnSetupError'
+import { MetadataSetupError } from '../utils/metadata'
 
 describe(`Column`, () => {
   let datastore: Datastore
@@ -52,7 +52,7 @@ describe(`Column`, () => {
     expect(await instance.arrayColumn).toEqual(values)
   })
 
-  describe(`ColumnSetupError`, () => {
+  describe(`MetadataSetupError`, () => {
     it(`is thrown with a duplicate key`, () => {
       expect(() => {
         @Entity({ datastore, key: `MyOtherEntity` })
@@ -64,7 +64,7 @@ describe(`Column`, () => {
           @Column({ key: `myDuplicatedProperty` })
           public myProperty2 = `other initial value`
         }
-      }).toThrow(ColumnSetupError)
+      }).toThrow(MetadataSetupError)
     })
   })
 })

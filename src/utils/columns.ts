@@ -1,59 +1,62 @@
 import '../metadata'
 
-import { EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { COLUMN_KEY, ColumnMetadata, ColumnKey } from '../Column/Column'
+import { EntityConstructor, BaseEntity, PropertyKey } from '../Entity/Entity'
+import { COLUMN_KEY } from '../Column/Column'
+import { ColumnMetadata } from '../Column/columnMetadata'
 import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
-import { getConstructor } from './entity'
+import { getConstructor } from './entities'
 import { getDatastore } from './datastore'
 import { getCache } from './cache'
 import { Value } from '../Datastore/Datastore'
 
-export const getColumns = (
+export const getColumnMetadatas = (
   constructor: EntityConstructor
 ): ColumnMetadata[] => {
   return Reflect.getMetadata(COLUMN_KEY, constructor) || []
 }
 
-const setColumns = (
+const setColumnMetadatas = (
   constructor: EntityConstructor,
-  columns: ColumnMetadata[]
+  columnMetadatas: ColumnMetadata[]
 ): void => {
-  Reflect.defineMetadata(COLUMN_KEY, columns, constructor)
+  Reflect.defineMetadata(COLUMN_KEY, columnMetadatas, constructor)
 }
 
-export const getColumn = (
+export const getColumnMetadata = (
   constructor: EntityConstructor,
-  property: ColumnKey
+  property: PropertyKey
 ): ColumnMetadata => {
-  const columns = getColumns(constructor)
-  const column = columns.find(({ property: p }) => p === property)
-  if (column === undefined)
+  const columnMetadatas = getColumnMetadatas(constructor)
+  const columnMetadata = columnMetadatas.find(
+    ({ property: p }) => p === property
+  )
+  if (columnMetadata === undefined)
     throw new ColumnLookupError(
       constructor,
       property,
       `Could not find Column. Has it been defined yet?`
     )
 
-  return column
+  return columnMetadata
 }
 
-export const setColumn = (
+export const setColumnMetadata = (
   constructor: EntityConstructor,
-  column: ColumnMetadata
+  columnMetadata: ColumnMetadata
 ): void => {
-  const columns = getColumns(constructor)
-  columns.push(column)
-  setColumns(constructor, columns)
+  const columnMetadatas = getColumnMetadatas(constructor)
+  columnMetadatas.push(columnMetadata)
+  setColumnMetadatas(constructor, columnMetadatas)
 }
 
-export const getPrimaryColumn = (
+export const getPrimaryColumnMetadata = (
   constructor: EntityConstructor
 ): ColumnMetadata | undefined => {
-  return getColumns(constructor).find(({ isPrimary }) => isPrimary)
+  return getColumnMetadatas(constructor).find(({ isPrimary }) => isPrimary)
 }
 
 const assertHasPrimaryColumn = (constructor: EntityConstructor): void => {
-  if (getPrimaryColumn(constructor) === undefined)
+  if (getPrimaryColumnMetadata(constructor) === undefined)
     throw new PrimaryColumnMissingError(constructor)
 }
 

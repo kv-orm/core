@@ -1,12 +1,16 @@
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { ColumnKey } from '../Column/Column'
+import { PropertyKey } from '../Entity/Entity'
 import { Key } from '../Datastore/Datastore'
 import { getHydrator } from './hydrate'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { oneToManySet } from './oneToManySet'
-import { RelationshipMetadata } from './relationshipMetadata'
-import { setRelationship } from '../utils/relationships'
+import { createRelationshipMetadata } from './relationshipMetadata'
+import {
+  setRelationshipMetadata,
+  getRelationshipMetadatas,
+} from '../utils/relationships'
 import { oneToManyGet } from './oneToManyGet'
+import { assertKeyNotInUse } from '../utils/metadata'
 
 interface OneToManyOptions {
   key?: Key
@@ -14,20 +18,20 @@ interface OneToManyOptions {
 }
 
 export function OneToMany(options: OneToManyOptions) {
-  return (instance: BaseEntity, property: ColumnKey): void => {
-    const relationshipMetadata: RelationshipMetadata = {
-      key: options.key || property.toString(),
+  return (instance: BaseEntity, property: PropertyKey): void => {
+    const relationshipMetadata = createRelationshipMetadata({
+      options,
       property,
-      type: options.type,
-    }
+    })
 
     const constructor = getConstructor(instance)
-    // TODO: Assert key not in use
-    setRelationship(constructor, relationshipMetadata)
+    assertKeyNotInUse(constructor, relationshipMetadata, {
+      getMetadatas: getRelationshipMetadatas,
+    })
+    setRelationshipMetadata(constructor, relationshipMetadata)
 
     const hydrator = getHydrator(options.type)
 
-    // Override Property
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,

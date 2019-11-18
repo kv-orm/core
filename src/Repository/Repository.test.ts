@@ -154,7 +154,7 @@ describe(`Repository`, () => {
     })
   })
 
-  describe(`RepositorySearchError`, () => {
+  describe(`ColumnLookupError`, () => {
     it(`is thrown when searching a non-existent property`, async () => {
       await expect(
         (async (): Promise<void> => {
