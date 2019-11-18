@@ -1,6 +1,6 @@
 import { BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 import { generateOneRelationshipKey } from '../utils/keyGeneration'
 import { RelationshipMetadata } from './relationshipMetadata'

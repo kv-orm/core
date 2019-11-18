@@ -4,7 +4,7 @@ import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { COLUMN_KEY, ColumnKey } from '../Column/Column'
 import { ColumnMetadata } from '../Column/columnMetadata'
 import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
-import { getConstructor } from './entity'
+import { getConstructor } from './entities'
 import { getDatastore } from './datastore'
 import { getCache } from './cache'
 import { Value } from '../Datastore/Datastore'
@@ -22,7 +22,7 @@ const setColumns = (
   Reflect.defineMetadata(COLUMN_KEY, columns, constructor)
 }
 
-export const getColumn = (
+export const getColumnMetadata = (
   constructor: EntityConstructor,
   property: ColumnKey
 ): ColumnMetadata => {
@@ -38,7 +38,7 @@ export const getColumn = (
   return column
 }
 
-export const setColumn = (
+export const setColumnMetadata = (
   constructor: EntityConstructor,
   column: ColumnMetadata
 ): void => {

@@ -4,7 +4,7 @@ import { Value } from '../Datastore/Datastore'
 import { getPrimaryColumn } from '../utils/columns'
 
 export const getHydrator = (
-  constructor: EntityConstructor<BaseEntity>
+  constructor: EntityConstructor
 ): ((identifier: Value) => Promise<BaseEntity>) => {
   return async (identifier: Value): Promise<BaseEntity> => {
     const primaryColumn = getPrimaryColumn(constructor)

@@ -8,7 +8,7 @@ import {
 } from './keyGeneration'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
-import { getPrimaryColumn, getColumns, getColumn } from './columns'
+import { getPrimaryColumn, getColumns, getColumnMetadata } from './columns'
 import { getRelationship } from './relationships'
 import { Entity, EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { EntityLookupError } from './errors'
@@ -90,14 +90,17 @@ describe(`keyGeneration`, () => {
   describe(`generatePropertyKey`, () => {
     it(`generates a key for a singleton with default keys`, async () => {
       const instance = new singletonEntityConstructor()
-      const columnMetadata = getColumn(singletonEntityConstructor, `myProperty`)
+      const columnMetadata = getColumnMetadata(
+        singletonEntityConstructor,
+        `myProperty`
+      )
       expect(generatePropertyKey(instance, columnMetadata)).toEqual(
         `SingletonEntity:myProperty`
       )
     })
     it(`generates a key for a singleton with custom keys`, async () => {
       const instance = new singletonEntityWithCustomKeysConstructor()
-      const columnMetadata = getColumn(
+      const columnMetadata = getColumnMetadata(
         singletonEntityWithCustomKeysConstructor,
         `myProperty`
       )
@@ -110,11 +113,11 @@ describe(`keyGeneration`, () => {
       const primaryColumnMetadata = getPrimaryColumn(
         complexEntityConstructor
       ) as ColumnMetadata
-      const otherColumnMetadata = getColumn(
+      const otherColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `myProperty`
       )
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `indexable`
       )
@@ -134,11 +137,11 @@ describe(`keyGeneration`, () => {
       const primaryColumnMetadata = getPrimaryColumn(
         complexEntityWithCustomKeysConstructor
       ) as ColumnMetadata
-      const otherColumnMetadata = getColumn(
+      const otherColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `myProperty`
       )
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `indexable`
       )
@@ -171,7 +174,7 @@ describe(`keyGeneration`, () => {
   })
   describe(`generateIndexablePropertyKey`, () => {
     it(`generates a key`, () => {
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `indexable`
       )
@@ -184,7 +187,7 @@ describe(`keyGeneration`, () => {
       ).toEqual(`ComplexEntity:indexable:abc@xyz.com`)
     })
     it(`generates a key with custom keys`, () => {
-      const indexableColumnMetadata = getColumn(
+      const indexableColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `indexable`
       )

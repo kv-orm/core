@@ -2,8 +2,8 @@ import '../metadata'
 
 import { Key } from '../Datastore/Datastore'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { setColumn, getColumns } from '../utils/columns'
-import { getConstructor } from '../utils/entity'
+import { setColumnMetadata, getColumns } from '../utils/columns'
+import { getConstructor } from '../utils/entities'
 import { columnGet } from './columnGet'
 import { columnSet } from './columnSet'
 import { ColumnSetupError } from './ColumnSetupError'
@@ -44,7 +44,7 @@ export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
 
     const constructor = getConstructor(instance)
     assertKeyNotInUse(constructor, columnMetadata)
-    setColumn(constructor, columnMetadata)
+    setColumnMetadata(constructor, columnMetadata)
 
     Reflect.defineProperty(instance, property, {
       enumerable: true,

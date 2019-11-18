@@ -1,18 +1,14 @@
-import {
-  EntityConstructor,
-  BaseEntity,
-  EntityConstructorMetadata,
-  ENTITY_KEY,
-} from '../Entity/Entity'
+import { EntityConstructor, BaseEntity, ENTITY_KEY } from '../Entity/Entity'
 import { EntityLookupError } from './errors'
+import { EntityMetadata } from '../Entity/entityMetadata'
 
 export const getEntityMetadata = (
   constructor: EntityConstructor
-): EntityConstructorMetadata => {
+): EntityMetadata => {
   const entityMetadata = Reflect.getMetadata(
     ENTITY_KEY,
     constructor
-  ) as EntityConstructorMetadata
+  ) as EntityMetadata
 
   if (entityMetadata === undefined)
     throw new EntityLookupError(
@@ -22,6 +18,11 @@ export const getEntityMetadata = (
 
   return entityMetadata
 }
+
+export const setEntityMetadata = (
+  constructor: EntityConstructor,
+  entityMetadata: EntityMetadata
+): void => Reflect.defineMetadata(ENTITY_KEY, entityMetadata, constructor)
 
 export const getConstructor = (instance: BaseEntity): EntityConstructor =>
   instance.constructor as EntityConstructor

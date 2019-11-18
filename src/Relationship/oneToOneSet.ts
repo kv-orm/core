@@ -1,6 +1,6 @@
 import { BaseEntity } from '../Entity/Entity'
 import { Key } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 import { getCache } from '../utils/cache'
 import {

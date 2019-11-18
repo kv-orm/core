@@ -1,6 +1,6 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
-import { createEmptyInstance } from '../utils/entity'
+import { createEmptyInstance } from '../utils/entities'
 import { getPrimaryColumn, setPrimaryColumnValue } from '../utils/columns'
 import { RepositoryLoadError } from './RepositoryLoadError'
 

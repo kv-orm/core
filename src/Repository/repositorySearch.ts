@@ -1,6 +1,6 @@
 import { EntityConstructor, BaseEntity } from '../Entity/Entity'
 import { Value } from '../Datastore/Datastore'
-import { getColumn } from '../utils/columns'
+import { getColumnMetadata } from '../utils/columns'
 import { ColumnKey } from '../Column/Column'
 import { generateIndexablePropertyKey } from '../utils/keyGeneration'
 import { repositoryLoad } from './repositoryLoad'
@@ -12,7 +12,7 @@ export const repositorySearch = async <T extends BaseEntity>(
   identifier: Value
 ): Promise<T | null> => {
   const datastore = getDatastore(constructor)
-  const columnMetadata = getColumn(constructor, property)
+  const columnMetadata = getColumnMetadata(constructor, property)
 
   // TODO: Assert Column isIndexable
 

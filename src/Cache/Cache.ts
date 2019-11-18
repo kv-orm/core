@@ -3,7 +3,7 @@ import { BaseEntity } from '../Entity/Entity'
 import { Instruction } from '../Instruction/Instruction'
 import { WriteInstruction } from '../Instruction/WriteInstruction'
 import { DeleteInstruction } from '../Instruction/DeleteInstruction'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 
 // TODO: Tidy and extract out

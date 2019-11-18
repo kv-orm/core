@@ -1,7 +1,7 @@
 import { BaseEntity } from '../Entity/Entity'
 import { ColumnMetadata } from './columnMetadata'
 import { Value } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 import { generatePropertyKey } from '../utils/keyGeneration'
 import { getCache } from '../utils/cache'

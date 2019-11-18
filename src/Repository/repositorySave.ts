@@ -1,6 +1,6 @@
 import { BaseEntity } from '../Entity/Entity'
 import { getDatastore } from '../utils/datastore'
-import { getConstructor } from '../utils/entity'
+import { getConstructor } from '../utils/entities'
 import { getCache } from '../utils/cache'
 
 // const saveIndexableProperty = async (

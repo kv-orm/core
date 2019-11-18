@@ -5,7 +5,7 @@ import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import { ColumnMetadata } from '../Column/columnMetadata'
 import { getPrimaryColumn, getPrimaryColumnValue } from './columns'
 import { getDatastore } from './datastore'
-import { getConstructor, getEntityMetadata } from './entity'
+import { getConstructor, getEntityMetadata } from './entities'
 import { RelationshipMetadata } from '../Relationship/relationshipMetadata'
 
 const getEntityKey = (constructor: EntityConstructor): Key => {
