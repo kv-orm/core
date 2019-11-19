@@ -16,7 +16,11 @@ import {
 } from './columns'
 import { getRelationshipMetadata } from './relationships'
 import { Entity, EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { EntityLookupError, InvalidKeyError } from './errors'
+import {
+  EntityLookupError,
+  InvalidKeyError,
+  RelationshipLookupError,
+} from './errors'
 import { OneToOne } from '../Relationship/OneToOne'
 
 describe(`keyGeneration`, () => {
