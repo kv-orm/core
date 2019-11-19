@@ -1,13 +1,16 @@
-import { Datastore } from '../Datastore/Datastore'
-import { BaseEntity, Entity } from '../Entity/Entity'
+import { Datastore, Value, SearchStrategy } from '../Datastore/Datastore'
+import { BaseEntity, Entity, EntityConstructor } from '../Entity/Entity'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { OneToMany } from './OneToMany'
 import { Column } from '../Column/Column'
 import { getRepository, Repository } from '../Repository/Repository'
+import { SearchResult } from '../Datastore/Datastore'
+import { SearchStrategyError } from '../Datastore/SearchStrategyError'
 
 describe(`OneToMany`, () => {
   let datastore: Datastore
   let childInstance: BaseEntity
+  let childEntityConstructor: EntityConstructor
   let otherChildInstance: BaseEntity
   let parentInstance: BaseEntity
   let singletonInstance: BaseEntity
@@ -30,6 +33,8 @@ describe(`OneToMany`, () => {
         this.id = id
       }
     }
+
+    childEntityConstructor = ChildEntity
 
     @Entity({ datastore })
     class ParentEntity {
@@ -93,5 +98,59 @@ describe(`OneToMany`, () => {
       i++
     }
     expect(i).toBe(1)
+  })
+
+  describe(`SearchStrategyError`, () => {
+    class UselessDatastore extends Datastore {
+      public searchStrategies = []
+
+      protected _read(): Promise<Value> {
+        throw new Error(`Method not implemented.`)
+      }
+
+      protected _write(): Promise<void> {
+        throw new Error(`Method not implemented.`)
+      }
+
+      protected _delete(): Promise<void> {
+        throw new Error(`Method not implemented.`)
+      }
+
+      protected _search(): Promise<SearchResult> {
+        throw new Error(`Method not implemented.`)
+      }
+    }
+
+    const uselessDatastore = new UselessDatastore()
+
+    @Entity({ datastore: uselessDatastore })
+    class UselessEntity {
+      @OneToMany({ type: childEntityConstructor })
+      relations = undefined
+    }
+
+    const instance = new UselessEntity()
+
+    it(`is thrown when using an unsupported Datastore`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          const relations = ((await instance.relations) as unknown) as {
+            next: () => Promise<void>
+          }
+          await relations.next()
+        })()
+      ).rejects.toThrow(SearchStrategyError)
+    })
+
+    it(`is thrown wnen trying to manually search the datastore`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await uselessDatastore.search({
+            strategy: SearchStrategy.prefix,
+            term: `test`,
+          })
+        })()
+      ).rejects.toThrow(SearchStrategyError)
+    })
   })
 })
