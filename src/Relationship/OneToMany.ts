@@ -33,13 +33,15 @@ export function OneToMany(options: OneToManyOptions, plugins = {}) {
     })
     setRelationshipMetadata(constructor, relationshipMetadata)
 
-    const hydrator = getHydrator(options.type)
-
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: function get(this: BaseEntity) {
-        return oneToManyGet(this, relationshipMetadata, hydrator)
+        return oneToManyGet(
+          this,
+          relationshipMetadata,
+          getHydrator(options.type)
+        )
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
         if (values) {
