@@ -7,6 +7,7 @@ import { Key } from '../Datastore/Datastore'
 interface Metadata {
   key: Key
   property: PropertyKey
+  plugins: {}
 }
 
 export class MetadataSetupError extends SetupError {

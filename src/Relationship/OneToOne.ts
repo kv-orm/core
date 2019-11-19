@@ -16,12 +16,15 @@ interface OneToOneOptions {
   key?: Key
   type: EntityConstructor
 }
-export function OneToOne(options: OneToOneOptions) {
+export function OneToOne(options: OneToOneOptions, plugins = {}) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata({
-      options,
-      property,
-    })
+    const relationshipMetadata = createRelationshipMetadata(
+      {
+        options,
+        property,
+      },
+      plugins
+    )
 
     const constructor = getConstructor(instance)
     assertKeyNotInUse(constructor, relationshipMetadata, {
