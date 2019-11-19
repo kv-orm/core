@@ -1,24 +1,13 @@
 import { BaseEntity } from '../Entity/Entity'
-import { Value, SearchStrategy } from '../Datastore/Datastore'
+import { Value, SearchStrategy, Datastore } from '../Datastore/Datastore'
 import { getConstructor } from '../utils/entities'
 import { getDatastore } from '../utils/datastore'
 import { generateManyRelationshipSearchKey } from '../utils/keyGeneration'
 import { RelationshipMetadata } from './relationshipMetadata'
 import { SearchStrategyError } from '../Datastore/SearchStrategyError'
+import { keysFromSearch } from '../utils/relationships'
 
-// TODO: Cache?
-export const oneToManyGet = async (
-  instance: BaseEntity,
-  relationshipMetadata: RelationshipMetadata
-): Promise<Value[]> => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-
-  const searchKey = generateManyRelationshipSearchKey(
-    instance,
-    relationshipMetadata
-  )
-
+const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
   let strategy
   if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
     strategy = SearchStrategy.prefix
@@ -30,13 +19,31 @@ export const oneToManyGet = async (
       `Datastore does not support searching`
     )
   }
+  return strategy
+}
 
-  // TODO: Yield and paginate
-  const searchResults = await datastore.search({
-    strategy: SearchStrategy.prefix,
+export async function* oneToManyGet(
+  instance: BaseEntity,
+  relationshipMetadata: RelationshipMetadata,
+  hydrator: (identifier: Value) => Promise<BaseEntity>
+): AsyncGenerator<BaseEntity> {
+  const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
+
+  const searchKey = generateManyRelationshipSearchKey(
+    instance,
+    relationshipMetadata
+  )
+  const searchStrategy = pickSearchStrategy(datastore)
+
+  const keyGenerator = await keysFromSearch(datastore, {
+    strategy: searchStrategy,
     term: searchKey,
   })
 
-  // TODO: Be safer with string-ing
-  return Promise.resolve(searchResults.keys.map(key => key.split(searchKey)[1]))
+  while (true) {
+    const { done, value } = await keyGenerator.next()
+    if (done) return
+    yield await hydrator(value)
+  }
 }

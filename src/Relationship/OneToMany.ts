@@ -35,9 +35,8 @@ export function OneToMany(options: OneToManyOptions) {
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
-      get: async function get(this: BaseEntity) {
-        const values = await oneToManyGet(this, relationshipMetadata)
-        return Promise.all(values.map(hydrator))
+      get: function get(this: BaseEntity) {
+        return oneToManyGet(this, relationshipMetadata, hydrator)
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
         if (values) {
