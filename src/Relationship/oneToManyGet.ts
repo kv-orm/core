@@ -38,7 +38,7 @@ export async function* oneToManyGet(
   )
   const searchStrategy = pickSearchStrategy(datastore)
 
-  const keyGenerator = await keysFromSearch(datastore, {
+  const keyGenerator = keysFromSearch(datastore, {
     strategy: searchStrategy,
     term: searchKey,
   })
@@ -46,6 +46,12 @@ export async function* oneToManyGet(
   while (true) {
     const { done, value } = await keyGenerator.next()
     if (done) return
-    yield await hydrator(extractManyRelationshipValueKey(value, searchKey))
+
+    const primaryColumnValue = extractManyRelationshipValueKey(
+      datastore,
+      value,
+      searchKey
+    )
+    yield await hydrator(primaryColumnValue)
   }
 }
