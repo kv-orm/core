@@ -44,12 +44,15 @@ const assertHasPrimaryColumn = (constructor: EntityConstructor): void => {
     throw new PrimaryColumnMissingError(constructor)
 }
 
-export const getPrimaryColumnValue = (instance: BaseEntity): Value => {
+export const getPrimaryColumnValue = (
+  instance: BaseEntity,
+  { failSilently } = { failSilently: false }
+): Value => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
   const cache = getCache(datastore)
   assertHasPrimaryColumn(constructor)
-  return cache.getPrimaryColumnValue(instance)
+  return cache.getPrimaryColumnValue(instance, { failSilently })
 }
 
 export const setPrimaryColumnValue = (

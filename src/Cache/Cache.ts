@@ -41,9 +41,12 @@ export class Cache {
     return cacheDelete(this, instance, keyGenerator)
   }
 
-  public getPrimaryColumnValue(instance: BaseEntity): Value {
+  public getPrimaryColumnValue(
+    instance: BaseEntity,
+    { failSilently } = { failSilently: false }
+  ): Value {
     const value = this.primaryColumnValues.get(instance)
-    if (value === undefined)
+    if (value === undefined && !failSilently)
       throw new CacheMissingPrimaryColumnValueError(instance)
     return value
   }

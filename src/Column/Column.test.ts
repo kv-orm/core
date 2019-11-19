@@ -3,6 +3,7 @@ import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
 import { Column } from '../Column/Column'
 import { MetadataSetupError } from '../utils/metadata'
+import { ReadOnlyError } from '../utils/errors'
 
 describe(`Column`, () => {
   let datastore: Datastore
@@ -17,11 +18,18 @@ describe(`Column`, () => {
       @Column({ key: `myProperty` })
       public myProperty = `initial value`
 
+      @Column({ isPrimary: true })
+      public id: string
+
+      constructor(id: string) {
+        this.id = id
+      }
+
       public otherProp = `1`
     }
 
-    instance = new MyEntity()
-    otherInstance = new MyEntity()
+    instance = new MyEntity(`abc`)
+    otherInstance = new MyEntity(`def`)
     otherInstance.otherProp = `2`
   })
 
@@ -65,6 +73,14 @@ describe(`Column`, () => {
           public myProperty2 = `other initial value`
         }
       }).toThrow(MetadataSetupError)
+    })
+  })
+
+  describe(`ReadOnlyError`, () => {
+    it(`is thrown when attempting to write to a Primary Column twice`, () => {
+      expect(() => {
+        instance.id = `zzz`
+      }).toThrow(ReadOnlyError)
     })
   })
 })

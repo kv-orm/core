@@ -1,5 +1,5 @@
 import { EntityConstructor, PropertyKey } from '../Entity/Entity'
-import { Key } from '../Datastore/Datastore'
+import { Key, Value } from '../Datastore/Datastore'
 
 export class KVORMError extends Error {
   constructor(message: string) {
@@ -19,6 +19,22 @@ export class MetadataError extends KVORMError {
   constructor(message: string) {
     super(message)
     this.name = `MetadataError`
+  }
+}
+
+export class ReadOnlyError extends KVORMError {
+  constructor(
+    constructor: EntityConstructor,
+    property: PropertyKey,
+    value: Value,
+    message = `Unknown Error`
+  ) {
+    super(
+      `Could not write Value, ${value}, to Column, ${property.toString()}, on Entity, ${
+        constructor.name
+      }: ${message}`
+    )
+    this.name = `ReadOnlyError`
   }
 }
 
