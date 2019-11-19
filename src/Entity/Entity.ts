@@ -29,18 +29,20 @@ const assertKeyNotInUse = (
   // throw new EntitySetupError(constructor, `Key is already in use`)
 }
 
-export function Entity({
-  datastore,
-  key,
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-EntityOptions): (constructor: EntityConstructor) => any {
+export function Entity(
+  { datastore, key }: EntityOptions,
+  plugins = {} // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): (constructor: EntityConstructor) => any {
   return function<T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {
-    const entityMetadata: EntityMetadata = createEntityMetadata({
-      datastore,
-      key: key || constructor.name,
-    })
+    const entityMetadata: EntityMetadata = createEntityMetadata(
+      {
+        datastore,
+        key: key || constructor.name,
+      },
+      plugins
+    )
 
     assertKeyNotInUse(datastore, entityMetadata, constructor)
     setEntityMetadata(constructor, entityMetadata)

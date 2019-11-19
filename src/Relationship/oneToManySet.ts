@@ -10,7 +10,7 @@ import { RelationshipMetadata } from './relationshipMetadata'
 export const oneToManySet = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
-  values: BaseEntity[]
+  values: BaseEntity[] = []
 ): void => {
   const { cache } = getConstructorDatastoreCache(instance)
 

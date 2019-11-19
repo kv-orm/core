@@ -17,12 +17,15 @@ interface OneToManyOptions {
   type: EntityConstructor
 }
 
-export function OneToMany(options: OneToManyOptions) {
+export function OneToMany(options: OneToManyOptions, plugins = {}) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata({
-      options,
-      property,
-    })
+    const relationshipMetadata = createRelationshipMetadata(
+      {
+        options,
+        property,
+      },
+      plugins
+    )
 
     const constructor = getConstructor(instance)
     assertKeyNotInUse(constructor, relationshipMetadata, {
@@ -30,13 +33,15 @@ export function OneToMany(options: OneToManyOptions) {
     })
     setRelationshipMetadata(constructor, relationshipMetadata)
 
-    const hydrator = getHydrator(options.type)
-
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: function get(this: BaseEntity) {
-        return oneToManyGet(this, relationshipMetadata, hydrator)
+        return oneToManyGet(
+          this,
+          relationshipMetadata,
+          getHydrator(options.type)
+        )
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
         if (values) {

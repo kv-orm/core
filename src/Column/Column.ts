@@ -17,12 +17,18 @@ interface ColumnOptions {
   isIndexable?: boolean
 }
 
-export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
+export const Column = <T extends BaseEntity>(
+  options: ColumnOptions = {},
+  plugins = {}
+) => {
   return (instance: T, property: keyof T): void => {
-    const columnMetadata = createColumnMetadata({
-      options,
-      property,
-    })
+    const columnMetadata = createColumnMetadata(
+      {
+        options,
+        property,
+      },
+      plugins
+    )
 
     const constructor = getConstructor(instance)
     assertKeyNotInUse(constructor, columnMetadata, {
