@@ -12,7 +12,7 @@ interface Metadata {
 export class MetadataSetupError extends SetupError {
   constructor(
     constructor: BaseEntity,
-    metadata: { key: string },
+    metadata: Metadata,
     message = `Unknown Error`
   ) {
     super(
@@ -24,11 +24,11 @@ export class MetadataSetupError extends SetupError {
 
 export const assertKeyNotInUse = (
   constructor: EntityConstructor,
-  metadata: { key: string },
+  metadata: Metadata,
   {
     getMetadatas,
   }: {
-    getMetadatas: (constructor: EntityConstructor) => { key: string }[]
+    getMetadatas: (constructor: EntityConstructor) => Metadata[]
   }
 ): void => {
   const metadatas = getMetadatas(constructor)
