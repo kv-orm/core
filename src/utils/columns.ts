@@ -8,46 +8,30 @@ import { getConstructor } from './entities'
 import { getDatastore } from './datastore'
 import { getCache } from './cache'
 import { Value } from '../Datastore/Datastore'
+import { getMetadatas, getMetadata, setMetadata } from './metadata'
 
 export const getColumnMetadatas = (
   constructor: EntityConstructor
-): ColumnMetadata[] => {
-  return Reflect.getMetadata(COLUMN_KEY, constructor) || []
-}
-
-const setColumnMetadatas = (
-  constructor: EntityConstructor,
-  columnMetadatas: ColumnMetadata[]
-): void => {
-  Reflect.defineMetadata(COLUMN_KEY, columnMetadatas, constructor)
-}
+): ColumnMetadata[] => getMetadatas(COLUMN_KEY, constructor) as ColumnMetadata[]
 
 export const getColumnMetadata = (
   constructor: EntityConstructor,
   property: PropertyKey
 ): ColumnMetadata => {
   const columnMetadatas = getColumnMetadatas(constructor)
-  const columnMetadata = columnMetadatas.find(
-    ({ property: p }) => p === property
-  )
-  if (columnMetadata === undefined)
+  return getMetadata(columnMetadatas, property, () => {
     throw new ColumnLookupError(
       constructor,
       property,
       `Could not find Column. Has it been defined yet?`
     )
-
-  return columnMetadata
+  })
 }
 
 export const setColumnMetadata = (
   constructor: EntityConstructor,
   columnMetadata: ColumnMetadata
-): void => {
-  const columnMetadatas = getColumnMetadatas(constructor)
-  columnMetadatas.push(columnMetadata)
-  setColumnMetadatas(constructor, columnMetadatas)
-}
+): void => setMetadata(COLUMN_KEY, constructor, columnMetadata)
 
 export const getPrimaryColumnMetadata = (
   constructor: EntityConstructor

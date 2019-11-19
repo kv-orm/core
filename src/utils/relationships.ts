@@ -11,46 +11,31 @@ import {
   Datastore,
 } from '../Datastore/Datastore'
 import { extractManyRelationshipValueKey } from './keyGeneration'
+import { getMetadatas, getMetadata, setMetadata } from './metadata'
 
 export const getRelationshipMetadatas = (
   constructor: EntityConstructor
-): RelationshipMetadata[] => {
-  return Reflect.getMetadata(RELATIONSHIP_KEY, constructor) || []
-}
-
-const setRelationshipMetadatas = (
-  constructor: EntityConstructor,
-  relationshipMetadatas: RelationshipMetadata[]
-): void => {
-  Reflect.defineMetadata(RELATIONSHIP_KEY, relationshipMetadatas, constructor)
-}
+): RelationshipMetadata[] =>
+  getMetadatas(RELATIONSHIP_KEY, constructor) as RelationshipMetadata[]
 
 export const getRelationshipMetadata = (
   constructor: EntityConstructor,
   property: PropertyKey
 ): RelationshipMetadata => {
   const relationshipMetadatas = getRelationshipMetadatas(constructor)
-  const relationshipMetadata = relationshipMetadatas.find(
-    ({ property: p }) => p === property
-  )
-  if (relationshipMetadata === undefined)
+  return getMetadata(relationshipMetadatas, property, () => {
     throw new RelationshipLookupError(
       constructor,
       property,
       `Could not find Relationship. Has it been defined yet?`
     )
-
-  return relationshipMetadata
+  }) as RelationshipMetadata
 }
 
 export const setRelationshipMetadata = (
   constructor: EntityConstructor,
   relationshipMetadata: RelationshipMetadata
-): void => {
-  const relationshipMetadatas = getRelationshipMetadatas(constructor)
-  relationshipMetadatas.push(relationshipMetadata)
-  setRelationshipMetadatas(constructor, relationshipMetadatas)
-}
+): void => setMetadata(RELATIONSHIP_KEY, constructor, relationshipMetadata)
 
 export async function* keysFromSearch(
   datastore: Datastore,
