@@ -2,7 +2,8 @@ import '../metadata'
 
 import { Datastore, Key } from '../Datastore/Datastore'
 import { createEntityMetadata, EntityMetadata } from './entityMetadata'
-import { setEntityMetadata } from '../utils/entities'
+import { setEntityMetadata, getEntityMetadata } from '../utils/entities'
+import { assertKeyNotInUse } from '../utils/metadata'
 
 export const ENTITY_KEY = Symbol(`entityMetadata`)
 
@@ -20,15 +21,6 @@ interface EntityOptions {
   datastore: Datastore
 }
 
-const assertKeyNotInUse = (
-  datastore: Datastore,
-  entityMetadata: EntityMetadata,
-  constructor: EntityConstructor
-): void => {
-  // TODO
-  // throw new EntitySetupError(constructor, `Key is already in use`)
-}
-
 export function Entity(
   { datastore, key }: EntityOptions,
   plugins = {} // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,7 +36,10 @@ export function Entity(
       plugins
     )
 
-    assertKeyNotInUse(datastore, entityMetadata, constructor)
+    assertKeyNotInUse(constructor, entityMetadata, {
+      getMetadatas: () => datastore.entityConstructors.map(getEntityMetadata),
+    })
+    datastore.registerEntity(constructor)
     setEntityMetadata(constructor, entityMetadata)
 
     return constructor

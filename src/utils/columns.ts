@@ -25,7 +25,7 @@ export const getColumnMetadata = (
       property,
       `Could not find Column. Has it been defined yet?`
     )
-  })
+  }) as ColumnMetadata
 }
 
 export const setColumnMetadata = (
