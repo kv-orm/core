@@ -2,6 +2,7 @@ import '../metadata'
 
 import { Datastore, Key } from '../Datastore/Datastore'
 import { createEntityMetadata, EntityMetadata } from './entityMetadata'
+import { setEntityMetadata } from '../utils/entities'
 
 export const ENTITY_KEY = Symbol(`entityMetadata`)
 
@@ -40,9 +41,10 @@ EntityOptions): (constructor: EntityConstructor) => any {
       datastore,
       key: key || constructor.name,
     })
-    assertKeyNotInUse(datastore, entityMetadata, constructor)
 
-    Reflect.defineMetadata(ENTITY_KEY, entityMetadata, constructor)
+    assertKeyNotInUse(datastore, entityMetadata, constructor)
+    setEntityMetadata(constructor, entityMetadata)
+
     return constructor
   }
 }
