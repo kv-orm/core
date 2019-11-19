@@ -4,13 +4,6 @@ import {
   RELATIONSHIP_KEY,
 } from '../Relationship/relationshipMetadata'
 import { RelationshipLookupError } from './errors'
-import {
-  SearchOptions,
-  Key,
-  SearchResult,
-  Datastore,
-} from '../Datastore/Datastore'
-import { extractManyRelationshipValueKey } from './keyGeneration'
 import { getMetadatas, getMetadata, setMetadata } from './metadata'
 
 export const getRelationshipMetadatas = (
@@ -36,26 +29,3 @@ export const setRelationshipMetadata = (
   constructor: EntityConstructor,
   relationshipMetadata: RelationshipMetadata
 ): void => setMetadata(RELATIONSHIP_KEY, constructor, relationshipMetadata)
-
-export async function* keysFromSearch(
-  datastore: Datastore,
-  options: SearchOptions
-): AsyncGenerator<Key> {
-  let cursor
-  let hasNextPage = true
-  while (hasNextPage) {
-    const searchResults: SearchResult = await datastore.search({
-      ...options,
-      after: cursor,
-    })
-    const { keys: queue } = searchResults
-    cursor = searchResults.cursor
-    hasNextPage = searchResults.hasNextPage
-
-    while (queue.length > 0) {
-      const key = queue.shift()
-      if (key !== undefined)
-        yield extractManyRelationshipValueKey(key, options.term)
-    }
-  }
-}
