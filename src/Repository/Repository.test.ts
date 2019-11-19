@@ -6,6 +6,7 @@ import { Repository, getRepository } from './Repository'
 import { RepositoryLoadError } from './RepositoryLoadError'
 import { ColumnLookupError } from '../utils/errors'
 import { EntityNotFoundError } from './EntityNotFoundError'
+import { ColumnNotSearchableError } from './ColumnNotSearchableError'
 
 describe(`Repository`, () => {
   let datastore: Datastore
@@ -128,6 +129,15 @@ describe(`Repository`, () => {
     )
   })
 
+  it(`returns null when searching for a non-existent instance`, async () => {
+    await complexRepository.save(complexInstance)
+    const searchedInstance = await complexRepository.search(
+      `indexableProperty`,
+      `non-existent@email.com`
+    )
+    expect(searchedInstance).toBeNull()
+  })
+
   it(`can save and load a Column with an array type`, async () => {
     const values = [1, 2, 3, 4, 5]
     complexInstance.arrayProperty = values
@@ -162,6 +172,16 @@ describe(`Repository`, () => {
           await complexRepository.search(`fakeProperty`, 1)
         })()
       ).rejects.toThrow(ColumnLookupError)
+    })
+  })
+
+  describe(`ColumnNotSearchableError`, () => {
+    it(`is thrown when searching a non isIndexable Column`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.search(`myProperty`, `value`)
+        })()
+      ).rejects.toThrow(ColumnNotSearchableError)
     })
   })
 
