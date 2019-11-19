@@ -110,8 +110,8 @@ export const generateManyRelationshipSearchKey = (
   )
 }
 
-// TODO: Be safer with string-ing
 export const extractManyRelationshipValueKey = (
+  datastore: Datastore,
   key: Key,
   searchKey: Key
-): Key => key.split(searchKey)[1]
+): Key => key.split(searchKey)[1].split(datastore.keySeparator)[0]
