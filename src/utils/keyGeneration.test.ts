@@ -5,6 +5,7 @@ import {
   generateIndexablePropertyKey,
   generateOneRelationshipKey,
   generateManyRelationshipKey,
+  assertKeysDoNotContainSeparator,
 } from './keyGeneration'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
@@ -15,7 +16,7 @@ import {
 } from './columns'
 import { getRelationshipMetadata } from './relationships'
 import { Entity, EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { EntityLookupError } from './errors'
+import { EntityLookupError, InvalidKeyError } from './errors'
 import { OneToOne } from '../Relationship/OneToOne'
 
 describe(`keyGeneration`, () => {
@@ -312,6 +313,14 @@ describe(`keyGeneration`, () => {
           relationshipInstance
         )
       ).toEqual(`CustomComplexEntityKey:12345:CustomRelationshipKey:12345`)
+    })
+  })
+
+  describe(`InvalidKeyError`, () => {
+    it(`is thrown when generating a key with the key separator in it`, () => {
+      expect(() => {
+        assertKeysDoNotContainSeparator(datastore, [`test:bad:key`, `:`])
+      }).toThrow(InvalidKeyError)
     })
   })
 })
