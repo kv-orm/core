@@ -1,11 +1,13 @@
 import { BaseEntity } from '../Entity/Entity'
 import { Value, SearchStrategy, Datastore } from '../Datastore/Datastore'
 import { getConstructor } from '../utils/entities'
-import { getDatastore } from '../utils/datastore'
-import { generateManyRelationshipSearchKey } from '../utils/keyGeneration'
+import { getDatastore, keysFromSearch } from '../utils/datastore'
+import {
+  generateManyRelationshipSearchKey,
+  extractManyRelationshipValueKey,
+} from '../utils/keyGeneration'
 import { RelationshipMetadata } from './relationshipMetadata'
 import { SearchStrategyError } from '../Datastore/SearchStrategyError'
-import { keysFromSearch } from '../utils/relationships'
 
 const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
   let strategy
@@ -44,6 +46,6 @@ export async function* oneToManyGet(
   while (true) {
     const { done, value } = await keyGenerator.next()
     if (done) return
-    yield await hydrator(value)
+    yield await hydrator(extractManyRelationshipValueKey(value, searchKey))
   }
 }

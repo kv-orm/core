@@ -1,5 +1,10 @@
 import { EntityConstructor } from '../Entity/Entity'
-import { Datastore, SearchOptions, SearchResult } from '../Datastore/Datastore'
+import {
+  Datastore,
+  SearchOptions,
+  SearchResult,
+  Key,
+} from '../Datastore/Datastore'
 import { getEntityMetadata } from './entities'
 
 export const getDatastore = (constructor: EntityConstructor): Datastore =>
@@ -25,4 +30,26 @@ export const paginateSearch = async (
   }
 
   return results
+}
+
+export async function* keysFromSearch(
+  datastore: Datastore,
+  options: SearchOptions
+): AsyncGenerator<Key> {
+  let cursor
+  let hasNextPage = true
+  while (hasNextPage) {
+    const searchResults: SearchResult = await datastore.search({
+      ...options,
+      after: cursor,
+    })
+    const { keys: queue } = searchResults
+    cursor = searchResults.cursor
+    hasNextPage = searchResults.hasNextPage
+
+    while (queue.length > 0) {
+      const key = queue.shift()
+      if (key !== undefined) yield key
+    }
+  }
 }

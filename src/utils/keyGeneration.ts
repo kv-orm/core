@@ -60,20 +60,7 @@ export const generateRelationshipKey = (instance: BaseEntity): Key => {
 export const generateOneRelationshipKey = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata
-): Key => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-  const items = [getEntityKey(constructor)]
-  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
-
-  if (primaryColumnMetadata) {
-    items.push(getPrimaryColumnValue(instance))
-  }
-
-  items.push(relationshipMetadata.key)
-
-  return items.join(datastore.keySeparator)
-}
+): Key => generatePropertyKey(instance, relationshipMetadata)
 
 // Author:UUID-HERE:books:UUID-HERE
 export const generateManyRelationshipKey = (
