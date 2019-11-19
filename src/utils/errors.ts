@@ -1,4 +1,5 @@
 import { EntityConstructor, PropertyKey } from '../Entity/Entity'
+import { Key } from '../Datastore/Datastore'
 
 export class KVORMError extends Error {
   constructor(message: string) {
@@ -65,5 +66,12 @@ export class PrimaryColumnMissingError extends MetadataError {
   ) {
     super(`Primary Column not found on Entity, ${constructor.name}: ${message}`)
     this.name = `PrimaryColumnMissingError`
+  }
+}
+
+export class InvalidKeyError extends MetadataError {
+  constructor(key: Key, message = `Unknown Error`) {
+    super(`Key, ${key}, is invalid: ${message}`)
+    this.name = `InvalidKeyError`
   }
 }

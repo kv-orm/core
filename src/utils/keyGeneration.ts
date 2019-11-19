@@ -1,15 +1,30 @@
 import '../metadata'
 
-import { Key, Value } from '../Datastore/Datastore'
+import { Key, Value, Datastore } from '../Datastore/Datastore'
 import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import { ColumnMetadata } from '../Column/columnMetadata'
 import { getPrimaryColumnMetadata, getPrimaryColumnValue } from './columns'
 import { getDatastore } from './datastore'
 import { getConstructor, getEntityMetadata } from './entities'
 import { RelationshipMetadata } from '../Relationship/relationshipMetadata'
+import { InvalidKeyError } from './errors'
 
-const getEntityKey = (constructor: EntityConstructor): Key =>
-  getEntityMetadata(constructor).key
+export const assertKeysDoNotContainSeparator = (
+  datastore: Datastore,
+  keys: Key[]
+): void => {
+  for (const key of keys) {
+    if (key.toString().includes(datastore.keySeparator))
+      throw new InvalidKeyError(key, `Key contains Datastore's Key Separator`)
+  }
+}
+
+const getEntityKey = (constructor: EntityConstructor): Key => {
+  const datastore = getDatastore(constructor)
+  const entityMetadata = getEntityMetadata(constructor)
+  assertKeysDoNotContainSeparator(datastore, [entityMetadata.key])
+  return entityMetadata.key
+}
 
 // Author:UUID-HERE:name
 // or, if singleton, ApplicationConfiguration:password
@@ -19,16 +34,17 @@ export const generatePropertyKey = (
 ): Key => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
-  const items = [getEntityKey(constructor)]
+  const keys = [getEntityKey(constructor)]
   const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
   if (primaryColumnMetadata) {
-    items.push(getPrimaryColumnValue(instance))
+    keys.push(getPrimaryColumnValue(instance))
   }
 
-  items.push(metadata.key)
+  keys.push(metadata.key)
 
-  return items.join(datastore.keySeparator)
+  assertKeysDoNotContainSeparator(datastore, keys)
+  return keys.join(datastore.keySeparator)
 }
 
 // Author:email:abc@xyz.com
@@ -38,22 +54,27 @@ export const generateIndexablePropertyKey = (
   value: Value
 ): Key => {
   const datastore = getDatastore(constructor)
-  return [getEntityKey(constructor), columnMetadata.key, value].join(
-    datastore.keySeparator
-  )
+  const keys = [getEntityKey(constructor), columnMetadata.key, value]
+  assertKeysDoNotContainSeparator(datastore, keys)
+  return keys.join(datastore.keySeparator)
 }
 
 // UUID-HERE
 // or, if singleton, ApplicationConfiguration
 export const generateRelationshipKey = (instance: BaseEntity): Key => {
   const constructor = getConstructor(instance)
+  const datastore = getDatastore(constructor)
   const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
 
+  let key
   if (primaryColumnMetadata) {
-    return getPrimaryColumnValue(instance)
+    key = getPrimaryColumnValue(instance)
+  } else {
+    key = getEntityKey(constructor)
   }
 
-  return getEntityKey(constructor)
+  assertKeysDoNotContainSeparator(datastore, [key])
+  return key
 }
 
 // Author:UUID-HERE:passport
@@ -70,11 +91,11 @@ export const generateManyRelationshipKey = (
 ): Key => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
-
-  return [
+  const keys = [
     generatePropertyKey(instance, relationshipMetadata),
     generateRelationshipKey(relationshipInstance),
-  ].join(datastore.keySeparator)
+  ]
+  return keys.join(datastore.keySeparator)
 }
 
 export const generateManyRelationshipSearchKey = (
