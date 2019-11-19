@@ -1,5 +1,6 @@
 import { Cache } from '../Cache/Cache'
 import { SearchStrategyError } from './SearchStrategyError'
+import { EntityConstructor } from '../Entity/Entity'
 
 export type Value = any // eslint-disable-line @typescript-eslint/no-explicit-any
 export type Key = string
@@ -32,6 +33,7 @@ export abstract class Datastore {
   public abstract searchStrategies: SearchStrategy[]
   public readonly keySeparator: Key
   public readonly cache: Cache
+  public entityConstructors: EntityConstructor[] = []
 
   protected abstract _read(key: Key): Promise<Value> | Value
   protected abstract _write(key: Key, value: Value): Promise<void>
@@ -71,5 +73,9 @@ export abstract class Datastore {
   }: DatastoreOptions = {}) {
     this.keySeparator = keySeparator
     this.cache = cache
+  }
+
+  public registerEntity(constructor: EntityConstructor): void {
+    this.entityConstructors.push(constructor)
   }
 }

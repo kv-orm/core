@@ -1,6 +1,7 @@
 import { Entity } from './Entity'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Datastore } from '../Datastore/Datastore'
+import { MetadataSetupError } from '../utils/metadata'
 
 describe(`Entity`, () => {
   let datastore: Datastore
@@ -17,5 +18,17 @@ describe(`Entity`, () => {
 
     expect(instance).toBeInstanceOf(X)
     expect(instance.constructor).toBe(X)
+  })
+
+  describe(`MetadataSetupError`, () => {
+    it(`is thrown when registering two Entities with the same Key`, () => {
+      expect(() => {
+        @Entity({ datastore })
+        class X {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+        @Entity({ datastore, key: `X` })
+        class Y {} // eslint-disable-line @typescript-eslint/no-unused-vars
+      }).toThrow(MetadataSetupError)
+    })
   })
 })
