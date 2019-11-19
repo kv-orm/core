@@ -5,7 +5,7 @@ import { cacheWrite } from './cacheWrite'
 import { cacheDelete } from './cacheDelete'
 import { cacheRead } from './cacheRead'
 import { cacheSync } from './cacheSync'
-import { CacheMissingPrimaryColumnValueError } from './CacheError'
+import { CacheMissingPrimaryColumnValueError } from './CacheMissingPrimaryColumnValueError'
 
 export class Cache {
   public instructions = new Map<BaseEntity, Instruction[]>()
