@@ -15,8 +15,10 @@ export const oneToManySet = (
   const { cache } = getConstructorDatastoreCache(instance)
 
   for (const value of values) {
-    const keyGenerator = (): Key =>
-      generateManyRelationshipKey(instance, relationshipMetadata, value)
+    const keyGenerator = (): Promise<Key> =>
+      Promise.resolve(
+        generateManyRelationshipKey(instance, relationshipMetadata, value)
+      )
     cache.write(instance, keyGenerator, generateRelationshipKey(value))
   }
 }

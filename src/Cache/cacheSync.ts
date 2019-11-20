@@ -10,7 +10,7 @@ export const cacheSync = async (
 ): Promise<boolean> => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
-  const instructions = optimizeInstructions(cache, instance)
+  const instructions = await optimizeInstructions(cache, instance)
 
   if (instructions.length === 0) return Promise.resolve(false)
 

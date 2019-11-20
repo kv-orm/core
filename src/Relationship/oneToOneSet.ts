@@ -14,7 +14,7 @@ export const oneToOneSet = (
 ): void => {
   const { cache } = getConstructorDatastoreCache(instance)
 
-  const keyGenerator = (): Key =>
-    generateOneRelationshipKey(instance, relationshipMetadata)
+  const keyGenerator = (): Promise<Key> =>
+    Promise.resolve(generateOneRelationshipKey(instance, relationshipMetadata))
   cache.write(instance, keyGenerator, generateRelationshipKey(value))
 }

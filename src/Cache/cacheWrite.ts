@@ -6,7 +6,7 @@ import { WriteInstruction } from '../Instruction/WriteInstruction'
 export const cacheWrite = (
   cache: Cache,
   instance: BaseEntity,
-  keyGenerator: () => Key,
+  keyGenerator: () => Promise<Key>,
   value: Value
 ): void =>
   cache.recordInstruction(instance, new WriteInstruction(keyGenerator, value))

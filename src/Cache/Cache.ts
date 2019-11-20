@@ -31,22 +31,19 @@ export class Cache {
 
   public write(
     instance: BaseEntity,
-    keyGenerator: () => Key,
+    keyGenerator: () => Promise<Key>,
     value: Value
   ): void {
     return cacheWrite(this, instance, keyGenerator, value)
   }
 
-  public delete(instance: BaseEntity, keyGenerator: () => Key): void {
+  public delete(instance: BaseEntity, keyGenerator: () => Promise<Key>): void {
     return cacheDelete(this, instance, keyGenerator)
   }
 
-  public getPrimaryColumnValue(
-    instance: BaseEntity,
-    { failSilently } = { failSilently: false }
-  ): Value {
+  public getPrimaryColumnValue(instance: BaseEntity): Value {
     const value = this.primaryColumnValues.get(instance)
-    if (value === undefined && !failSilently)
+    if (value === undefined)
       throw new CacheMissingPrimaryColumnValueError(instance)
     return value
   }

@@ -17,7 +17,11 @@ export const columnSet = (
   const { constructor, cache } = getConstructorDatastoreCache(instance)
 
   if (columnMetadata.isPrimary) {
-    if (getPrimaryColumnValue(instance, { failSilently: true }) !== undefined) {
+    let primaryColumnValue
+    try {
+      primaryColumnValue = getPrimaryColumnValue(instance)
+    } catch {}
+    if (primaryColumnValue !== undefined) {
       throw new ReadOnlyError(
         constructor,
         columnMetadata.property,
@@ -29,12 +33,15 @@ export const columnSet = (
   }
 
   if (columnMetadata.isIndexable) {
-    const indexableKeyGenerator = (): Key =>
-      generateIndexablePropertyKey(constructor, columnMetadata, value)
+    const indexableKeyGenerator = (): Promise<Key> =>
+      Promise.resolve(
+        generateIndexablePropertyKey(constructor, columnMetadata, value)
+      )
     const primaryColumnValue = getPrimaryColumnValue(instance)
     cache.write(instance, indexableKeyGenerator, primaryColumnValue)
   }
 
-  const keyGenerator = (): Key => generatePropertyKey(instance, columnMetadata)
+  const keyGenerator = (): Promise<Key> =>
+    Promise.resolve(generatePropertyKey(instance, columnMetadata))
   cache.write(instance, keyGenerator, value)
 }
