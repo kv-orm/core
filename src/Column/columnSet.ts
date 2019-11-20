@@ -33,15 +33,13 @@ export const columnSet = (
   }
 
   if (columnMetadata.isIndexable) {
-    const indexableKeyGenerator = (): Promise<Key> =>
-      Promise.resolve(
-        generateIndexablePropertyKey(constructor, columnMetadata, value)
-      )
+    const indexableKeyGenerator = (): Key =>
+      generateIndexablePropertyKey(constructor, columnMetadata, value)
+
     const primaryColumnValue = getPrimaryColumnValue(instance)
     cache.write(instance, indexableKeyGenerator, primaryColumnValue)
   }
 
-  const keyGenerator = (): Promise<Key> =>
-    Promise.resolve(generatePropertyKey(instance, columnMetadata))
+  const keyGenerator = (): Key => generatePropertyKey(instance, columnMetadata)
   cache.write(instance, keyGenerator, value)
 }

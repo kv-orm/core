@@ -1,11 +1,10 @@
 import { WriteInstruction } from './WriteInstruction'
-import { Key } from '../Datastore/Datastore'
 
 describe(`WriteInstruction`, () => {
   let instruction: WriteInstruction
 
   beforeEach(() => {
-    instruction = new WriteInstruction((): Key => `key`, `value`)
+    instruction = new WriteInstruction(() => `key`, `value`)
   })
 
   it(`should generate keys`, async () => {

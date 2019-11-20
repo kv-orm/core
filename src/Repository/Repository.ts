@@ -6,7 +6,7 @@ import { Value } from '../Datastore/Datastore'
 import { repositoryLoad } from './repositoryLoad'
 import { repositorySearch } from './repositorySearch'
 import { repositorySave } from './repositorySave'
-// import { repositoryDelete } from './repositoryDelete'
+import { repositoryDelete } from './repositoryDelete'
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>
@@ -23,7 +23,7 @@ export const getRepository = <T extends BaseEntity>(
       return repositoryLoad(constructor, identifier)
     },
     delete(instance: BaseEntity): Promise<boolean> {
-      return repositorySave(instance)
+      return repositoryDelete(instance)
     },
     save(instance: BaseEntity): Promise<boolean> {
       return repositorySave(instance)

@@ -6,24 +6,21 @@ import {
   generatePropertyKey,
   generateIndexablePropertyKey,
 } from '../utils/keyGeneration'
+import { columnGet } from './columnGet'
 
-export const columnDelete = (
+export const columnDelete = async (
   instance: BaseEntity,
   columnMetadata: ColumnMetadata
-): void => {
+): Promise<void> => {
   const { constructor, cache } = getConstructorDatastoreCache(instance)
 
   if (columnMetadata.isIndexable) {
-    const indexableKeyGenerator = async (): Promise<Key> =>
-      generateIndexablePropertyKey(
-        constructor,
-        columnMetadata,
-        await instance[columnMetadata.property.toString()]
-      )
+    const value = await columnGet(instance, columnMetadata)
+    const indexableKeyGenerator = (): Key =>
+      generateIndexablePropertyKey(constructor, columnMetadata, value)
     cache.delete(instance, indexableKeyGenerator)
   }
 
-  const keyGenerator = (): Promise<Key> =>
-    Promise.resolve(generatePropertyKey(instance, columnMetadata))
+  const keyGenerator = (): Key => generatePropertyKey(instance, columnMetadata)
   cache.delete(instance, keyGenerator)
 }

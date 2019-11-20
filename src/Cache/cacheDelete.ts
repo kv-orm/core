@@ -6,6 +6,6 @@ import { DeleteInstruction } from '../Instruction/DeleteInstruction'
 export const cacheDelete = (
   cache: Cache,
   instance: BaseEntity,
-  keyGenerator: () => Promise<Key>
+  keyGenerator: () => Key
 ): void =>
   cache.recordInstruction(instance, new DeleteInstruction(keyGenerator))

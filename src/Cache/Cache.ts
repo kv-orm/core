@@ -31,13 +31,13 @@ export class Cache {
 
   public write(
     instance: BaseEntity,
-    keyGenerator: () => Promise<Key>,
+    keyGenerator: () => Key,
     value: Value
   ): void {
     return cacheWrite(this, instance, keyGenerator, value)
   }
 
-  public delete(instance: BaseEntity, keyGenerator: () => Promise<Key>): void {
+  public delete(instance: BaseEntity, keyGenerator: () => Key): void {
     return cacheDelete(this, instance, keyGenerator)
   }
 

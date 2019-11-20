@@ -19,5 +19,6 @@ export const cacheSync = async (
   }
 
   cache.instructions.set(instance, [])
+
   return Promise.resolve(true)
 }

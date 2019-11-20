@@ -111,6 +111,42 @@ describe(`Repository`, () => {
     expect(await loadedInstance.myProperty).toEqual(`new value`)
   })
 
+  it(`can delete an instance`, async () => {
+    expect(await singletonRepository.save(singletonInstance)).toBeTruthy()
+    expect(await datastore.read(`SingletonEntity:myProperty`)).toEqual(
+      `initial value`
+    )
+
+    expect(await singletonRepository.delete(singletonInstance)).toBeTruthy()
+    expect(await datastore.read(`SingletonEntity:myProperty`)).toBeNull()
+
+    expect(await complexRepository.save(complexInstance)).toBeTruthy()
+    expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toEqual(
+      `initial value`
+    )
+    expect(await datastore.read(`ComplexEntity:12345:primaryProperty`)).toEqual(
+      12345
+    )
+    expect(
+      await datastore.read(`ComplexEntity:12345:indexableProperty`)
+    ).toEqual(`abc@xyz.com`)
+    expect(
+      await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
+    ).toEqual(12345)
+
+    expect(await complexRepository.delete(complexInstance)).toBeTruthy()
+    expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toBeNull()
+    expect(
+      await datastore.read(`ComplexEntity:12345:primaryProperty`)
+    ).toBeNull()
+    expect(
+      await datastore.read(`ComplexEntity:12345:indexableProperty`)
+    ).toBeNull()
+    expect(
+      await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
+    ).toBeNull()
+  })
+
   it(`can search for an instance`, async () => {
     await complexRepository.save(complexInstance)
     const loadedInstance = await complexRepository.load(12345)

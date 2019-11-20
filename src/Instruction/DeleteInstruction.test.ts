@@ -1,11 +1,10 @@
 import { DeleteInstruction } from './DeleteInstruction'
-import { Key } from '../Datastore/Datastore'
 
 describe(`DeleteInstruction`, () => {
   let instruction: DeleteInstruction
 
   beforeEach(() => {
-    instruction = new DeleteInstruction((): Key => `key`)
+    instruction = new DeleteInstruction(() => `key`)
   })
 
   it(`should generate keys`, async () => {
