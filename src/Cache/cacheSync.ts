@@ -3,6 +3,7 @@ import { BaseEntity } from '../Entity/Entity'
 import { optimizeInstructions } from './optimizeInstructions'
 import { getDatastore } from '../utils/datastore'
 import { getConstructor } from '../utils/entities'
+import { cacheStabilize } from './cacheStabilize'
 
 export const cacheSync = async (
   cache: Cache,
@@ -15,9 +16,10 @@ export const cacheSync = async (
   if (instructions.length === 0) return Promise.resolve(false)
 
   for (const instruction of instructions) {
-    await instruction.perform(datastore)
+    await instruction.performOnDatastore(datastore)
   }
 
+  await cacheStabilize(cache, instance)
   cache.instructions.set(instance, [])
 
   return Promise.resolve(true)

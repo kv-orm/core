@@ -2,13 +2,13 @@ import { BaseEntity } from '../Entity/Entity'
 import { getColumnMetadatas } from '../utils/columns'
 import { repositorySave } from './repositorySave'
 import { columnDelete } from '../Column/columnDelete'
-import { getConstructor } from '../utils/entities'
+import { getConstructorDatastoreCache } from '../utils/entities'
 
 // TODO: Cascading relationships
 export const repositoryDelete = async (
   instance: BaseEntity
 ): Promise<boolean> => {
-  const constructor = getConstructor(instance)
+  const { constructor, cache } = getConstructorDatastoreCache(instance)
   const columnMetadatas = getColumnMetadatas(constructor)
 
   for (const columnMetadata of columnMetadatas.filter(
@@ -23,7 +23,9 @@ export const repositoryDelete = async (
     await columnDelete(instance, columnMetadata)
   }
 
-  // TODO: Remove from cache primaryValues
-
-  return repositorySave(instance)
+  if (await repositorySave(instance)) {
+    cache.setPrimaryColumnValue(instance, null)
+    return true
+  }
+  return false
 }

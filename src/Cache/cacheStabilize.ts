@@ -14,7 +14,7 @@ export const cacheStabilize = async (
   const data = cache.data.get(instance) || new Map<Key, Value>()
 
   for (const instruction of instructions) {
-    data.set(await instruction.key, instruction.value)
+    instruction.performOnCacheData(data)
   }
 
   cache.data.set(instance, data)

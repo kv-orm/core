@@ -1,4 +1,4 @@
-import { Datastore } from '../Datastore/Datastore'
+import { Datastore, Value, Key } from '../Datastore/Datastore'
 import { BaseEntity, Entity } from '../Entity/Entity'
 import { MemoryDatastore } from '../MemoryDatastore/MemoryDatastore'
 import { Column } from '../Column/Column'
@@ -116,9 +116,15 @@ describe(`Repository`, () => {
     expect(await datastore.read(`SingletonEntity:myProperty`)).toEqual(
       `initial value`
     )
+    expect(
+      (datastore.cache.data.get(singletonInstance) as Map<Key, Value>).size
+    ).not.toBe(0)
 
     expect(await singletonRepository.delete(singletonInstance)).toBeTruthy()
     expect(await datastore.read(`SingletonEntity:myProperty`)).toBeNull()
+    expect(
+      (datastore.cache.data.get(singletonInstance) as Map<Key, Value>).size
+    ).toBe(0)
 
     expect(await complexRepository.save(complexInstance)).toBeTruthy()
     expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toEqual(
@@ -133,6 +139,9 @@ describe(`Repository`, () => {
     expect(
       await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
     ).toEqual(12345)
+    expect(
+      (datastore.cache.data.get(complexInstance) as Map<Key, Value>).size
+    ).not.toBe(0)
 
     expect(await complexRepository.delete(complexInstance)).toBeTruthy()
     expect(await datastore.read(`ComplexEntity:12345:myProperty`)).toBeNull()
@@ -145,6 +154,9 @@ describe(`Repository`, () => {
     expect(
       await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
     ).toBeNull()
+    expect(
+      (datastore.cache.data.get(complexInstance) as Map<Key, Value>).size
+    ).toBe(0)
   })
 
   it(`can search for an instance`, async () => {
