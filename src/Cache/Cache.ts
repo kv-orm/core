@@ -1,11 +1,13 @@
 import { Key, Value } from '../Datastore/Datastore'
-import { BaseEntity } from '../Entity/Entity'
+import { BaseEntity, EntityConstructor } from '../Entity/Entity'
 import { Instruction } from '../Instruction/Instruction'
 import { cacheWrite } from './cacheWrite'
 import { cacheDelete } from './cacheDelete'
 import { cacheRead } from './cacheRead'
 import { cacheSync } from './cacheSync'
 import { CacheMissingPrimaryColumnValueError } from './CacheMissingPrimaryColumnValueError'
+import { getPrimaryColumnMetadata } from '../utils/columns'
+import { assertIdentifierValid } from '../Repository/repositoryLoad'
 
 export class Cache {
   public instructions = new Map<BaseEntity, Instruction[]>()
@@ -50,5 +52,26 @@ export class Cache {
 
   public setPrimaryColumnValue(instance: BaseEntity, value: Value): void {
     this.primaryColumnValues.set(instance, value)
+  }
+
+  public getInstance(
+    constructor: EntityConstructor,
+    identifier?: Value
+  ): BaseEntity | undefined {
+    const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
+
+    assertIdentifierValid(constructor, primaryColumnMetadata, identifier)
+
+    for (const instance of this.instructions.keys()) {
+      // TODO: Make nice
+      if (instance.constructor === constructor) {
+        if (identifier !== undefined) {
+          if (this.getPrimaryColumnValue(instance) === identifier)
+            return instance
+        } else {
+          return instance
+        }
+      }
+    }
   }
 }

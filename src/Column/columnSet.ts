@@ -7,7 +7,6 @@ import {
   generateIndexablePropertyKey,
 } from '../utils/keyGeneration'
 import { getPrimaryColumnValue, setPrimaryColumnValue } from '../utils/columns'
-import { ReadOnlyError } from '../utils/errors'
 
 export const columnSet = (
   instance: BaseEntity,
@@ -17,18 +16,6 @@ export const columnSet = (
   const { constructor, cache } = getConstructorDatastoreCache(instance)
 
   if (columnMetadata.isPrimary) {
-    let primaryColumnValue
-    try {
-      primaryColumnValue = getPrimaryColumnValue(instance)
-    } catch {}
-    if (primaryColumnValue !== undefined) {
-      throw new ReadOnlyError(
-        constructor,
-        columnMetadata.property,
-        value,
-        `Primary Column Value has already been set`
-      )
-    }
     setPrimaryColumnValue(instance, value)
   }
 

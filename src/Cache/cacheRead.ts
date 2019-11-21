@@ -10,7 +10,7 @@ export const cacheRead = async (
   instance: BaseEntity,
   key: Key
 ): Promise<Value> => {
-  await cacheStabilize(cache, instance)
+  cacheStabilize(cache, instance)
   const data = cache.data.get(instance) || new Map<Key, Value>()
   let value = data.get(key) || null
   if (value !== null) return value

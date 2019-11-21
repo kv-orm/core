@@ -4,7 +4,11 @@ import { Key } from '../Datastore/Datastore'
 import { getHydrator } from './hydrate'
 import { getConstructor } from '../utils/entities'
 import { oneToManySet } from './oneToManySet'
-import { createRelationshipMetadata } from './relationshipMetadata'
+import {
+  createRelationshipMetadata,
+  RelationshipType,
+  CascadeOptions,
+} from './relationshipMetadata'
 import {
   setRelationshipMetadata,
   getRelationshipMetadatas,
@@ -15,13 +19,19 @@ import { assertKeyNotInUse } from '../utils/metadata'
 interface OneToManyOptions {
   key?: Key
   type: EntityConstructor
+  cascade?: CascadeOptions
 }
 
 export function OneToMany(options: OneToManyOptions, plugins = {}) {
   return (instance: BaseEntity, property: PropertyKey): void => {
     const relationshipMetadata = createRelationshipMetadata(
       {
-        options,
+        options: {
+          key: options.key,
+          relationType: options.type,
+          type: RelationshipType.OneToMany,
+          cascade: options.cascade,
+        },
         property,
       },
       plugins

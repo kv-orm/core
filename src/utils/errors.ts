@@ -26,11 +26,10 @@ export class ReadOnlyError extends KVORMError {
   constructor(
     constructor: EntityConstructor,
     property: PropertyKey,
-    value: Value,
     message = `Unknown Error`
   ) {
     super(
-      `Could not write Value, ${value}, to Column, ${property.toString()}, on Entity, ${
+      `Could not write value to Column, ${property.toString()}, on Entity, ${
         constructor.name
       }: ${message}`
     )

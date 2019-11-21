@@ -11,7 +11,7 @@ import { generatePropertyKey } from '../utils/keyGeneration'
 import { EntityNotFoundError } from './EntityNotFoundError'
 import { ColumnMetadata } from '../Column/columnMetadata'
 
-const assertIdentifierValid = (
+export const assertIdentifierValid = (
   constructor: EntityConstructor,
   primaryColumnMetadata: ColumnMetadata | undefined,
   identifier: Value
@@ -63,6 +63,7 @@ export const repositoryLoad = async <T extends BaseEntity>(
   } else {
     // Entity is a singleton
     // Should we still somehow check if it has been saved before and throw a notfound error?
+    // See: https://github.com/kv-orm/core/issues/46
   }
 
   return instance

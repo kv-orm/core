@@ -10,7 +10,7 @@ export class DeleteInstruction extends WriteInstruction {
     await datastore.delete(this.key)
   }
 
-  public async performOnCacheData(cacheData: Map<Key, Value>): Promise<void> {
+  public performOnCacheData(cacheData: Map<Key, Value>): void {
     cacheData.delete(this.key)
   }
 }

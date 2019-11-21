@@ -3,12 +3,17 @@ import '../metadata'
 import { EntityConstructor, BaseEntity, PropertyKey } from '../Entity/Entity'
 import { COLUMN_KEY } from '../Column/Column'
 import { ColumnMetadata } from '../Column/columnMetadata'
-import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
+import {
+  ColumnLookupError,
+  PrimaryColumnMissingError,
+  ReadOnlyError,
+} from './errors'
 import { getConstructor } from './entities'
 import { getDatastore } from './datastore'
 import { getCache } from './cache'
 import { Value } from '../Datastore/Datastore'
 import { getMetadatas, getMetadata, setMetadata } from './metadata'
+import { CacheMissingPrimaryColumnValueError } from '../Cache/CacheMissingPrimaryColumnValueError'
 
 export const getColumnMetadatas = (
   constructor: EntityConstructor
@@ -52,6 +57,25 @@ export const getPrimaryColumnValue = (instance: BaseEntity): Value => {
   return cache.getPrimaryColumnValue(instance)
 }
 
+const assertPrimaryColumnHasNoValue = (instance: BaseEntity): void => {
+  try {
+    const primaryColumnValue = getPrimaryColumnValue(instance)
+    if (primaryColumnValue !== undefined) {
+      const constructor = getConstructor(instance)
+      const primaryColumnMetadata = getPrimaryColumnMetadata(
+        constructor
+      ) as ColumnMetadata
+      throw new ReadOnlyError(
+        constructor,
+        primaryColumnMetadata.property,
+        `Primary Column Value has already been set`
+      )
+    }
+  } catch (e) {
+    if (!(e instanceof CacheMissingPrimaryColumnValueError)) throw e
+  }
+}
+
 export const setPrimaryColumnValue = (
   instance: BaseEntity,
   value: Value
@@ -59,6 +83,6 @@ export const setPrimaryColumnValue = (
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
   const cache = getCache(datastore)
-  assertHasPrimaryColumn(constructor)
+  assertPrimaryColumnHasNoValue(instance)
   return cache.setPrimaryColumnValue(instance, value)
 }

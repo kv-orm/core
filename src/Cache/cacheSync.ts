@@ -11,16 +11,16 @@ export const cacheSync = async (
 ): Promise<boolean> => {
   const constructor = getConstructor(instance)
   const datastore = getDatastore(constructor)
-  const instructions = await optimizeInstructions(cache, instance)
+  const instructions = optimizeInstructions(cache, instance)
 
-  if (instructions.length === 0) return Promise.resolve(false)
+  if (instructions.length === 0) return false
 
   for (const instruction of instructions) {
     await instruction.performOnDatastore(datastore)
   }
 
-  await cacheStabilize(cache, instance)
+  cacheStabilize(cache, instance)
   cache.instructions.set(instance, [])
 
-  return Promise.resolve(true)
+  return true
 }

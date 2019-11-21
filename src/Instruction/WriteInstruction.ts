@@ -15,7 +15,7 @@ export class WriteInstruction extends Instruction {
     await datastore.write(this.key, this.value)
   }
 
-  public async performOnCacheData(cacheData: Map<Key, Value>): Promise<void> {
+  public performOnCacheData(cacheData: Map<Key, Value>): void {
     cacheData.set(this.key, this.value)
   }
 }

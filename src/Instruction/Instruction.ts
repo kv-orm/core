@@ -5,9 +5,7 @@ export abstract class Instruction {
   public abstract value: Value
 
   public abstract async performOnDatastore(datastore: Datastore): Promise<void>
-  public abstract async performOnCacheData(
-    cacheData: Map<Key, Value>
-  ): Promise<void>
+  public abstract performOnCacheData(cacheData: Map<Key, Value>): void
 
   public get key(): Key {
     return this.keyGenerator()
