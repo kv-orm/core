@@ -1,10 +1,13 @@
 <h1 align="center">Welcome to @kv-orm/core 👋</h1>
 <p>
-  <a href="https://github.com/kv-orm/core/actions" target="_blank">
+  <a href="https://github.com/kv-orm/core/actions?query=workflow%3ATest" target="_blank">
     <img alt="GitHub Actions Checks" src="https://github.com/kv-orm/core/workflows/Test/badge.svg" />
   </a>
   <a href="https://lgtm.com/projects/g/kv-orm/core/alerts/" target="_blank">
     <img alt="LGTM Alerts" src="https://img.shields.io/lgtm/alerts/g/kv-orm/core.svg?logo=lgtm&style=plastic" />
+  </a>
+  <a href="https://snyk.io/test/github/kv-orm/core?targetFile=package.json" target="_blank">
+    <img alt="Synk Vulnerabilities" src="https://snyk.io/test/github/kv-orm/core/badge.svg?targetFile=package.json" />
   </a>
   <a href="https://codecov.io/gh/kv-orm/core" target="_blank">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/github/kv-orm/core?logo=codecov&style=plastic" />
@@ -20,9 +23,6 @@
   </a>
   <a href="https://github.com/kv-orm/core/blob/master/LICENSE" target="_blank">
     <img alt="License" src="https://img.shields.io/github/license/kv-orm/core?style=plastic" />
-  </a>
-  <a href="https://greenkeeper.io" target="_blank">
-    <img alt="Greenkeeper" src="https://badges.greenkeeper.io/kv-orm/core.svg?style=plastic" />
   </a>
   <a href="https://www.typescriptlang.org/" target="_blank">
     <img alt="Types" src="https://img.shields.io/npm/types/kv-orm.svg?style=plastic" />
@@ -178,7 +178,7 @@ class Author {
 
   public someUnsavedProperty: any
 
-  public constructor(firstName: string, lastName: string, emailAddress: string, phoneNumber: string) {
+  public constructor({ firstName, lastName, emailAddress, phoneNumber }: { firstName: string, lastName: string, emailAddress: string, phoneNumber: string) {
     this.firstName = firstName
     this.lastName = lastName
     this.emailAddress = emailAddress
@@ -186,17 +186,17 @@ class Author {
   }
 }
 
-const williamShakespeare = new Author(
-  'William',
-  'Shakespeare',
-  'william@shakespeare.com',
-  '+1234567890'
-)
+const williamShakespeare = new Author({
+  firstName: 'William',
+  lastName: 'Shakespeare',
+  emailAddress: 'william@shakespeare.com',
+  phoneNumber: '+1234567890'
+})
 williamShakespeare.nickName = 'Bill'
 williamShakespeare.someUnsavedProperty = "Won't get saved!"
 
 // When in an async function, you can fetch the value with `await`
-async function foo() => {
+async () => {
   console.log(await author.firstName)
 }
 
@@ -227,8 +227,6 @@ An example of a singleton class where you do not need a Primary Column, might be
 ### Indexable Columns
 
 Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
-
-> These will be searchable very shortly.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -288,12 +286,13 @@ const authorRepository = getRepository(Author)
 You can then save Entity instances.
 
 ```typescript
-const williamShakespeare = new Author(
-  'William',
-  'Shakespeare',
-  'william@shakespeare.com',
-  '+1234567890'
-)
+const williamShakespeare = new Author({
+  firstName: 'William',
+  lastName: 'Shakespeare',
+  emailAddress: 'william@shakespeare.com',
+  phoneNumber: '+1234567890',
+})
+
 await authorRepository.save(williamShakepseare)
 ```
 
@@ -305,6 +304,7 @@ And subsequently, load them back again. If the Entity has a Primary Column, you 
 const loadedWilliamShakespeare = await authorRepository.load(
   'william@shakespeare.com'
 )
+
 console.log(await loadedWilliamShakespeare.nickName) // Bill
 ```
 
@@ -317,12 +317,14 @@ const searchedWilliamShakespeare = await authorRepository.search(
   'phoneNumber',
   '+1234567890'
 )
+
 console.log(await searchedWilliamShakespeare.nickName) // Bill
 
 const searchedNonexistent = await authorRepository.search(
   'phoneNumber',
   '+9999999999'
 )
+
 console.log(searchedNonexistent) // null
 ```
 
@@ -358,7 +360,6 @@ npm test
   <img alt="Features" src="https://img.shields.io/github/issues/kv-orm/core/enhancement?color=%2335a501&label=Features&logo=github&style=plastic" />
 </a>
 
-- Searching Indexable Columns
 - Relationships
 - Improved performance
 
