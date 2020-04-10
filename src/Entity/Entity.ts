@@ -25,7 +25,7 @@ export function Entity(
   { datastore, key }: EntityOptions,
   plugins = {} // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (constructor: EntityConstructor) => any {
-  return function<T extends BaseEntity>(
+  return function <T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {
     const entityMetadata: EntityMetadata = createEntityMetadata(

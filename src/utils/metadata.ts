@@ -33,7 +33,7 @@ export const assertKeyNotInUse = (
   }
 ): void => {
   const metadatas = getMetadatas(constructor)
-  const keysInUse = metadatas.map(metadata => metadata.key)
+  const keysInUse = metadatas.map((metadata) => metadata.key)
 
   if (keysInUse.indexOf(metadata.key) !== -1)
     throw new MetadataSetupError(constructor, metadata, `Key is already in use`)

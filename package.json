@@ -1,6 +1,6 @@
 {
   "name": "@kv-orm/core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Node.js ORM for key-value datastores",
   "main": "dist/index",
   "types": "dist/index",
@@ -42,20 +42,20 @@
   },
   "homepage": "https://github.com/kv-orm/core#readme",
   "devDependencies": {
-    "@babel/core": "7.7.5",
-    "@babel/preset-env": "7.7.6",
+    "@babel/core": "7.9.0",
+    "@babel/preset-env": "7.9.5",
     "@types/jest": "25.2.1",
-    "@typescript-eslint/eslint-plugin": "2.13.0",
-    "@typescript-eslint/parser": "2.19.0",
-    "babel-jest": "24.9.0",
+    "@typescript-eslint/eslint-plugin": "2.27.0",
+    "@typescript-eslint/parser": "2.27.0",
+    "babel-jest": "25.3.0",
     "codecov": "3.6.5",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.1",
     "eslint-plugin-prettier": "3.1.2",
-    "jest": "24.9.0",
-    "prettier": "1.19.1",
+    "jest": "25.3.0",
+    "prettier": "2.0.4",
     "ts-jest": "25.3.1",
-    "typescript": "3.6.2"
+    "typescript": "3.8.3"
   },
   "dependencies": {
     "reflect-metadata": "0.1.13"
