@@ -3,4 +3,9 @@ module.exports = {
   rootDir: `src`,
   coverageDirectory: `../coverage`,
   testEnvironment: `node`,
+  collectCoverageFrom: [
+    '**/*.{js,ts}',
+    '!**/node_modules/**',
+    '!*.testhelpers.{js,ts}',
+  ],
 }
