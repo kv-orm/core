@@ -15,6 +15,7 @@ interface ColumnOptions {
   key?: Key;
   isPrimary?: boolean;
   isIndexable?: boolean;
+  isUnique?: boolean;
 }
 
 export const Column = <T extends BaseEntity>(

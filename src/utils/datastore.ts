@@ -4,8 +4,10 @@ import {
   SearchOptions,
   SearchResult,
   Key,
+  SearchStrategy,
 } from "../Datastore/Datastore";
 import { getEntityMetadata } from "./entities";
+import { SearchStrategyError } from "../Datastore/SearchStrategyError";
 
 export const getDatastore = (constructor: EntityConstructor): Datastore =>
   getEntityMetadata(constructor).datastore;
@@ -53,3 +55,18 @@ export async function* keysFromSearch(
     }
   }
 }
+
+export const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
+  let strategy;
+  if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
+    strategy = SearchStrategy.prefix;
+  }
+
+  if (strategy === undefined) {
+    throw new SearchStrategyError(
+      SearchStrategy.prefix,
+      `Datastore does not support searching`
+    );
+  }
+  return strategy;
+};

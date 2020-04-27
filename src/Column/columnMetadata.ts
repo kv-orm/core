@@ -6,15 +6,21 @@ export interface ColumnMetadata {
   property: PropertyKey;
   isPrimary?: boolean;
   isIndexable?: boolean;
+  isUnique?: boolean;
   plugins: {};
 }
 
 export const createColumnMetadata = (
   {
-    options: { key, isIndexable, isPrimary },
+    options: { key, isIndexable, isPrimary, isUnique },
     property,
   }: {
-    options: { key?: string; isIndexable?: boolean; isPrimary?: boolean };
+    options: {
+      key?: string;
+      isIndexable?: boolean;
+      isPrimary?: boolean;
+      isUnique?: boolean;
+    };
     property: PropertyKey;
   },
   plugins = {}
@@ -23,5 +29,6 @@ export const createColumnMetadata = (
   property,
   isIndexable: !!isIndexable,
   isPrimary: !!isPrimary,
+  isUnique: !!isUnique,
   plugins,
 });

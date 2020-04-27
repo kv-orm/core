@@ -24,7 +24,7 @@ export class Author {
   @Column({ isPrimary: true })
   public emailAddress: columnType<string>;
 
-  @Column({ isIndexable: true })
+  @Column({ isIndexable: true, isUnique: true })
   public phoneNumber: columnType<string>;
 
   public someUnsavedProperty: any;

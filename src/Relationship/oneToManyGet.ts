@@ -1,28 +1,16 @@
 import { BaseEntity } from "../Entity/Entity";
-import { Value, SearchStrategy, Datastore } from "../Datastore/Datastore";
+import { Value } from "../Datastore/Datastore";
 import { getConstructor } from "../utils/entities";
-import { getDatastore, keysFromSearch } from "../utils/datastore";
+import {
+  getDatastore,
+  keysFromSearch,
+  pickSearchStrategy,
+} from "../utils/datastore";
 import {
   generateManyRelationshipSearchKey,
   extractManyRelationshipValueKey,
 } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
-import { SearchStrategyError } from "../Datastore/SearchStrategyError";
-
-const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
-  let strategy;
-  if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
-    strategy = SearchStrategy.prefix;
-  }
-
-  if (strategy === undefined) {
-    throw new SearchStrategyError(
-      SearchStrategy.prefix,
-      `Datastore does not support searching`
-    );
-  }
-  return strategy;
-};
 
 export async function* oneToManyGet(
   instance: BaseEntity,

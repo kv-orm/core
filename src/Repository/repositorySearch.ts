@@ -1,17 +1,26 @@
 import { EntityConstructor, BaseEntity } from "../Entity/Entity";
-import { Value } from "../Datastore/Datastore";
+import { Value, SearchStrategy } from "../Datastore/Datastore";
 import { getColumnMetadata } from "../utils/columns";
 import { PropertyKey } from "../Entity/Entity";
-import { generateIndexablePropertyKey } from "../utils/keyGeneration";
+import {
+  getIndexableSearchKey,
+  extractManyRelationshipValueKey,
+} from "../utils/keyGeneration";
 import { repositoryLoad } from "./repositoryLoad";
-import { getDatastore } from "../utils/datastore";
+import {
+  getDatastore,
+  pickSearchStrategy,
+  keysFromSearch,
+} from "../utils/datastore";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
+import { getHydrator } from "../Relationship/hydrate";
 
-export const repositorySearch = async <T extends BaseEntity>(
-  constructor: EntityConstructor<T>,
+export async function* repositorySearch<T extends BaseEntity>(
+  constructor: EntityConstructor,
   property: PropertyKey,
   identifier: Value
-): Promise<T | null> => {
+): AsyncGenerator<T> {
+  const hydrator = getHydrator(constructor);
   const datastore = getDatastore(constructor);
   const columnMetadata = getColumnMetadata(constructor, property);
 
@@ -22,16 +31,25 @@ export const repositorySearch = async <T extends BaseEntity>(
       `Column is not set as isIndexable`
     );
 
-  const key = generateIndexablePropertyKey(
-    constructor,
-    columnMetadata,
-    identifier
-  );
-  const primaryIdentifier = await datastore.read(key);
+  const searchKey =
+    getIndexableSearchKey(constructor, columnMetadata, identifier) +
+    datastore.keySeparator;
+  const searchStrategy = pickSearchStrategy(datastore);
 
-  if (primaryIdentifier !== null) {
-    return await repositoryLoad(constructor, primaryIdentifier);
-  } else {
-    return null;
+  const keyGenerator = keysFromSearch(datastore, {
+    strategy: searchStrategy,
+    term: searchKey,
+  });
+
+  while (true) {
+    const { done, value } = await keyGenerator.next();
+    if (done) return;
+
+    const primaryColumnValue = extractManyRelationshipValueKey(
+      datastore,
+      value,
+      searchKey
+    );
+    yield await hydrator(primaryColumnValue);
   }
-};
+}

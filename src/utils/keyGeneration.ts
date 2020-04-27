@@ -5,7 +5,11 @@ import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { ColumnMetadata } from "../Column/columnMetadata";
 import { getPrimaryColumnMetadata, getPrimaryColumnValue } from "./columns";
 import { getDatastore } from "./datastore";
-import { getConstructor, getEntityMetadata } from "./entities";
+import {
+  getConstructor,
+  getEntityMetadata,
+  getConstructorDatastoreCache,
+} from "./entities";
 import { RelationshipMetadata } from "../Relationship/relationshipMetadata";
 import { InvalidKeyError } from "./errors";
 
@@ -47,14 +51,36 @@ export const generatePropertyKey = (
   return keys.join(datastore.keySeparator);
 };
 
-// Author:email:abc@xyz.com
+// Author:email:abc@xyz.com:UUID-HERE
+// or, if isUnique, Author:email:abc@xyz.com
 export const generateIndexablePropertyKey = (
-  constructor: EntityConstructor,
+  instance: BaseEntity,
   columnMetadata: ColumnMetadata,
   value: Value
 ): Key => {
+  const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
+
   const keys = [getEntityKey(constructor), columnMetadata.key, value];
+
+  if (!columnMetadata.isUnique) {
+    keys.push(getPrimaryColumnValue(instance));
+  }
+
+  assertKeysDoNotContainSeparator(datastore, keys);
+  return keys.join(datastore.keySeparator);
+};
+
+// Author:email:abc@xyz.com
+export const getIndexableSearchKey = (
+  constructor: EntityConstructor,
+  columnMetadata: ColumnMetadata,
+  value: Value
+) => {
+  const datastore = getDatastore(constructor);
+
+  const keys = [getEntityKey(constructor), columnMetadata.key, value];
+
   assertKeysDoNotContainSeparator(datastore, keys);
   return keys.join(datastore.keySeparator);
 };

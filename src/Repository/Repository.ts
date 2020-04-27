@@ -5,12 +5,15 @@ import { PropertyKey } from "../Entity/Entity";
 import { Value } from "../Datastore/Datastore";
 import { repositoryLoad } from "./repositoryLoad";
 import { repositorySearch } from "./repositorySearch";
+import { repositoryFind } from "./repositoryFind";
 import { repositorySave } from "./repositorySave";
+import { getHydrator } from "../Relationship/hydrate";
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>;
   save(entity: BaseEntity): Promise<boolean>;
-  search(property: PropertyKey, identifier: Value): Promise<BaseEntity | null>;
+  find(property: PropertyKey, identifier: Value): Promise<BaseEntity | null>;
+  search(property: PropertyKey, identifier: Value): AsyncGenerator<BaseEntity>;
 }
 
 export const getRepository = <T extends BaseEntity>(
@@ -23,8 +26,11 @@ export const getRepository = <T extends BaseEntity>(
     async save(instance: BaseEntity): Promise<boolean> {
       return await repositorySave(instance);
     },
-    async search(property: PropertyKey, identifier: Value): Promise<T | null> {
-      return await repositorySearch(constructor, property, identifier);
+    async find(property: PropertyKey, identifier: Value): Promise<T | null> {
+      return await repositoryFind(constructor, property, identifier);
+    },
+    search(property: PropertyKey, identifier: Value): AsyncGenerator<T> {
+      return repositorySearch(constructor, property, identifier);
     },
   };
 };

@@ -29,27 +29,26 @@ describe(`library`, () => {
       expect(await loadedWilliamShakespeare.nickName).toEqual(`Bill`);
     });
 
-    it(`repository searches`, async () => {
-      const searchedWilliamShakespeare = await repository.search(
+    it(`repository finds`, async () => {
+      const foundWilliamShakespeare = await repository.find(
         `phoneNumber`,
         `+1234567890`
       );
 
-      expect(searchedWilliamShakespeare).not.toBeNull();
-      expect(await searchedWilliamShakespeare?.nickName).toEqual(`Bill`);
+      expect(foundWilliamShakespeare).not.toBeNull();
+      expect(await foundWilliamShakespeare?.nickName).toEqual(`Bill`);
 
-      const searchedNonexistent = await repository.search(
+      const foundNonexistent = await repository.find(
         `phoneNumber`,
         `+9999999999`
       );
 
-      expect(searchedNonexistent).toBeNull();
+      expect(foundNonexistent).toBeNull();
     });
   });
 
   describe(`the datastore`, () => {
     it(`is saved as expected`, () => {
-      console.log((libraryDatastore as any).data);
       expect(
         datastoreEqualTo(libraryDatastore, [
           [`Author:william@shakespeare.com:givenName`, `William`],

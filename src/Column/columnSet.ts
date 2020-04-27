@@ -30,7 +30,7 @@ export const columnSet = (
 
   if (columnMetadata.isIndexable) {
     const indexableKeyGenerator = (): Key =>
-      generateIndexablePropertyKey(constructor, columnMetadata, value);
+      generateIndexablePropertyKey(instance, columnMetadata, value);
     const primaryColumnValue = getPrimaryColumnValue(instance);
     cache.write(instance, indexableKeyGenerator, primaryColumnValue);
   }

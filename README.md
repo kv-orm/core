@@ -157,26 +157,26 @@ Using the `@Column()` decorator on an Entity property is how you mark it as a sa
 Like with Entities, you can optionally pass in a `key` to the decorator.
 
 ```typescript
-import { Column } from '@kv-orm/core'
+import { Column } from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
-  @Column({ key: 'givenName' })
-  public firstName: string
+  @Column({ key: "givenName" })
+  public firstName: string;
 
   @Column()
-  public lastName: string
+  public lastName: string;
 
   @Column()
-  public nickName: string | undefined
+  public nickName: string | undefined;
 
   @Column({ isPrimary: true }) // More on this in a moment
-  public emailAddress: string
+  public emailAddress: string;
 
-  @Column({ isIndexable: true }) // More on this in a moment
-  public phoneNumber: string
+  @Column({ isIndexable: true, isUnique: true }) // More on this in a moment
+  public phoneNumber: string;
 
-  public someUnsavedProperty: any
+  public someUnsavedProperty: any;
 
   public constructor({
     firstName,
@@ -184,31 +184,31 @@ class Author {
     emailAddress,
     phoneNumber,
   }: {
-    firstName: string
-    lastName: string
-    emailAddress: string
-    phoneNumber: string
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
+    phoneNumber: string;
   }) {
-    this.firstName = firstName
-    this.lastName = lastName
-    this.emailAddress = emailAddress
-    this.phoneNumber = phoneNumber
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.emailAddress = emailAddress;
+    this.phoneNumber = phoneNumber;
   }
 }
 
 const williamShakespeare = new Author({
-  firstName: 'William',
-  lastName: 'Shakespeare',
-  emailAddress: 'william@shakespeare.com',
-  phoneNumber: '+1234567890',
-})
-williamShakespeare.nickName = 'Bill'
-williamShakespeare.someUnsavedProperty = "Won't get saved!"
+  firstName: "William",
+  lastName: "Shakespeare",
+  emailAddress: "william@shakespeare.com",
+  phoneNumber: "+1234567890",
+});
+williamShakespeare.nickName = "Bill";
+williamShakespeare.someUnsavedProperty = "Won't get saved!";
 
 // When in an async function, you can fetch the value with `await`
-async foo () => {
-  console.log(await author.firstName)
-}
+(async () => {
+  console.log(await author.firstName);
+})();
 ```
 
 ### Primary Columns
@@ -231,14 +231,14 @@ An example of a singleton class where you do not need a Primary Column, might be
 
 ### Indexable Columns
 
-Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
+Similarly, an Column can be set as Indexable with `{ isIndexable: true, isUnique: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
-  @Column({ isIndexable: true })
+  @Column({ isIndexable: true, isUnique: true })
   public phoneNumber: string;
 
   // ...
@@ -251,30 +251,26 @@ If your property is particularly complex (i.e. can't be stored natively in the d
 
 For example, let's say you have a complex property on `Author`, `somethingComplex`:
 
-<!-- prettier-ignore-start -->
-
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
   @Column()
-  private _complex: string = ''  // place to store serialized value of somethingComplex
+  private _complex: string = ""; // place to store serialized value of somethingComplex
 
   set somethingComplex(value: any) {
     // function serialize(value: any): string
-    this._complex = serialize(value)
+    this._complex = serialize(value);
   }
   get somethingComplex(): any {
     // function deserialize(serializedValue: string): any
-    return (async () => deserialize(await this._complex))()
+    return (async () => deserialize(await this._complex))();
   }
 
   // ...
 }
 ```
-
-<!-- prettier-ignore-end -->
 
 ## Repositories
 
@@ -313,24 +309,32 @@ const loadedWilliamShakespeare = await authorRepository.load(
 console.log(await loadedWilliamShakespeare.nickName); // Bill
 ```
 
-### Search
+### Find
 
-If a property has been set as `isIndexable`, you can load an instance by a saved value. If no results are found, `null` is returned.
+If a property has been set as `isIndexable` and `isUnique`, you can load an instance by a saved value. If no results are found, `null` is returned.
 
 ```typescript
-const searchedWilliamShakespeare = await authorRepository.search(
+const foundWilliamShakespeare = await authorRepository.find(
   "phoneNumber",
   "+1234567890"
 );
 
-console.log(await searchedWilliamShakespeare?.nickName); // Bill
+console.log(await foundWilliamShakespeare?.nickName); // Bill
 
-const searchedNonexistent = await authorRepository.search(
+const foundNonexistent = await authorRepository.find(
   "phoneNumber",
   "+9999999999"
 );
 
-console.log(searchedNonexistent); // null
+console.log(foundNonexistent); // null
+```
+
+### Search
+
+If a property has been set as only `isIndexable` (is non-unique), you can search for instances with a saved value.
+
+```typescript
+// TODO
 ```
 
 ## Relationships
