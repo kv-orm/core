@@ -1,6 +1,6 @@
-import { KVORMError } from '../utils/errors'
-import { BaseEntity } from '../Entity/Entity'
-import { getConstructor } from '../utils/entities'
+import { KVORMError } from "../utils/errors";
+import { BaseEntity } from "../Entity/Entity";
+import { getConstructor } from "../utils/entities";
 
 export class CacheMissingPrimaryColumnValueError extends KVORMError {
   constructor(instance: BaseEntity) {
@@ -8,7 +8,7 @@ export class CacheMissingPrimaryColumnValueError extends KVORMError {
       `Could not find the value of the Primary Column in the cache for an Entity, ${
         getConstructor(instance).name
       }`
-    )
-    this.name = `CacheMissingPrimaryColumnValueError`
+    );
+    this.name = `CacheMissingPrimaryColumnValueError`;
   }
 }

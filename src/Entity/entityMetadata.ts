@@ -1,11 +1,11 @@
-import { Datastore, Key } from '../Datastore/Datastore'
-import { BaseEntity } from './Entity'
+import { Datastore, Key } from "../Datastore/Datastore";
+import { BaseEntity } from "./Entity";
 
 export interface EntityMetadata {
-  datastore: Datastore
-  key: Key
-  instances: BaseEntity[]
-  plugins: {}
+  datastore: Datastore;
+  key: Key;
+  instances: BaseEntity[];
+  plugins: {};
 }
 
 export const createEntityMetadata = (
@@ -13,8 +13,8 @@ export const createEntityMetadata = (
     datastore,
     key,
   }: {
-    datastore: Datastore
-    key: Key
+    datastore: Datastore;
+    key: Key;
   },
   plugins = {}
 ): EntityMetadata => ({
@@ -22,4 +22,4 @@ export const createEntityMetadata = (
   key,
   instances: [], // TODO
   plugins,
-})
+});

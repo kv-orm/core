@@ -1,7 +1,7 @@
-import { Cache } from './Cache'
-import { BaseEntity } from '../Entity/Entity'
-import { Key, Value } from '../Datastore/Datastore'
-import { WriteInstruction } from '../Instruction/WriteInstruction'
+import { Cache } from "./Cache";
+import { BaseEntity } from "../Entity/Entity";
+import { Key, Value } from "../Datastore/Datastore";
+import { WriteInstruction } from "../Instruction/WriteInstruction";
 
 export const cacheWrite = (
   cache: Cache,
@@ -9,4 +9,4 @@ export const cacheWrite = (
   keyGenerator: () => Key,
   value: Value
 ): void =>
-  cache.recordInstruction(instance, new WriteInstruction(keyGenerator, value))
+  cache.recordInstruction(instance, new WriteInstruction(keyGenerator, value));

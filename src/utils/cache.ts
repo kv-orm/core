@@ -1,4 +1,4 @@
-import { Cache } from '../Cache/Cache'
-import { Datastore } from '../Datastore/Datastore'
+import { Cache } from "../Cache/Cache";
+import { Datastore } from "../Datastore/Datastore";
 
-export const getCache = (datastore: Datastore): Cache => datastore.cache
+export const getCache = (datastore: Datastore): Cache => datastore.cache;

@@ -1,1 +1,1 @@
-export type oneToManyType<T> = T[] | AsyncGenerator<T>
+export type oneToManyType<T> = T[] | AsyncGenerator<T>;

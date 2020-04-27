@@ -1,18 +1,18 @@
-import { DeleteInstruction } from './DeleteInstruction'
-import { Key } from '../Datastore/Datastore'
+import { DeleteInstruction } from "./DeleteInstruction";
+import { Key } from "../Datastore/Datastore";
 
 describe(`DeleteInstruction`, () => {
-  let instruction: DeleteInstruction
+  let instruction: DeleteInstruction;
 
   beforeEach(() => {
-    instruction = new DeleteInstruction((): Key => `key`)
-  })
+    instruction = new DeleteInstruction((): Key => `key`);
+  });
 
   it(`should generate keys`, async () => {
-    expect(instruction.key).toEqual(`key`)
-  })
+    expect(instruction.key).toEqual(`key`);
+  });
 
   it(`should have a null value`, () => {
-    expect(instruction.value).toBeNull()
-  })
-})
+    expect(instruction.value).toBeNull();
+  });
+});

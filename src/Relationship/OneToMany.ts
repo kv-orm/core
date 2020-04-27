@@ -1,20 +1,20 @@
-import { BaseEntity, EntityConstructor } from '../Entity/Entity'
-import { PropertyKey } from '../Entity/Entity'
-import { Key } from '../Datastore/Datastore'
-import { getHydrator } from './hydrate'
-import { getConstructor } from '../utils/entities'
-import { oneToManySet } from './oneToManySet'
-import { createRelationshipMetadata } from './relationshipMetadata'
+import { BaseEntity, EntityConstructor } from "../Entity/Entity";
+import { PropertyKey } from "../Entity/Entity";
+import { Key } from "../Datastore/Datastore";
+import { getHydrator } from "./hydrate";
+import { getConstructor } from "../utils/entities";
+import { oneToManySet } from "./oneToManySet";
+import { createRelationshipMetadata } from "./relationshipMetadata";
 import {
   setRelationshipMetadata,
   getRelationshipMetadatas,
-} from '../utils/relationships'
-import { oneToManyGet } from './oneToManyGet'
-import { assertKeyNotInUse } from '../utils/metadata'
+} from "../utils/relationships";
+import { oneToManyGet } from "./oneToManyGet";
+import { assertKeyNotInUse } from "../utils/metadata";
 
 interface OneToManyOptions {
-  key?: Key
-  type: EntityConstructor
+  key?: Key;
+  type: EntityConstructor;
 }
 
 export function OneToMany(options: OneToManyOptions, plugins = {}) {
@@ -25,13 +25,13 @@ export function OneToMany(options: OneToManyOptions, plugins = {}) {
         property,
       },
       plugins
-    )
+    );
 
-    const constructor = getConstructor(instance)
+    const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, relationshipMetadata, {
       getMetadatas: getRelationshipMetadatas,
-    })
-    setRelationshipMetadata(constructor, relationshipMetadata)
+    });
+    setRelationshipMetadata(constructor, relationshipMetadata);
 
     Reflect.defineProperty(instance, property, {
       enumerable: true,
@@ -41,13 +41,13 @@ export function OneToMany(options: OneToManyOptions, plugins = {}) {
           this,
           relationshipMetadata,
           getHydrator(options.type)
-        )
+        );
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
         if (values) {
-          oneToManySet(this, relationshipMetadata, values)
+          oneToManySet(this, relationshipMetadata, values);
         }
       },
-    })
-  }
+    });
+  };
 }

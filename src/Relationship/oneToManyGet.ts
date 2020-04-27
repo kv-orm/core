@@ -1,57 +1,57 @@
-import { BaseEntity } from '../Entity/Entity'
-import { Value, SearchStrategy, Datastore } from '../Datastore/Datastore'
-import { getConstructor } from '../utils/entities'
-import { getDatastore, keysFromSearch } from '../utils/datastore'
+import { BaseEntity } from "../Entity/Entity";
+import { Value, SearchStrategy, Datastore } from "../Datastore/Datastore";
+import { getConstructor } from "../utils/entities";
+import { getDatastore, keysFromSearch } from "../utils/datastore";
 import {
   generateManyRelationshipSearchKey,
   extractManyRelationshipValueKey,
-} from '../utils/keyGeneration'
-import { RelationshipMetadata } from './relationshipMetadata'
-import { SearchStrategyError } from '../Datastore/SearchStrategyError'
+} from "../utils/keyGeneration";
+import { RelationshipMetadata } from "./relationshipMetadata";
+import { SearchStrategyError } from "../Datastore/SearchStrategyError";
 
 const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
-  let strategy
+  let strategy;
   if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
-    strategy = SearchStrategy.prefix
+    strategy = SearchStrategy.prefix;
   }
 
   if (strategy === undefined) {
     throw new SearchStrategyError(
       SearchStrategy.prefix,
       `Datastore does not support searching`
-    )
+    );
   }
-  return strategy
-}
+  return strategy;
+};
 
 export async function* oneToManyGet(
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
   hydrator: (identifier: Value) => Promise<BaseEntity>
 ): AsyncGenerator<BaseEntity> {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
+  const constructor = getConstructor(instance);
+  const datastore = getDatastore(constructor);
 
   const searchKey = generateManyRelationshipSearchKey(
     instance,
     relationshipMetadata
-  )
-  const searchStrategy = pickSearchStrategy(datastore)
+  );
+  const searchStrategy = pickSearchStrategy(datastore);
 
   const keyGenerator = keysFromSearch(datastore, {
     strategy: searchStrategy,
     term: searchKey,
-  })
+  });
 
   while (true) {
-    const { done, value } = await keyGenerator.next()
-    if (done) return
+    const { done, value } = await keyGenerator.next();
+    if (done) return;
 
     const primaryColumnValue = extractManyRelationshipValueKey(
       datastore,
       value,
       searchKey
-    )
-    yield await hydrator(primaryColumnValue)
+    );
+    yield await hydrator(primaryColumnValue);
   }
 }

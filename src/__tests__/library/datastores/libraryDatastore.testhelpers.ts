@@ -1,3 +1,3 @@
-import { MemoryDatastore } from '../../../MemoryDatastore/MemoryDatastore'
+import { MemoryDatastore } from "../../../MemoryDatastore/MemoryDatastore";
 
-export const libraryDatastore = new MemoryDatastore()
+export const libraryDatastore = new MemoryDatastore();

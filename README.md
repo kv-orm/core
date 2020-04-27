@@ -61,10 +61,10 @@ If there is any other datastore that you'd like to see supported, please [create
 - Support for multiple key-value datastores in a single application.
 
   ```typescript
-  import { MemoryDatastore } from '@kv-orm/core'
+  import { MemoryDatastore } from "@kv-orm/core";
 
-  const libraryDatastore = new MemoryDatastore()
-  const applicationSecrets = new MemoryDatastore()
+  const libraryDatastore = new MemoryDatastore();
+  const applicationSecrets = new MemoryDatastore();
   ```
 
   See above for the full list of [Supported Datastores](#Supported%20Datastores).
@@ -72,15 +72,15 @@ If there is any other datastore that you'd like to see supported, please [create
 - Easy construction of typed Entities using [Typescript](https://www.typescriptlang.org/).
 
   ```typescript
-  import { Column, Entity } from '@kv-orm/core'
+  import { Column, Entity } from "@kv-orm/core";
 
   @Entity({ datastore: libraryDatastore })
   class Author {
     @Column()
-    public firstName: string
+    public firstName: string;
 
     @Column()
-    public lastName: string
+    public lastName: string;
 
     // ...
   }
@@ -89,22 +89,22 @@ If there is any other datastore that you'd like to see supported, please [create
 - On-demand, asynchronous, lazy-loading: [kv-orm] won't load properties of an Entity until they're needed, and will do so seamlessly at the time of lookup.
 
   ```typescript
-  import { getRepository } from '@kv-orm/core'
+  import { getRepository } from "@kv-orm/core";
 
-  const authorRepository = getRepository(Author)
+  const authorRepository = getRepository(Author);
 
-  let author = await authorRepository.load('william@shakespeare.com') // 1ms - no properties of the author have been loaded
+  let author = await authorRepository.load("william@shakespeare.com"); // 1ms - no properties of the author have been loaded
 
-  console.log(await author.firstName) // 60ms - author.firstName is fetched
+  console.log(await author.firstName); // 60ms - author.firstName is fetched
   ```
 
 - No unnecessary reads: if a property is already in memory, [kv-orm] won't look it up again unless it needs to.
 
   ```typescript
-  let author = await authorRepository.load('william@shakespeare.com')
+  let author = await authorRepository.load("william@shakespeare.com");
 
-  console.log(await author.lastName) // 60ms - author.lastName is fetched
-  console.log(await author.lastName) // 1ms - author.lastName is retrieved from memory (no lookup performed)
+  console.log(await author.lastName); // 60ms - author.lastName is fetched
+  console.log(await author.lastName); // 1ms - author.lastName is retrieved from memory (no lookup performed)
   ```
 
 # Usage
@@ -122,9 +122,9 @@ npm install --save @kv-orm/core
 `MemoryDatastore` is inbuilt into `@kv-orm/core`. It is a simple in-memory key-value datastore, and can be used for prototyping applications.
 
 ```typescript
-import { MemoryDatastore } from `@kv-orm/core`
+import { MemoryDatastore } from `@kv-orm/core`;
 
-const libraryDatastore = new MemoryDatastore()
+const libraryDatastore = new MemoryDatastore();
 ```
 
 ### Cloudflare Workers KV
@@ -140,14 +140,14 @@ Optionally, you can also pass in a `key` to the decorator, to rename the key nam
 You can initialize a new instance of the Entity as normal.
 
 ```typescript
-import { Entity } from '@kv-orm/core'
+import { Entity } from "@kv-orm/core";
 
-@Entity({ datastore: libraryDatastore, key: 'Author' })
+@Entity({ datastore: libraryDatastore, key: "Author" })
 class Author {
   // ...
 }
 
-const authorInstance = new Author()
+const authorInstance = new Author();
 ```
 
 ## Columns
@@ -221,7 +221,7 @@ class Author {
   // ...
 
   @Column({ isPrimary: true })
-  public emailAddress: string
+  public emailAddress: string;
 
   // ...
 }
@@ -239,7 +239,7 @@ class Author {
   // ...
 
   @Column({ isIndexable: true })
-  public phoneNumber: string
+  public phoneNumber: string;
 
   // ...
 }
@@ -281,9 +281,9 @@ class Author {
 To actually interact with the datastore, you'll need a Repository.
 
 ```typescript
-import { getRepository } from '@kv-orm/core'
+import { getRepository } from "@kv-orm/core";
 
-const authorRepository = getRepository(Author)
+const authorRepository = getRepository(Author);
 ```
 
 ### Save
@@ -292,13 +292,13 @@ You can then save Entity instances.
 
 ```typescript
 const williamShakespeare = new Author({
-  firstName: 'William',
-  lastName: 'Shakespeare',
-  emailAddress: 'william@shakespeare.com',
-  phoneNumber: '+1234567890',
-})
+  firstName: "William",
+  lastName: "Shakespeare",
+  emailAddress: "william@shakespeare.com",
+  phoneNumber: "+1234567890",
+});
 
-await authorRepository.save(williamShakepseare)
+await authorRepository.save(williamShakepseare);
 ```
 
 ### Load
@@ -307,10 +307,10 @@ And subsequently, load them back again. If the Entity has a Primary Column, you 
 
 ```typescript
 const loadedWilliamShakespeare = await authorRepository.load(
-  'william@shakespeare.com'
-)
+  "william@shakespeare.com"
+);
 
-console.log(await loadedWilliamShakespeare.nickName) // Bill
+console.log(await loadedWilliamShakespeare.nickName); // Bill
 ```
 
 ### Search
@@ -319,18 +319,18 @@ If a property has been set as `isIndexable`, you can load an instance by a saved
 
 ```typescript
 const searchedWilliamShakespeare = await authorRepository.search(
-  'phoneNumber',
-  '+1234567890'
-)
+  "phoneNumber",
+  "+1234567890"
+);
 
-console.log(await searchedWilliamShakespeare?.nickName) // Bill
+console.log(await searchedWilliamShakespeare?.nickName); // Bill
 
 const searchedNonexistent = await authorRepository.search(
-  'phoneNumber',
-  '+9999999999'
-)
+  "phoneNumber",
+  "+9999999999"
+);
 
-console.log(searchedNonexistent) // null
+console.log(searchedNonexistent); // null
 ```
 
 ## Relationships
@@ -350,15 +350,15 @@ console.log(searchedNonexistent) // null
 When defining an Entity in Typescript, you must provide types for the properties. For example, `firstName` and `lastName` are set as `string`s:
 
 ```typescript
-import { Column, Entity } from '@kv-orm/core'
+import { Column, Entity } from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
   @Column()
-  public firstName: string
+  public firstName: string;
 
   @Column()
-  public lastName: string
+  public lastName: string;
 
   // ...
 }
@@ -369,15 +369,15 @@ However, when reading these values with kv-orm, in fact a `Promise<string>` is r
 Therefore, to improve the developer experience and prevent Typescript errors such as `'await' has no effect on the type of this expression. ts(80007)` and `Property 'then' does not exist on type 'T'. ts(2339)`, when declaring the Entity, wrap the property types in the `columnType` helper. In the same example:
 
 ```typescript
-import { Column, Entity, columnType } from '@kv-orm/core'
+import { Column, Entity, columnType } from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
   @Column()
-  public firstName: columnType<string>
+  public firstName: columnType<string>;
 
   @Column()
-  public lastName: columnType<string>
+  public lastName: columnType<string>;
 
   // ...
 }
@@ -431,7 +431,7 @@ This project is [MIT](https://github.com/kv-orm/core/blob/master/LICENSE) licens
 If you're using a preprocessor that minifies class names, such as Babel, the class constructors names often get shortened. kv-orm will always use this class name, so, either disable minification in the preprocessor, or manually set the `key` value when creating an Entity e.g.
 
 ```typescript
-@Entity({ key: 'MyClass' })
+@Entity({ key: "MyClass" })
 class MyClass {
   // ...
 }

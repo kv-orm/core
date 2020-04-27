@@ -1,15 +1,15 @@
-import { EntityConstructor, BaseEntity } from '../Entity/Entity'
-import { Value, Datastore } from '../Datastore/Datastore'
-import { createEmptyInstance } from '../utils/entities'
+import { EntityConstructor, BaseEntity } from "../Entity/Entity";
+import { Value, Datastore } from "../Datastore/Datastore";
+import { createEmptyInstance } from "../utils/entities";
 import {
   getPrimaryColumnMetadata,
   setPrimaryColumnValue,
-} from '../utils/columns'
-import { RepositoryLoadError } from './RepositoryLoadError'
-import { getDatastore } from '../utils/datastore'
-import { generatePropertyKey } from '../utils/keyGeneration'
-import { EntityNotFoundError } from './EntityNotFoundError'
-import { ColumnMetadata } from '../Column/columnMetadata'
+} from "../utils/columns";
+import { RepositoryLoadError } from "./RepositoryLoadError";
+import { getDatastore } from "../utils/datastore";
+import { generatePropertyKey } from "../utils/keyGeneration";
+import { EntityNotFoundError } from "./EntityNotFoundError";
+import { ColumnMetadata } from "../Column/columnMetadata";
 
 const assertIdentifierValid = (
   constructor: EntityConstructor,
@@ -20,14 +20,14 @@ const assertIdentifierValid = (
     throw new RepositoryLoadError(
       constructor,
       `Entity is a singleton, so cannot load with an identifier.`
-    )
+    );
   } else if (primaryColumnMetadata !== undefined && identifier === undefined) {
     throw new RepositoryLoadError(
       constructor,
       `Entity is not a singleton, and so requires an identifier to load with.`
-    )
+    );
   }
-}
+};
 
 const loadNonSingleton = async (
   datastore: Datastore,
@@ -36,21 +36,21 @@ const loadNonSingleton = async (
   primaryColumnMetadata: ColumnMetadata,
   identifier: Value
 ): Promise<void> => {
-  setPrimaryColumnValue(instance, identifier)
-  const key = generatePropertyKey(instance, primaryColumnMetadata)
+  setPrimaryColumnValue(instance, identifier);
+  const key = generatePropertyKey(instance, primaryColumnMetadata);
   if ((await datastore.read(key)) !== identifier)
-    throw new EntityNotFoundError(constructor, identifier)
-}
+    throw new EntityNotFoundError(constructor, identifier);
+};
 
 export const repositoryLoad = async <T extends BaseEntity>(
   constructor: EntityConstructor<T>,
   identifier?: Value
 ): Promise<T> => {
-  const datastore = getDatastore(constructor)
-  const instance = createEmptyInstance(constructor)
-  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor)
+  const datastore = getDatastore(constructor);
+  const instance = createEmptyInstance(constructor);
+  const primaryColumnMetadata = getPrimaryColumnMetadata(constructor);
 
-  assertIdentifierValid(constructor, primaryColumnMetadata, identifier)
+  assertIdentifierValid(constructor, primaryColumnMetadata, identifier);
 
   if (primaryColumnMetadata !== undefined && identifier !== undefined) {
     await loadNonSingleton(
@@ -59,11 +59,11 @@ export const repositoryLoad = async <T extends BaseEntity>(
       instance,
       primaryColumnMetadata,
       identifier
-    )
+    );
   } else {
     // Entity is a singleton
     // Should we still somehow check if it has been saved before and throw a notfound error?
   }
 
-  return instance
-}
+  return instance;
+};
