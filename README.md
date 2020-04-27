@@ -170,15 +170,25 @@ class Author {
   @Column()
   public nickName: string | undefined
 
-  @Column({ isPrimary: true })  // More on this in a moment
+  @Column({ isPrimary: true }) // More on this in a moment
   public emailAddress: string
 
-  @Column({ isIndexable: true })  // More on this in a moment
+  @Column({ isIndexable: true }) // More on this in a moment
   public phoneNumber: string
 
   public someUnsavedProperty: any
 
-  public constructor({ firstName, lastName, emailAddress, phoneNumber }: { firstName: string, lastName: string, emailAddress: string, phoneNumber: string) {
+  public constructor({
+    firstName,
+    lastName,
+    emailAddress,
+    phoneNumber,
+  }: {
+    firstName: string
+    lastName: string
+    emailAddress: string
+    phoneNumber: string
+  }) {
     this.firstName = firstName
     this.lastName = lastName
     this.emailAddress = emailAddress
@@ -190,20 +200,15 @@ const williamShakespeare = new Author({
   firstName: 'William',
   lastName: 'Shakespeare',
   emailAddress: 'william@shakespeare.com',
-  phoneNumber: '+1234567890'
+  phoneNumber: '+1234567890',
 })
 williamShakespeare.nickName = 'Bill'
 williamShakespeare.someUnsavedProperty = "Won't get saved!"
 
 // When in an async function, you can fetch the value with `await`
-async () => {
+async foo () => {
   console.log(await author.firstName)
 }
-
-// Or, use `Promise.then()`...
-author.lastName.then(lastName => {
-  console.log(lastName)
-})
 ```
 
 ### Primary Columns
@@ -254,15 +259,15 @@ class Author {
   // ...
 
   @Column()
-  private _complex: string  // place to store serialized value of somethingComplex
+  private _complex: string = ''  // place to store serialized value of somethingComplex
 
   set somethingComplex(value: any) {
     // function serialize(value: any): string
     this._complex = serialize(value)
   }
-  async get somethingComplex(): any {
+  get somethingComplex(): any {
     // function deserialize(serializedValue: string): any
-    return deserialize(await this._complex)
+    return (async () => deserialize(await this._complex))()
   }
 
   // ...
@@ -318,7 +323,7 @@ const searchedWilliamShakespeare = await authorRepository.search(
   '+1234567890'
 )
 
-console.log(await searchedWilliamShakespeare.nickName) // Bill
+console.log(await searchedWilliamShakespeare?.nickName) // Bill
 
 const searchedNonexistent = await authorRepository.search(
   'phoneNumber',
@@ -335,6 +340,56 @@ console.log(searchedNonexistent) // null
 > TODO: Documentation
 
 ### One To Many
+
+> TODO: Documentation
+
+# Types
+
+## `columnType`
+
+When defining an Entity in Typescript, you must provide types for the properties. For example, `firstName` and `lastName` are set as `string`s:
+
+```typescript
+import { Column, Entity } from '@kv-orm/core'
+
+@Entity({ datastore: libraryDatastore })
+class Author {
+  @Column()
+  public firstName: string
+
+  @Column()
+  public lastName: string
+
+  // ...
+}
+```
+
+However, when reading these values with kv-orm, in fact a `Promise<string>` is returned. Simply switching these type definitions to `Promise<T>` is not valid either, as writing values is done synchronously.
+
+Therefore, to improve the developer experience and prevent Typescript errors such as `'await' has no effect on the type of this expression. ts(80007)` and `Property 'then' does not exist on type 'T'. ts(2339)`, when declaring the Entity, wrap the property types in the `columnType` helper. In the same example:
+
+```typescript
+import { Column, Entity, columnType } from '@kv-orm/core'
+
+@Entity({ datastore: libraryDatastore })
+class Author {
+  @Column()
+  public firstName: columnType<string>
+
+  @Column()
+  public lastName: columnType<string>
+
+  // ...
+}
+```
+
+`columnType` is simply an alias: `type columnType<T> = T | Promise<T>`.
+
+## `oneToOneType`
+
+> TODO: Documentation
+
+## `oneToManyType`
 
 > TODO: Documentation
 
@@ -359,9 +414,6 @@ npm test
 <a href="https://github.com/kv-orm/core/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement" target="_blank">
   <img alt="Features" src="https://img.shields.io/github/issues/kv-orm/core/enhancement?color=%2335a501&label=Features&logo=github&style=plastic" />
 </a>
-
-- Relationships
-- Improved performance
 
 <a href="https://github.com/kv-orm/core/issues?q=is%3Aopen+is%3Aissue+label%3Abug" target="_blank">
   <img alt="Bugs" src="https://img.shields.io/github/issues/kv-orm/core/bug?color=%23d73a4a&label=Bugs&logo=github&style=plastic" />

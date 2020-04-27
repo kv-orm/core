@@ -4,9 +4,7 @@ import { EntityConstructor, BaseEntity, PropertyKey } from '../Entity/Entity'
 import { COLUMN_KEY } from '../Column/Column'
 import { ColumnMetadata } from '../Column/columnMetadata'
 import { ColumnLookupError, PrimaryColumnMissingError } from './errors'
-import { getConstructor } from './entities'
-import { getDatastore } from './datastore'
-import { getCache } from './cache'
+import { getConstructorDatastoreCache } from './entities'
 import { Value } from '../Datastore/Datastore'
 import { getMetadatas, getMetadata, setMetadata } from './metadata'
 
@@ -48,9 +46,7 @@ export const getPrimaryColumnValue = (
   instance: BaseEntity,
   { failSilently } = { failSilently: false }
 ): Value => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-  const cache = getCache(datastore)
+  const { constructor, cache } = getConstructorDatastoreCache(instance)
   assertHasPrimaryColumn(constructor)
   return cache.getPrimaryColumnValue(instance, { failSilently })
 }
@@ -59,9 +55,7 @@ export const setPrimaryColumnValue = (
   instance: BaseEntity,
   value: Value
 ): void => {
-  const constructor = getConstructor(instance)
-  const datastore = getDatastore(constructor)
-  const cache = getCache(datastore)
+  const { constructor, cache } = getConstructorDatastoreCache(instance)
   assertHasPrimaryColumn(constructor)
   return cache.setPrimaryColumnValue(instance, value)
 }

@@ -6,6 +6,11 @@ module.exports = {
   collectCoverageFrom: [
     '**/*.{js,ts}',
     '!**/node_modules/**',
-    '!*.testhelpers.{js,ts}',
+    '!**/*.testhelpers.{js,ts}',
+  ],
+  testMatch: [
+    '**/__tests__/**/*.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)',
+    '!**/*.testhelpers.ts',
   ],
 }
