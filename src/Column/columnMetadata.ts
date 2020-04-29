@@ -23,7 +23,7 @@ export const createColumnMetadata = ({
 }): ColumnMetadata => ({
   key: key || property.toString(),
   property,
-  isIndexable: !!isIndexable,
+  isIndexable: !!isPrimary || !!isIndexable,
   isPrimary: !!isPrimary,
   isUnique: !!isPrimary || !!isUnique,
 });

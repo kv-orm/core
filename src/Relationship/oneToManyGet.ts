@@ -8,15 +8,16 @@ import {
 } from "../utils/datastore";
 import {
   generateManyRelationshipSearchKey,
-  extractManyRelationshipValueKey,
+  extractValueFromSearchKey,
 } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
+import { hydrator, hydrateMany } from "../utils/hydrate";
 
-export async function* oneToManyGet(
+export const oneToManyGet = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
-  hydrator: (identifier: Value) => Promise<BaseEntity>
-): AsyncGenerator<BaseEntity> {
+  hydrator: hydrator
+): AsyncGenerator<BaseEntity> => {
   const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
 
@@ -24,22 +25,5 @@ export async function* oneToManyGet(
     instance,
     relationshipMetadata
   );
-  const searchStrategy = pickSearchStrategy(datastore);
-
-  const keyGenerator = keysFromSearch(datastore, {
-    strategy: searchStrategy,
-    term: searchKey,
-  });
-
-  while (true) {
-    const { done, value } = await keyGenerator.next();
-    if (done) return;
-
-    const primaryColumnValue = extractManyRelationshipValueKey(
-      datastore,
-      value,
-      searchKey
-    );
-    yield await hydrator(primaryColumnValue);
-  }
-}
+  return hydrateMany(datastore, searchKey, hydrator);
+};

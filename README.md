@@ -469,4 +469,10 @@ class MyClass {
 }
 ```
 
+# Upgrading from alpha (0.0.X)
+
+Thank you for trying out kv-orm in it's alpha period! Thanks to a generous sponsor, I have been able to complete work to elevate [kv-orm] to a more featureful beta. Unfortunately, this has meant a couple of minor breaking changes.
+
+- `PrimaryColumn`, `IndexableColumn`
+
 [kv-orm]: https://github.com/kv-orm/core

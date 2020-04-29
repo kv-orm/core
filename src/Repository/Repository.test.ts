@@ -7,6 +7,7 @@ import { RepositoryLoadError } from "./RepositoryLoadError";
 import { ColumnLookupError } from "../utils/errors";
 import { EntityNotFoundError } from "./EntityNotFoundError";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
+import { ColumnNotFindableError } from "./ColumnNotFindableError";
 
 describe(`Repository`, () => {
   let datastore: Datastore;
@@ -214,13 +215,13 @@ describe(`Repository`, () => {
     });
   });
 
-  describe(`ColumnNotSearchableError`, () => {
+  describe(`ColumnNotFindableError`, () => {
     it(`is thrown when searching a non isIndexable Column`, async () => {
       await expect(
         (async (): Promise<void> => {
           await complexRepository.find(`myProperty`, `value`);
         })()
-      ).rejects.toThrow(ColumnNotSearchableError);
+      ).rejects.toThrow(ColumnNotFindableError);
     });
   });
 

@@ -65,6 +65,7 @@ describe(`library`, () => {
           "Author:william@shakespeare.com:_complex" => "2020-01-02T03:04:05.000Z",
           "Author:william@shakespeare.com:givenName" => "William",
           "Author:william@shakespeare.com:lastName" => "Shakespeare",
+          "Author:emailAddress:william@shakespeare.com" => "william@shakespeare.com",
           "Author:william@shakespeare.com:emailAddress" => "william@shakespeare.com",
           "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
           "Author:william@shakespeare.com:phoneNumber" => "+1234567890",

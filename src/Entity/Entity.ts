@@ -5,15 +5,15 @@ import { createEntityMetadata, EntityMetadata } from "./entityMetadata";
 import { setEntityMetadata, getEntityMetadata } from "../utils/entities";
 import { assertKeyNotInUse } from "../utils/metadata";
 
-export const ENTITY_KEY = Symbol(`entityMetadata`);
+export const ENTITY_KEY = Symbol(`Entity`);
 
-export type PropertyValue = any; // eslint-disable-line @typescript-eslint/no-explicit-any
+export type PropertyValue = any;
 export type PropertyKey = string | number | symbol;
 
 export type BaseEntity = Record<PropertyKey, PropertyValue>;
 
 export type EntityConstructor<T extends BaseEntity = BaseEntity> = {
-  new (...args: any[]): T; // eslint-disable-line @typescript-eslint/no-explicit-any
+  new (...args: any[]): T;
 };
 
 interface EntityOptions {
@@ -21,15 +21,16 @@ interface EntityOptions {
   datastore: Datastore;
 }
 
-export function Entity(
-  { datastore, key }: EntityOptions // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): (constructor: EntityConstructor) => any {
+export function Entity({
+  datastore,
+  key,
+}: EntityOptions): (constructor: EntityConstructor) => any {
   return function <T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {
     const entityMetadata: EntityMetadata = createEntityMetadata({
-      datastore,
-      key: key || constructor.name,
+      options: { datastore, key },
+      constructor,
     });
 
     assertKeyNotInUse(constructor, entityMetadata, {

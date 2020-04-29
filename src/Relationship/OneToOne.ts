@@ -1,7 +1,7 @@
 import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
-import { getHydrator } from "./hydrate";
+import { getHydrator } from "../utils/hydrate";
 import { getConstructor } from "../utils/entities";
 import { oneToOneSet } from "./oneToOneSet";
 import { createRelationshipMetadata } from "./relationshipMetadata";
