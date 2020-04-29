@@ -7,7 +7,6 @@ import { repositoryLoad } from "./repositoryLoad";
 import { repositorySearch } from "./repositorySearch";
 import { repositoryFind } from "./repositoryFind";
 import { repositorySave } from "./repositorySave";
-import { getHydrator } from "../Relationship/hydrate";
 
 export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>;

@@ -5,11 +5,7 @@ import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { ColumnMetadata } from "../Column/columnMetadata";
 import { getPrimaryColumnMetadata, getPrimaryColumnValue } from "./columns";
 import { getDatastore } from "./datastore";
-import {
-  getConstructor,
-  getEntityMetadata,
-  getConstructorDatastoreCache,
-} from "./entities";
+import { getConstructor, getEntityMetadata } from "./entities";
 import { RelationshipMetadata } from "../Relationship/relationshipMetadata";
 import { InvalidKeyError } from "./errors";
 

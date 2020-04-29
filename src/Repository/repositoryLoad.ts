@@ -1,6 +1,6 @@
 import { EntityConstructor, BaseEntity } from "../Entity/Entity";
 import { Value, Datastore } from "../Datastore/Datastore";
-import { createEmptyInstance, getEntityMetadata } from "../utils/entities";
+import { createEmptyInstance } from "../utils/entities";
 import {
   getPrimaryColumnMetadata,
   setPrimaryColumnValue,
