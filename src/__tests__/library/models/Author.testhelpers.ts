@@ -1,5 +1,8 @@
 import { Entity } from "../../../Entity/Entity";
 import { Column } from "../../../Column/Column";
+import { PrimaryColumn } from "../../../Column/PrimaryColumn";
+import { UniqueColumn } from "../../../Column/UniqueColumn";
+import { IndexableColumn } from "../../../Column/IndexableColumn";
 import { columnType } from "../../../types/columnType";
 import { libraryDatastore } from "../datastores/libraryDatastore.testhelpers";
 
@@ -21,14 +24,14 @@ export class Author {
   @Column()
   public nickName?: columnType<string>;
 
-  @Column({ isPrimary: true })
+  @PrimaryColumn()
   public emailAddress: columnType<string>;
 
-  @Column({ isIndexable: true, isUnique: true })
-  public phoneNumber: columnType<string>;
-
-  @Column({ isIndexable: true })
+  @IndexableColumn()
   public birthYear: columnType<number>;
+
+  @UniqueColumn()
+  public phoneNumber: columnType<string>;
 
   public someUnsavedProperty: any;
 
@@ -47,19 +50,19 @@ export class Author {
     firstName,
     lastName,
     emailAddress,
-    phoneNumber,
     birthYear,
+    phoneNumber,
   }: {
     firstName: string;
     lastName: string;
     emailAddress: string;
-    phoneNumber: string;
     birthYear: number;
+    phoneNumber: string;
   }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.emailAddress = emailAddress;
-    this.phoneNumber = phoneNumber;
     this.birthYear = birthYear;
+    this.phoneNumber = phoneNumber;
   }
 }

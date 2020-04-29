@@ -149,7 +149,7 @@ describe(`Repository`, () => {
     );
   });
 
-  it("throws an error when finding a non-unique column", () => {
+  it("throws an error when finding a non UniqueColumn", () => {
     expect(
       complexRepository.find("indexableProperty", "")
     ).rejects.toThrowError();
@@ -227,7 +227,7 @@ describe(`Repository`, () => {
   });
 
   describe(`ColumnNotFindableError`, () => {
-    it(`is thrown when searching a non isIndexable Column`, async () => {
+    it(`is thrown when searching a non IndexableColumn`, async () => {
       await expect(
         (async (): Promise<void> => {
           await complexRepository.find(`myProperty`, `value`);
@@ -237,7 +237,7 @@ describe(`Repository`, () => {
   });
 
   describe(`ColumnNotFindableError`, () => {
-    it(`is thrown when searching a non isIndexable Column`, async () => {
+    it(`is thrown when searching a non IndexableColumn`, async () => {
       await expect(
         (async (): Promise<void> => {
           await complexRepository.search(`myProperty`, `value`);

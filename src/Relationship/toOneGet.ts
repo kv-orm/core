@@ -4,7 +4,7 @@ import { getConstructorDatastoreCache } from "../utils/entities";
 import { generateOneRelationshipKey } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
 
-export const oneToOneGet = async (
+export const toOneGet = async (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata
 ): Promise<Value> => {

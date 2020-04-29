@@ -3,21 +3,21 @@ import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
 import { getHydrator } from "../utils/hydrate";
 import { getConstructor } from "../utils/entities";
-import { oneToManySet } from "./oneToManySet";
+import { toManySet } from "./toManySet";
 import { createRelationshipMetadata } from "./relationshipMetadata";
 import {
   setRelationshipMetadata,
   getRelationshipMetadatas,
 } from "../utils/relationships";
-import { oneToManyGet } from "./oneToManyGet";
+import { toManyGet } from "./toManyGet";
 import { assertKeyNotInUse } from "../utils/metadata";
 
-interface OneToManyOptions {
+interface ToManyOptions {
   key?: Key;
   type: EntityConstructor;
 }
 
-export function OneToMany(options: OneToManyOptions) {
+export function ToMany(options: ToManyOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
     const relationshipMetadata = createRelationshipMetadata({
       options,
@@ -36,10 +36,10 @@ export function OneToMany(options: OneToManyOptions) {
       enumerable: true,
       configurable: true,
       get: function get(this: BaseEntity) {
-        return oneToManyGet(this, relationshipMetadata, hydrator);
+        return toManyGet(this, relationshipMetadata, hydrator);
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
-        if (values) oneToManySet(this, relationshipMetadata, values);
+        if (values) toManySet(this, relationshipMetadata, values);
       },
     });
   };

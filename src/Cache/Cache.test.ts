@@ -38,7 +38,7 @@ describe(`Cache`, () => {
   });
 
   describe(`CacheMissingPrimaryColumnValueError`, () => {
-    it(`is thrown when reading an, as yet, unset Primary Column value`, () => {
+    it(`is thrown when reading an, as yet, unset PrimaryColumn value`, () => {
       expect(() => {
         cache.getPrimaryColumnValue({});
       }).toThrow(CacheMissingPrimaryColumnValueError);

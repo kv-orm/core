@@ -1,11 +1,11 @@
 import { Datastore } from "../Datastore/Datastore";
 import { BaseEntity, Entity } from "../Entity/Entity";
 import { MemoryDatastore } from "../MemoryDatastore/MemoryDatastore";
-import { OneToOne } from "./OneToOne";
+import { ToOne } from "./ToOne";
 import { Column } from "../Column/Column";
 import { getRepository, Repository } from "../Repository/Repository";
 
-describe(`OneToMany`, () => {
+describe(`ToMany`, () => {
   let datastore: Datastore;
   let childInstance: BaseEntity;
   let parentInstance: BaseEntity;
@@ -32,7 +32,7 @@ describe(`OneToMany`, () => {
 
     @Entity({ datastore })
     class ParentEntity {
-      @OneToOne({ type: ChildEntity })
+      @ToOne({ type: ChildEntity })
       public myProperty: ChildEntity | undefined = undefined;
     }
 
@@ -44,7 +44,7 @@ describe(`OneToMany`, () => {
 
     @Entity({ datastore })
     class SingletonParentEntity {
-      @OneToOne({ type: SingletonEntity })
+      @ToOne({ type: SingletonEntity })
       public myProperty: SingletonEntity | undefined = undefined;
     }
 

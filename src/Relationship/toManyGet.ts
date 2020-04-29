@@ -5,7 +5,7 @@ import { generateManyRelationshipSearchKey } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
 import { hydrator, hydrateMany } from "../utils/hydrate";
 
-export const oneToManyGet = (
+export const toManyGet = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
   hydrator: hydrator

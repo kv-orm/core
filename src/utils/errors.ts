@@ -78,11 +78,9 @@ export class RelationshipLookupError extends MetadataError {
 export class PrimaryColumnMissingError extends MetadataError {
   constructor(
     constructor: EntityConstructor,
-    message = `Primary Column Missing`
+    message = `PrimaryColumn Missing`
   ) {
-    super(
-      `Primary Column not found on Entity, ${constructor.name}: ${message}`
-    );
+    super(`PrimaryColumn not found on Entity, ${constructor.name}: ${message}`);
     this.name = `PrimaryColumnMissingError`;
   }
 }

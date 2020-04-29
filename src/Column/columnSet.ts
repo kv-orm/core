@@ -23,7 +23,7 @@ export const columnSet = (
         constructor,
         columnMetadata.property,
         value,
-        `Primary Column Value has already been set`
+        `PrimaryColumn Value has already been set`
       );
     }
     setPrimaryColumnValue(instance, value);

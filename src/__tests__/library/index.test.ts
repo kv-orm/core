@@ -67,10 +67,10 @@ describe(`library`, () => {
           "Author:william@shakespeare.com:lastName" => "Shakespeare",
           "Author:emailAddress:william@shakespeare.com" => "william@shakespeare.com",
           "Author:william@shakespeare.com:emailAddress" => "william@shakespeare.com",
-          "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
-          "Author:william@shakespeare.com:phoneNumber" => "+1234567890",
           "Author:birthYear:1564:william@shakespeare.com" => "william@shakespeare.com",
           "Author:william@shakespeare.com:birthYear" => 1564,
+          "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:phoneNumber" => "+1234567890",
           "Author:william@shakespeare.com:nickName" => "Bill",
         }
       `);
