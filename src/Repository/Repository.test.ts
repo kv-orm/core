@@ -8,6 +8,7 @@ import { ColumnLookupError } from "../utils/errors";
 import { EntityNotFoundError } from "./EntityNotFoundError";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
 import { ColumnNotFindableError } from "./ColumnNotFindableError";
+import { RepositoryFindError } from "./RepositoryFindError";
 
 describe(`Repository`, () => {
   let datastore: Datastore;
@@ -21,7 +22,7 @@ describe(`Repository`, () => {
 
     @Entity({ datastore, key: `SingletonEntity` })
     class SingletonEntity {
-      @Column({ key: `myProperty` })
+      @Column({ key: `myProperty`, isIndexable: true })
       public myProperty = `initial value`;
     }
 
@@ -205,6 +206,16 @@ describe(`Repository`, () => {
     });
   });
 
+  describe("RepositoryFindError", () => {
+    it(`is thrown when loading a singleton Entity without an identifier`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await singletonRepository.find("myProperty", "someValue");
+        })()
+      ).rejects.toThrow(RepositoryFindError);
+    });
+  });
+
   describe(`ColumnLookupError`, () => {
     it(`is thrown when searching a non-existent property`, async () => {
       await expect(
@@ -222,6 +233,16 @@ describe(`Repository`, () => {
           await complexRepository.find(`myProperty`, `value`);
         })()
       ).rejects.toThrow(ColumnNotFindableError);
+    });
+  });
+
+  describe(`ColumnNotFindableError`, () => {
+    it(`is thrown when searching a non isIndexable Column`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.search(`myProperty`, `value`);
+        })()
+      ).rejects.toThrow(ColumnNotSearchableError);
     });
   });
 

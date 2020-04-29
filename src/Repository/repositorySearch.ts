@@ -2,16 +2,8 @@ import { EntityConstructor, BaseEntity } from "../Entity/Entity";
 import { Value } from "../Datastore/Datastore";
 import { getColumnMetadata } from "../utils/columns";
 import { PropertyKey } from "../Entity/Entity";
-import {
-  getUniqueSearchKey,
-  extractValueFromSearchKey,
-  getIndexableSearchKey,
-} from "../utils/keyGeneration";
-import {
-  getDatastore,
-  pickSearchStrategy,
-  keysFromSearch,
-} from "../utils/datastore";
+import { getIndexableSearchKey } from "../utils/keyGeneration";
+import { getDatastore } from "../utils/datastore";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
 import { getHydrator, hydrateMany } from "../utils/hydrate";
 

@@ -5,6 +5,7 @@ import { getConstructorDatastoreCache } from "../utils/entities";
 import {
   generatePropertyKey,
   generateIndexablePropertyKey,
+  generateRelationshipKey,
 } from "../utils/keyGeneration";
 import { getPrimaryColumnValue, setPrimaryColumnValue } from "../utils/columns";
 import { ReadOnlyError } from "../utils/errors";
@@ -31,7 +32,7 @@ export const columnSet = (
   if (columnMetadata.isIndexable) {
     const indexableKeyGenerator = (): Key =>
       generateIndexablePropertyKey(instance, columnMetadata, value);
-    const primaryColumnValue = getPrimaryColumnValue(instance);
+    const primaryColumnValue = generateRelationshipKey(instance);
     cache.write(instance, indexableKeyGenerator, primaryColumnValue);
   }
 

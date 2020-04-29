@@ -60,7 +60,7 @@ export const generateIndexablePropertyKey = (
   const keys = [getEntityKey(constructor), columnMetadata.key, value];
 
   if (!columnMetadata.isUnique) {
-    keys.push(getPrimaryColumnValue(instance));
+    keys.push(generateRelationshipKey(instance));
   }
 
   assertKeysDoNotContainSeparator(datastore, keys);
