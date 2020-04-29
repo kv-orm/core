@@ -254,7 +254,7 @@ class Author {
 
 ### Unique Indexable Columns
 
-Columns with guaranteed unique values can be setup with `{ isIndexable: true, isUnique: true }`. This is more efficient that just setting it as `isIndexable`, and the [loading mechanism](#find) is simpler.
+Columns with unique values can be setup with `{ isIndexable: true, isUnique: true }`. This is more efficient that just setting it as `isIndexable`, and the [loading mechanism](#find) is simpler.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
