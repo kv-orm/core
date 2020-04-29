@@ -44,6 +44,18 @@ describe(`library`, () => {
 
       expect(foundNonexistent).toBeNull();
     });
+
+    it(`repository searches`, async () => {
+      const searchedAuthors = await repository.search(`birthYear`, 1564);
+
+      let i = 0;
+      for await (const searchedAuthor of searchedAuthors) {
+        expect(await searchedAuthor.nickName).toEqual("Bill");
+        i++;
+      }
+
+      expect(i).toBe(1);
+    });
   });
 
   describe(`the datastore`, () => {
@@ -56,6 +68,8 @@ describe(`library`, () => {
           "Author:william@shakespeare.com:emailAddress" => "william@shakespeare.com",
           "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
           "Author:william@shakespeare.com:phoneNumber" => "+1234567890",
+          "Author:birthYear:1564:william@shakespeare.com" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:birthYear" => 1564,
           "Author:william@shakespeare.com:nickName" => "Bill",
         }
       `);

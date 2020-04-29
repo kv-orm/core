@@ -27,6 +27,9 @@ export class Author {
   @Column({ isIndexable: true, isUnique: true })
   public phoneNumber: columnType<string>;
 
+  @Column({ isIndexable: true })
+  public birthYear: columnType<number>;
+
   public someUnsavedProperty: any;
 
   @Column()
@@ -45,15 +48,18 @@ export class Author {
     lastName,
     emailAddress,
     phoneNumber,
+    birthYear,
   }: {
     firstName: string;
     lastName: string;
     emailAddress: string;
     phoneNumber: string;
+    birthYear: number;
   }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.emailAddress = emailAddress;
     this.phoneNumber = phoneNumber;
+    this.birthYear = birthYear;
   }
 }

@@ -32,7 +32,7 @@
   </a>
 </p>
 
-[kv-orm] is an Node.JS [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [key-value datastores](https://en.wikipedia.org/wiki/Key-value_database). **It is currently in alpha**.
+[kv-orm] is an Node.JS [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [key-value datastores](https://en.wikipedia.org/wiki/Key-value_database). **It is currently in beta**.
 
 ## Author
 
@@ -173,6 +173,9 @@ class Author {
   @Column({ isPrimary: true }) // More on this in a moment
   public emailAddress: string;
 
+  @Column({ isIndexable: true }) // More on this in a moment
+  public birthYear: number;
+
   @Column({ isIndexable: true, isUnique: true }) // More on this in a moment
   public phoneNumber: string;
 
@@ -182,16 +185,19 @@ class Author {
     firstName,
     lastName,
     emailAddress,
+    birthYear,
     phoneNumber,
   }: {
     firstName: string;
     lastName: string;
     emailAddress: string;
+    birthYear: number;
     phoneNumber: string;
   }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.emailAddress = emailAddress;
+    this.birthYear = birthYear;
     this.phoneNumber = phoneNumber;
   }
 }
@@ -200,6 +206,7 @@ const williamShakespeare = new Author({
   firstName: "William",
   lastName: "Shakespeare",
   emailAddress: "william@shakespeare.com",
+  birthYear: 1564,
   phoneNumber: "+1234567890",
 });
 williamShakespeare.nickName = "Bill";
@@ -213,7 +220,7 @@ williamShakespeare.someUnsavedProperty = "Won't get saved!";
 
 ### Primary Columns
 
-Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator.
+Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator (`isUnique` is automatically set to `true`).
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -231,7 +238,23 @@ An example of a singleton class where you do not need a Primary Column, might be
 
 ### Indexable Columns
 
-Similarly, an Column can be set as Indexable with `{ isIndexable: true, isUnique: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
+Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. This type of Column should be used to store non-unique values.
+
+```typescript
+@Entity({ datastore: libraryDatastore })
+class Author {
+  // ...
+
+  @Column({ isIndexable: true })
+  public birthYear: number;
+
+  // ...
+}
+```
+
+### Unique Indexable Columns
+
+Columns with guaranteed unique values can be setup with `{ isIndexable: true, isUnique: true }`. This is more efficient that just setting it as `isIndexable`, and the [loading mechanism](#find) is simpler.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -239,7 +262,7 @@ class Author {
   // ...
 
   @Column({ isIndexable: true, isUnique: true })
-  public phoneNumber: string;
+  public phoneNumber: number;
 
   // ...
 }
@@ -291,6 +314,7 @@ const williamShakespeare = new Author({
   firstName: "William",
   lastName: "Shakespeare",
   emailAddress: "william@shakespeare.com",
+  birthYear: 1564,
   phoneNumber: "+1234567890",
 });
 
@@ -307,6 +331,18 @@ const loadedWilliamShakespeare = await authorRepository.load(
 );
 
 console.log(await loadedWilliamShakespeare.nickName); // Bill
+```
+
+### Search
+
+If a property has been set as only `isIndexable` (is non-unique), you can search for instances with a saved value.
+
+```typescript
+const searchedAuthors = await authorRepository.search("birthYear", 1564);
+
+for await (const searchedAuthor of searchedAuthors) {
+  console.log(await searchedAuthor.nickName); // Bill
+}
 ```
 
 ### Find
@@ -327,14 +363,6 @@ const foundNonexistent = await authorRepository.find(
 );
 
 console.log(foundNonexistent); // null
-```
-
-### Search
-
-If a property has been set as only `isIndexable` (is non-unique), you can search for instances with a saved value.
-
-```typescript
-// TODO
 ```
 
 ## Relationships

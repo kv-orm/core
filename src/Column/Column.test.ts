@@ -4,6 +4,8 @@ import { Datastore } from "../Datastore/Datastore";
 import { Column } from "../Column/Column";
 import { MetadataSetupError } from "../utils/metadata";
 import { ReadOnlyError } from "../utils/errors";
+import { getColumnMetadata } from "../utils/columns";
+import { getConstructor } from "../utils/entities";
 
 describe(`Column`, () => {
   let datastore: Datastore;
@@ -58,6 +60,12 @@ describe(`Column`, () => {
     instance = new EntityWithArrayColumn(values);
 
     expect(await instance.arrayColumn).toEqual(values);
+  });
+
+  it("automatically sets primary columns as unique", () => {
+    const columnMetadata = getColumnMetadata(getConstructor(instance), "id");
+
+    expect(columnMetadata.isUnique).toBeTruthy();
   });
 
   describe(`MetadataSetupError`, () => {
