@@ -1,13 +1,13 @@
 import { Datastore, Value, SearchStrategy } from "../Datastore/Datastore";
 import { BaseEntity, Entity, EntityConstructor } from "../Entity/Entity";
 import { MemoryDatastore } from "../MemoryDatastore/MemoryDatastore";
-import { OneToMany } from "./OneToMany";
+import { ToMany } from "./ToMany";
 import { Column } from "../Column/Column";
 import { getRepository, Repository } from "../Repository/Repository";
 import { SearchResult } from "../Datastore/Datastore";
 import { SearchStrategyError } from "../Datastore/SearchStrategyError";
 
-describe(`OneToMany`, () => {
+describe(`ToMany`, () => {
   let datastore: Datastore;
   let childInstance: BaseEntity;
   let childEntityConstructor: EntityConstructor;
@@ -38,7 +38,7 @@ describe(`OneToMany`, () => {
 
     @Entity({ datastore })
     class ParentEntity {
-      @OneToMany({ type: ChildEntity })
+      @ToMany({ type: ChildEntity })
       public myProperty: ChildEntity[] = [];
     }
 
@@ -50,7 +50,7 @@ describe(`OneToMany`, () => {
 
     @Entity({ datastore })
     class SingletonParentEntity {
-      @OneToMany({ type: SingletonEntity })
+      @ToMany({ type: SingletonEntity })
       public myProperty: SingletonEntity[] = [];
     }
 
@@ -125,7 +125,7 @@ describe(`OneToMany`, () => {
 
     @Entity({ datastore: uselessDatastore })
     class UselessEntity {
-      @OneToMany({ type: childEntityConstructor })
+      @ToMany({ type: childEntityConstructor })
       relations = undefined;
     }
 

@@ -21,7 +21,7 @@ import {
   InvalidKeyError,
   RelationshipLookupError,
 } from "./errors";
-import { OneToOne } from "../Relationship/OneToOne";
+import { ToOne } from "../Relationship/ToOne";
 
 describe(`keyGeneration`, () => {
   let datastore: Datastore;
@@ -38,7 +38,7 @@ describe(`keyGeneration`, () => {
       @Column()
       public myProperty = `initial value`;
 
-      @OneToOne({ type: SingletonEntity })
+      @ToOne({ type: SingletonEntity })
       public relationshipProperty: undefined;
     }
 
@@ -49,7 +49,7 @@ describe(`keyGeneration`, () => {
       @Column({ key: `CustomPropertyKey` })
       public myProperty = `initial value`;
 
-      @OneToOne({
+      @ToOne({
         type: SingletonEntityWithCustomKeys,
         key: `CustomRelationshipKey`,
       })
@@ -69,7 +69,7 @@ describe(`keyGeneration`, () => {
       @Column({ isIndexable: true, isUnique: true })
       public indexable = `abc@xyz.com`;
 
-      @OneToOne({ type: ComplexEntity })
+      @ToOne({ type: ComplexEntity })
       public relationshipProperty: undefined;
     }
 
@@ -86,7 +86,7 @@ describe(`keyGeneration`, () => {
       @Column({ isIndexable: true, isUnique: true, key: `CustomIndexableKey` })
       public indexable = `abc@xyz.com`;
 
-      @OneToOne({
+      @ToOne({
         type: ComplexEntityWithCustomKeys,
         key: `CustomRelationshipKey`,
       })

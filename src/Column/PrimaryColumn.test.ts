@@ -20,7 +20,7 @@ describe("PrimaryColumn", () => {
     expect(await instance.id).toEqual("123");
   });
   describe(`ReadOnlyError`, () => {
-    it(`is thrown when attempting to write to a Primary Column twice`, () => {
+    it(`is thrown when attempting to write to a PrimaryColumn twice`, () => {
       expect(() => {
         instance.id = `zzz`;
       }).toThrow(ReadOnlyError);

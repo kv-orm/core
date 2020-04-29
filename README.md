@@ -157,7 +157,12 @@ Using the `@Column()` decorator on an Entity property is how you mark it as a sa
 Like with Entities, you can optionally pass in a `key` to the decorator.
 
 ```typescript
-import { Column } from "@kv-orm/core";
+import {
+  Column,
+  PrimaryColumn,
+  UniqueColumn,
+  IndexableColumn,
+} from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
@@ -170,13 +175,13 @@ class Author {
   @Column()
   public nickName: string | undefined;
 
-  @Column({ isPrimary: true }) // More on this in a moment
+  @PrimaryColumn() // More on this in a moment
   public emailAddress: string;
 
-  @Column({ isIndexable: true }) // More on this in a moment
+  @IndexableColumn() // More on this in a moment
   public birthYear: number;
 
-  @Column({ isIndexable: true, isUnique: true }) // More on this in a moment
+  @UniqueColumn() // More on this in a moment
   public phoneNumber: string;
 
   public someUnsavedProperty: any;
@@ -220,48 +225,50 @@ williamShakespeare.someUnsavedProperty = "Won't get saved!";
 
 ### Primary Columns
 
-Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator (`isUnique` is automatically set to `true`).
+Any non-singleton class needs a PrimaryColumn used to differentiate Entity instances. For this reason, **PrimaryColumn values are required and must be unique**.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
-  @Column({ isPrimary: true })
+  @PrimaryColumn()
   public emailAddress: string;
 
   // ...
 }
 ```
 
-An example of a singleton class where you do not need a Primary Column, might be a global configuration Entity where you store application secrets (e.g. API keys).
+An example of a singleton class where you do not need a PrimaryColumn, might be a global configuration Entity where you store application secrets (e.g. API keys).
 
 ### Indexable Columns
 
-Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. This type of Column should be used to store non-unique values.
+An IndexableColumn can be used to mark a property as one which you may wish to later lookup with. For example, in SQL, you might perform the following query: `SELECT * FROM Author WHERE birthYear = 1564`. In [kv-orm], you can lookup Entity instances with a given IndexableColumn value with a repository's [search](#search) method
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
-  @Column({ isIndexable: true })
+  @IndexableColumn()
   public birthYear: number;
 
   // ...
 }
 ```
 
-### Unique Indexable Columns
+IndexableColumn types should be used to store non-unique values.
 
-Columns with unique values can be setup with `{ isIndexable: true, isUnique: true }`. This is more efficient that just setting it as `isIndexable`, and the [loading mechanism](#find) is simpler.
+### Unique Columns
+
+Columns with unique values can be setup with UniqueColumn. This is more efficient that an IndexableColumn, and the [loading mechanism](#find) is simpler.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
-  @Column({ isIndexable: true, isUnique: true })
+  @UniqueColumn()
   public phoneNumber: number;
 
   // ...
@@ -323,7 +330,7 @@ await authorRepository.save(williamShakepseare);
 
 ### Load
 
-And subsequently, load them back again. If the Entity has a Primary Column, you can load the specific instance by passing in the Primary Column value.
+And subsequently, load them back again. If the Entity has a PrimaryColumn, you can load the specific instance by passing in the PrimaryColumn value.
 
 ```typescript
 const loadedWilliamShakespeare = await authorRepository.load(
@@ -335,7 +342,7 @@ console.log(await loadedWilliamShakespeare.nickName); // Bill
 
 ### Search
 
-If a property has been set as only `isIndexable` (is non-unique), you can search for instances with a saved value.
+If a property has been set as an IndexableColumn (is non-unique), you can search for instances with a saved value.
 
 ```typescript
 const searchedAuthors = await authorRepository.search("birthYear", 1564);
@@ -347,7 +354,7 @@ for await (const searchedAuthor of searchedAuthors) {
 
 ### Find
 
-If a property has been set as `isIndexable` and `isUnique`, you can load an instance by a saved value. If no results are found, `null` is returned.
+If a property has been set as a UniqueColumn, you can directly load an instance by a saved value. If no results are found, `null` is returned.
 
 ```typescript
 const foundWilliamShakespeare = await authorRepository.find(
@@ -367,11 +374,11 @@ console.log(foundNonexistent); // null
 
 ## Relationships
 
-### One To One
+### \* To One
 
 > TODO: Documentation
 
-### One To Many
+### \* To Many
 
 > TODO: Documentation
 
@@ -379,7 +386,7 @@ console.log(foundNonexistent); // null
 
 ## `columnType`
 
-When defining an Entity in Typescript, you must provide types for the properties. For example, `firstName` and `lastName` are set as `string`s:
+When defining an Entity in TypeScript, you must provide types for the properties. For example, `firstName` and `lastName` are set as `string`s:
 
 ```typescript
 import { Column, Entity } from "@kv-orm/core";
@@ -398,7 +405,7 @@ class Author {
 
 However, when reading these values with kv-orm, in fact a `Promise<string>` is returned. Simply switching these type definitions to `Promise<T>` is not valid either, as writing values is done synchronously.
 
-Therefore, to improve the developer experience and prevent Typescript errors such as `'await' has no effect on the type of this expression. ts(80007)` and `Property 'then' does not exist on type 'T'. ts(2339)`, when declaring the Entity, wrap the property types in the `columnType` helper. In the same example:
+Therefore, to improve the developer experience and prevent TypeScript errors such as `'await' has no effect on the type of this expression. ts(80007)` and `Property 'then' does not exist on type 'T'. ts(2339)`, when declaring the Entity, wrap the property types in the `columnType` helper. In the same example:
 
 ```typescript
 import { Column, Entity, columnType } from "@kv-orm/core";
@@ -417,11 +424,11 @@ class Author {
 
 `columnType` is simply an alias: `type columnType<T> = T | Promise<T>`.
 
-## `oneToOneType`
+## `toOneType`
 
 > TODO: Documentation
 
-## `oneToManyType`
+## `toManyType`
 
 > TODO: Documentation
 

@@ -1,10 +1,10 @@
-import { OneToMany } from "../Relationship/OneToMany";
+import { ToOne } from "../Relationship/ToOne";
 import { Entity } from "../Entity/Entity";
 import { Datastore } from "../Datastore/Datastore";
 import { MemoryDatastore } from "../MemoryDatastore/MemoryDatastore";
-import { oneToManyType } from "./oneToManyType";
+import { toOneType } from "./toOneType";
 
-describe(`oneToManyType`, () => {
+describe(`toOneType`, () => {
   let datastore: Datastore;
 
   beforeEach(() => {
@@ -17,21 +17,21 @@ describe(`oneToManyType`, () => {
 
     @Entity({ datastore })
     class WithColumnType {
-      @OneToMany({ type: Child })
-      relation: oneToManyType<Child>;
+      @ToOne({ type: Child })
+      relation: toOneType<Child>;
 
       constructor() {
-        this.relation = [new Child()];
+        this.relation = new Child();
       }
     }
 
     @Entity({ datastore })
     class WithoutColumnType {
-      @OneToMany({ type: Child })
-      relation: Child[];
+      @ToOne({ type: Child })
+      relation: Child;
 
       constructor() {
-        this.relation = [new Child()];
+        this.relation = new Child();
       }
     }
 
@@ -41,7 +41,7 @@ describe(`oneToManyType`, () => {
     await instanceWithColumnType.relation;
     await instanceWithoutColumnType.relation; // 'await' has no effect on the type of this expression.ts(80007)
 
-    instanceWithColumnType.relation = [new Child()];
-    instanceWithoutColumnType.relation = [new Child()];
+    instanceWithColumnType.relation = new Child();
+    instanceWithoutColumnType.relation = new Child();
   });
 });

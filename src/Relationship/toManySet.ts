@@ -2,19 +2,21 @@ import { BaseEntity } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
 import { getConstructorDatastoreCache } from "../utils/entities";
 import {
+  generateManyRelationshipKey,
   generateRelationshipKey,
-  generateOneRelationshipKey,
 } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
 
-export const oneToOneSet = (
+export const toManySet = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
-  value: BaseEntity
+  values: BaseEntity[]
 ): void => {
   const { cache } = getConstructorDatastoreCache(instance);
 
-  const keyGenerator = (): Key =>
-    generateOneRelationshipKey(instance, relationshipMetadata);
-  cache.write(instance, keyGenerator, generateRelationshipKey(value));
+  for (const value of values) {
+    const keyGenerator = (): Key =>
+      generateManyRelationshipKey(instance, relationshipMetadata, value);
+    cache.write(instance, keyGenerator, generateRelationshipKey(value));
+  }
 };

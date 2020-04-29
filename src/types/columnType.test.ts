@@ -43,7 +43,7 @@ describe(`columnType`, () => {
   });
 });
 
-type oneToManyType<T> =
+type toManyType<T> =
   | T[]
   | {
       push(value: T): void;
