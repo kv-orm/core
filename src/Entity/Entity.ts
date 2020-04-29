@@ -22,19 +22,15 @@ interface EntityOptions {
 }
 
 export function Entity(
-  { datastore, key }: EntityOptions,
-  plugins = {} // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { datastore, key }: EntityOptions // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (constructor: EntityConstructor) => any {
   return function <T extends BaseEntity>(
     constructor: EntityConstructor<T>
   ): EntityConstructor<T> {
-    const entityMetadata: EntityMetadata = createEntityMetadata(
-      {
-        datastore,
-        key: key || constructor.name,
-      },
-      plugins
-    );
+    const entityMetadata: EntityMetadata = createEntityMetadata({
+      datastore,
+      key: key || constructor.name,
+    });
 
     assertKeyNotInUse(constructor, entityMetadata, {
       getMetadatas: () => datastore.entityConstructors.map(getEntityMetadata),

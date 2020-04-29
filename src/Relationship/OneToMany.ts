@@ -17,15 +17,12 @@ interface OneToManyOptions {
   type: EntityConstructor;
 }
 
-export function OneToMany(options: OneToManyOptions, plugins = {}) {
+export function OneToMany(options: OneToManyOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata(
-      {
-        options,
-        property,
-      },
-      plugins
-    );
+    const relationshipMetadata = createRelationshipMetadata({
+      options,
+      property,
+    });
 
     const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, relationshipMetadata, {

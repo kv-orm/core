@@ -7,7 +7,6 @@ import { Key } from "../Datastore/Datastore";
 interface Metadata {
   key: Key;
   property?: PropertyKey; // TODO: Clean-up. Separate Relationship, Column and Entity Metadatas properly
-  plugins: {};
 }
 
 export class MetadataSetupError extends SetupError {

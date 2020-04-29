@@ -2,7 +2,6 @@ import { Author } from "./models/Author.testhelpers";
 import { williamShakespeare } from "./fixtures/williamShakespeare.testhelpers";
 import { getRepository } from "../../Repository/Repository";
 import { libraryDatastore } from "./datastores/libraryDatastore.testhelpers";
-import { datastoreEqualTo } from "../utils/datastore.testhelpers";
 
 const repository = getRepository(Author);
 
@@ -49,23 +48,17 @@ describe(`library`, () => {
 
   describe(`the datastore`, () => {
     it(`is saved as expected`, () => {
-      expect(
-        datastoreEqualTo(libraryDatastore, [
-          [`Author:william@shakespeare.com:givenName`, `William`],
-          [`Author:william@shakespeare.com:lastName`, `Shakespeare`],
-          [
-            `Author:william@shakespeare.com:emailAddress`,
-            `william@shakespeare.com`,
-          ],
-          [`Author:william@shakespeare.com:phoneNumber`, `+1234567890`],
-          [`Author:phoneNumber:+1234567890`, `william@shakespeare.com`],
-          [`Author:william@shakespeare.com:nickName`, `Bill`],
-          [
-            `Author:william@shakespeare.com:_complex`,
-            `2020-01-02T03:04:05.000Z`,
-          ],
-        ])
-      ).toBeTruthy();
+      expect((libraryDatastore as any).data).toMatchInlineSnapshot(`
+        Map {
+          "Author:william@shakespeare.com:_complex" => "2020-01-02T03:04:05.000Z",
+          "Author:william@shakespeare.com:givenName" => "William",
+          "Author:william@shakespeare.com:lastName" => "Shakespeare",
+          "Author:william@shakespeare.com:emailAddress" => "william@shakespeare.com",
+          "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:phoneNumber" => "+1234567890",
+          "Author:william@shakespeare.com:nickName" => "Bill",
+        }
+      `);
     });
   });
 });

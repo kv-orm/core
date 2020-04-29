@@ -5,21 +5,16 @@ export interface EntityMetadata {
   datastore: Datastore;
   key: Key;
   instances: BaseEntity[];
-  plugins: {};
 }
 
-export const createEntityMetadata = (
-  {
-    datastore,
-    key,
-  }: {
-    datastore: Datastore;
-    key: Key;
-  },
-  plugins = {}
-): EntityMetadata => ({
+export const createEntityMetadata = ({
+  datastore,
+  key,
+}: {
+  datastore: Datastore;
+  key: Key;
+}): EntityMetadata => ({
   datastore,
   key,
   instances: [], // TODO
-  plugins,
 });

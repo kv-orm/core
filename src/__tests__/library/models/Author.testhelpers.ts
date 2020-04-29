@@ -1,7 +1,7 @@
-import { libraryDatastore } from "../datastores/libraryDatastore.testhelpers";
 import { Entity } from "../../../Entity/Entity";
 import { Column } from "../../../Column/Column";
 import { columnType } from "../../../types/columnType";
+import { libraryDatastore } from "../datastores/libraryDatastore.testhelpers";
 
 const serialize = (value: columnType<Date>): string => {
   if (!(value instanceof Date)) throw new Error(`Value must be a date`);
