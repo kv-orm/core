@@ -2,7 +2,6 @@ import { Author } from "./models/Author.testhelpers";
 import { williamShakespeare } from "./fixtures/williamShakespeare.testhelpers";
 import { getRepository } from "../../Repository/Repository";
 import { libraryDatastore } from "./datastores/libraryDatastore.testhelpers";
-import { datastoreEqualTo } from "../utils/datastore.testhelpers";
 
 const repository = getRepository(Author);
 
@@ -29,44 +28,52 @@ describe(`library`, () => {
       expect(await loadedWilliamShakespeare.nickName).toEqual(`Bill`);
     });
 
-    it(`repository searches`, async () => {
-      const searchedWilliamShakespeare = await repository.search(
+    it(`repository finds`, async () => {
+      const foundWilliamShakespeare = await repository.find(
         `phoneNumber`,
         `+1234567890`
       );
 
-      expect(searchedWilliamShakespeare).not.toBeNull();
-      expect(await searchedWilliamShakespeare?.nickName).toEqual(`Bill`);
+      expect(foundWilliamShakespeare).not.toBeNull();
+      expect(await foundWilliamShakespeare?.nickName).toEqual(`Bill`);
 
-      const searchedNonexistent = await repository.search(
+      const foundNonexistent = await repository.find(
         `phoneNumber`,
         `+9999999999`
       );
 
-      expect(searchedNonexistent).toBeNull();
+      expect(foundNonexistent).toBeNull();
+    });
+
+    it(`repository searches`, async () => {
+      const searchedAuthors = await repository.search(`birthYear`, 1564);
+
+      let i = 0;
+      for await (const searchedAuthor of searchedAuthors) {
+        expect(await searchedAuthor.nickName).toEqual("Bill");
+        i++;
+      }
+
+      expect(i).toBe(1);
     });
   });
 
   describe(`the datastore`, () => {
     it(`is saved as expected`, () => {
-      console.log((libraryDatastore as any).data);
-      expect(
-        datastoreEqualTo(libraryDatastore, [
-          [`Author:william@shakespeare.com:givenName`, `William`],
-          [`Author:william@shakespeare.com:lastName`, `Shakespeare`],
-          [
-            `Author:william@shakespeare.com:emailAddress`,
-            `william@shakespeare.com`,
-          ],
-          [`Author:william@shakespeare.com:phoneNumber`, `+1234567890`],
-          [`Author:phoneNumber:+1234567890`, `william@shakespeare.com`],
-          [`Author:william@shakespeare.com:nickName`, `Bill`],
-          [
-            `Author:william@shakespeare.com:_complex`,
-            `2020-01-02T03:04:05.000Z`,
-          ],
-        ])
-      ).toBeTruthy();
+      expect((libraryDatastore as any).data).toMatchInlineSnapshot(`
+        Map {
+          "Author:william@shakespeare.com:_complex" => "2020-01-02T03:04:05.000Z",
+          "Author:william@shakespeare.com:givenName" => "William",
+          "Author:william@shakespeare.com:lastName" => "Shakespeare",
+          "Author:emailAddress:william@shakespeare.com" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:emailAddress" => "william@shakespeare.com",
+          "Author:phoneNumber:+1234567890" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:phoneNumber" => "+1234567890",
+          "Author:birthYear:1564:william@shakespeare.com" => "william@shakespeare.com",
+          "Author:william@shakespeare.com:birthYear" => 1564,
+          "Author:william@shakespeare.com:nickName" => "Bill",
+        }
+      `);
     });
   });
 });

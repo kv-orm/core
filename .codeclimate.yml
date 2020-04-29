@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 plugins:
   eslint:
     enabled: true
@@ -16,5 +16,6 @@ plugins:
   nodesecurity:
     enabled: true
 exclude_patterns:
-  - '**/*.test.ts'
-  - '*.js'
+  - "**/*.testhelpers.ts"
+  - "**/*.test.ts"
+  - "*.js"

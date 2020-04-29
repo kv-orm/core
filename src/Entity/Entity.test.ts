@@ -24,10 +24,10 @@ describe(`Entity`, () => {
     it(`is thrown when registering two Entities with the same Key`, () => {
       expect(() => {
         @Entity({ datastore })
-        class X {} // eslint-disable-line @typescript-eslint/no-unused-vars
+        class X {}
 
         @Entity({ datastore, key: `X` })
-        class Y {} // eslint-disable-line @typescript-eslint/no-unused-vars
+        class Y {}
       }).toThrow(MetadataSetupError);
     });
   });

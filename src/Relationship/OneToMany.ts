@@ -1,7 +1,7 @@
 import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
-import { getHydrator } from "./hydrate";
+import { getHydrator } from "../utils/hydrate";
 import { getConstructor } from "../utils/entities";
 import { oneToManySet } from "./oneToManySet";
 import { createRelationshipMetadata } from "./relationshipMetadata";
@@ -17,15 +17,12 @@ interface OneToManyOptions {
   type: EntityConstructor;
 }
 
-export function OneToMany(options: OneToManyOptions, plugins = {}) {
+export function OneToMany(options: OneToManyOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata(
-      {
-        options,
-        property,
-      },
-      plugins
-    );
+    const relationshipMetadata = createRelationshipMetadata({
+      options,
+      property,
+    });
 
     const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, relationshipMetadata, {
@@ -33,20 +30,16 @@ export function OneToMany(options: OneToManyOptions, plugins = {}) {
     });
     setRelationshipMetadata(constructor, relationshipMetadata);
 
+    const hydrator = getHydrator(options.type);
+
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: function get(this: BaseEntity) {
-        return oneToManyGet(
-          this,
-          relationshipMetadata,
-          getHydrator(options.type)
-        );
+        return oneToManyGet(this, relationshipMetadata, hydrator);
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
-        if (values) {
-          oneToManySet(this, relationshipMetadata, values);
-        }
+        if (values) oneToManySet(this, relationshipMetadata, values);
       },
     });
   };

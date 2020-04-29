@@ -15,20 +15,15 @@ interface ColumnOptions {
   key?: Key;
   isPrimary?: boolean;
   isIndexable?: boolean;
+  isUnique?: boolean;
 }
 
-export const Column = <T extends BaseEntity>(
-  options: ColumnOptions = {},
-  plugins = {}
-) => {
+export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
   return (instance: T, property: keyof T): void => {
-    const columnMetadata = createColumnMetadata(
-      {
-        options,
-        property,
-      },
-      plugins
-    );
+    const columnMetadata = createColumnMetadata({
+      options,
+      property,
+    });
 
     const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, columnMetadata, {

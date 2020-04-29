@@ -66,7 +66,7 @@ describe(`keyGeneration`, () => {
       @Column()
       public myProperty = `initial value`;
 
-      @Column({ isIndexable: true })
+      @Column({ isIndexable: true, isUnique: true })
       public indexable = `abc@xyz.com`;
 
       @OneToOne({ type: ComplexEntity })
@@ -83,7 +83,7 @@ describe(`keyGeneration`, () => {
       @Column({ key: `CustomPropertyKey` })
       public myProperty = `initial value`;
 
-      @Column({ isIndexable: true, key: `CustomIndexableKey` })
+      @Column({ isIndexable: true, isUnique: true, key: `CustomIndexableKey` })
       public indexable = `abc@xyz.com`;
 
       @OneToOne({
@@ -183,26 +183,28 @@ describe(`keyGeneration`, () => {
   });
   describe(`generateIndexablePropertyKey`, () => {
     it(`generates a key`, () => {
+      const instance = new complexEntityConstructor();
       const indexableColumnMetadata = getColumnMetadata(
         complexEntityConstructor,
         `indexable`
       );
       expect(
         generateIndexablePropertyKey(
-          complexEntityConstructor,
+          instance,
           indexableColumnMetadata,
           `abc@xyz.com`
         )
       ).toEqual(`ComplexEntity:indexable:abc@xyz.com`);
     });
     it(`generates a key with custom keys`, () => {
+      const instance = new complexEntityWithCustomKeysConstructor();
       const indexableColumnMetadata = getColumnMetadata(
         complexEntityWithCustomKeysConstructor,
         `indexable`
       );
       expect(
         generateIndexablePropertyKey(
-          complexEntityWithCustomKeysConstructor,
+          instance,
           indexableColumnMetadata,
           `abc@xyz.com`
         )

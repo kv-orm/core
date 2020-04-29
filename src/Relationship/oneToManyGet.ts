@@ -1,34 +1,15 @@
 import { BaseEntity } from "../Entity/Entity";
-import { Value, SearchStrategy, Datastore } from "../Datastore/Datastore";
 import { getConstructor } from "../utils/entities";
-import { getDatastore, keysFromSearch } from "../utils/datastore";
-import {
-  generateManyRelationshipSearchKey,
-  extractManyRelationshipValueKey,
-} from "../utils/keyGeneration";
+import { getDatastore } from "../utils/datastore";
+import { generateManyRelationshipSearchKey } from "../utils/keyGeneration";
 import { RelationshipMetadata } from "./relationshipMetadata";
-import { SearchStrategyError } from "../Datastore/SearchStrategyError";
+import { hydrator, hydrateMany } from "../utils/hydrate";
 
-const pickSearchStrategy = (datastore: Datastore): SearchStrategy => {
-  let strategy;
-  if (datastore.searchStrategies.indexOf(SearchStrategy.prefix) !== -1) {
-    strategy = SearchStrategy.prefix;
-  }
-
-  if (strategy === undefined) {
-    throw new SearchStrategyError(
-      SearchStrategy.prefix,
-      `Datastore does not support searching`
-    );
-  }
-  return strategy;
-};
-
-export async function* oneToManyGet(
+export const oneToManyGet = (
   instance: BaseEntity,
   relationshipMetadata: RelationshipMetadata,
-  hydrator: (identifier: Value) => Promise<BaseEntity>
-): AsyncGenerator<BaseEntity> {
+  hydrator: hydrator
+): AsyncGenerator<BaseEntity> => {
   const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
 
@@ -36,22 +17,5 @@ export async function* oneToManyGet(
     instance,
     relationshipMetadata
   );
-  const searchStrategy = pickSearchStrategy(datastore);
-
-  const keyGenerator = keysFromSearch(datastore, {
-    strategy: searchStrategy,
-    term: searchKey,
-  });
-
-  while (true) {
-    const { done, value } = await keyGenerator.next();
-    if (done) return;
-
-    const primaryColumnValue = extractManyRelationshipValueKey(
-      datastore,
-      value,
-      searchKey
-    );
-    yield await hydrator(primaryColumnValue);
-  }
-}
+  return hydrateMany(datastore, searchKey, hydrator);
+};

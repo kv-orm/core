@@ -32,7 +32,7 @@
   </a>
 </p>
 
-[kv-orm] is an Node.JS [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [key-value datastores](https://en.wikipedia.org/wiki/Key-value_database). **It is currently in alpha**.
+[kv-orm] is an Node.JS [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [key-value datastores](https://en.wikipedia.org/wiki/Key-value_database). **It is currently in beta**.
 
 ## Author
 
@@ -157,63 +157,70 @@ Using the `@Column()` decorator on an Entity property is how you mark it as a sa
 Like with Entities, you can optionally pass in a `key` to the decorator.
 
 ```typescript
-import { Column } from '@kv-orm/core'
+import { Column } from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
-  @Column({ key: 'givenName' })
-  public firstName: string
+  @Column({ key: "givenName" })
+  public firstName: string;
 
   @Column()
-  public lastName: string
+  public lastName: string;
 
   @Column()
-  public nickName: string | undefined
+  public nickName: string | undefined;
 
   @Column({ isPrimary: true }) // More on this in a moment
-  public emailAddress: string
+  public emailAddress: string;
 
   @Column({ isIndexable: true }) // More on this in a moment
-  public phoneNumber: string
+  public birthYear: number;
 
-  public someUnsavedProperty: any
+  @Column({ isIndexable: true, isUnique: true }) // More on this in a moment
+  public phoneNumber: string;
+
+  public someUnsavedProperty: any;
 
   public constructor({
     firstName,
     lastName,
     emailAddress,
+    birthYear,
     phoneNumber,
   }: {
-    firstName: string
-    lastName: string
-    emailAddress: string
-    phoneNumber: string
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
+    birthYear: number;
+    phoneNumber: string;
   }) {
-    this.firstName = firstName
-    this.lastName = lastName
-    this.emailAddress = emailAddress
-    this.phoneNumber = phoneNumber
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.emailAddress = emailAddress;
+    this.birthYear = birthYear;
+    this.phoneNumber = phoneNumber;
   }
 }
 
 const williamShakespeare = new Author({
-  firstName: 'William',
-  lastName: 'Shakespeare',
-  emailAddress: 'william@shakespeare.com',
-  phoneNumber: '+1234567890',
-})
-williamShakespeare.nickName = 'Bill'
-williamShakespeare.someUnsavedProperty = "Won't get saved!"
+  firstName: "William",
+  lastName: "Shakespeare",
+  emailAddress: "william@shakespeare.com",
+  birthYear: 1564,
+  phoneNumber: "+1234567890",
+});
+williamShakespeare.nickName = "Bill";
+williamShakespeare.someUnsavedProperty = "Won't get saved!";
 
 // When in an async function, you can fetch the value with `await`
-async foo () => {
-  console.log(await author.firstName)
-}
+(async () => {
+  console.log(await author.firstName);
+})();
 ```
 
 ### Primary Columns
 
-Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator.
+Any non-singleton class needs a Primary Column used to differentiate Entity instances. For this reason, **Primary Column values are required and must be unique**. Simply pass in `{ isPrimary: true }` into the Column decorator (`isUnique` is automatically set to `true`).
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -231,7 +238,7 @@ An example of a singleton class where you do not need a Primary Column, might be
 
 ### Indexable Columns
 
-Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. And like with Primary Columns, **Indexable Column values should be unique**.
+Similarly, an Column can be set as Indexable with `{ isIndexable: true }`. This type of Column should be used to store non-unique values.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -239,7 +246,23 @@ class Author {
   // ...
 
   @Column({ isIndexable: true })
-  public phoneNumber: string;
+  public birthYear: number;
+
+  // ...
+}
+```
+
+### Unique Indexable Columns
+
+Columns with unique values can be setup with `{ isIndexable: true, isUnique: true }`. This is more efficient that just setting it as `isIndexable`, and the [loading mechanism](#find) is simpler.
+
+```typescript
+@Entity({ datastore: libraryDatastore })
+class Author {
+  // ...
+
+  @Column({ isIndexable: true, isUnique: true })
+  public phoneNumber: number;
 
   // ...
 }
@@ -251,30 +274,26 @@ If your property is particularly complex (i.e. can't be stored natively in the d
 
 For example, let's say you have a complex property on `Author`, `somethingComplex`:
 
-<!-- prettier-ignore-start -->
-
 ```typescript
 @Entity({ datastore: libraryDatastore })
 class Author {
   // ...
 
   @Column()
-  private _complex: string = ''  // place to store serialized value of somethingComplex
+  private _complex: string = ""; // place to store serialized value of somethingComplex
 
   set somethingComplex(value: any) {
     // function serialize(value: any): string
-    this._complex = serialize(value)
+    this._complex = serialize(value);
   }
   get somethingComplex(): any {
     // function deserialize(serializedValue: string): any
-    return (async () => deserialize(await this._complex))()
+    return (async () => deserialize(await this._complex))();
   }
 
   // ...
 }
 ```
-
-<!-- prettier-ignore-end -->
 
 ## Repositories
 
@@ -295,6 +314,7 @@ const williamShakespeare = new Author({
   firstName: "William",
   lastName: "Shakespeare",
   emailAddress: "william@shakespeare.com",
+  birthYear: 1564,
   phoneNumber: "+1234567890",
 });
 
@@ -315,22 +335,34 @@ console.log(await loadedWilliamShakespeare.nickName); // Bill
 
 ### Search
 
-If a property has been set as `isIndexable`, you can load an instance by a saved value. If no results are found, `null` is returned.
+If a property has been set as only `isIndexable` (is non-unique), you can search for instances with a saved value.
 
 ```typescript
-const searchedWilliamShakespeare = await authorRepository.search(
+const searchedAuthors = await authorRepository.search("birthYear", 1564);
+
+for await (const searchedAuthor of searchedAuthors) {
+  console.log(await searchedAuthor.nickName); // Bill
+}
+```
+
+### Find
+
+If a property has been set as `isIndexable` and `isUnique`, you can load an instance by a saved value. If no results are found, `null` is returned.
+
+```typescript
+const foundWilliamShakespeare = await authorRepository.find(
   "phoneNumber",
   "+1234567890"
 );
 
-console.log(await searchedWilliamShakespeare?.nickName); // Bill
+console.log(await foundWilliamShakespeare?.nickName); // Bill
 
-const searchedNonexistent = await authorRepository.search(
+const foundNonexistent = await authorRepository.find(
   "phoneNumber",
   "+9999999999"
 );
 
-console.log(searchedNonexistent); // null
+console.log(foundNonexistent); // null
 ```
 
 ## Relationships
@@ -436,5 +468,11 @@ class MyClass {
   // ...
 }
 ```
+
+# Upgrading from alpha (0.0.X)
+
+Thank you for trying out kv-orm in it's alpha period! Thanks to a generous sponsor, I have been able to complete work to elevate [kv-orm] to a more featureful beta. Unfortunately, this has meant a couple of minor breaking changes.
+
+- `PrimaryColumn`, `IndexableColumn`
 
 [kv-orm]: https://github.com/kv-orm/core

@@ -33,7 +33,7 @@ describe(`Cache`, () => {
   it(`can be written to, read from, and elements can be deleted`, async () => {
     cache.write(instance, () => `key`, `value`);
     expect(await cache.read(instance, `key`)).toEqual(`value`);
-    await cache.delete(instance, () => `key`);
+    cache.delete(instance, () => `key`);
     expect(await cache.read(instance, `key`)).toBeNull();
   });
 

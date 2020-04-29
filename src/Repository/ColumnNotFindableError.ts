@@ -2,7 +2,7 @@ import { KVORMError } from "../utils/errors";
 import { EntityConstructor } from "../Entity/Entity";
 import { ColumnMetadata } from "../Column/columnMetadata";
 
-export class ColumnNotSearchableError extends KVORMError {
+export class ColumnNotFindableError extends KVORMError {
   constructor(
     constructor: EntityConstructor,
     columnMetadata: ColumnMetadata,
@@ -11,8 +11,8 @@ export class ColumnNotSearchableError extends KVORMError {
     super(
       `The Column, ${columnMetadata.property.toString()}, on Entity, ${
         constructor.name
-      } cannot be searched with: ${message}`
+      } cannot be used to find: ${message}`
     );
-    this.name = `ColumnNotSearchableError`;
+    this.name = `ColumnNotFindableError`;
   }
 }

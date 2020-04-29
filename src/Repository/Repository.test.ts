@@ -7,6 +7,8 @@ import { RepositoryLoadError } from "./RepositoryLoadError";
 import { ColumnLookupError } from "../utils/errors";
 import { EntityNotFoundError } from "./EntityNotFoundError";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
+import { ColumnNotFindableError } from "./ColumnNotFindableError";
+import { RepositoryFindError } from "./RepositoryFindError";
 
 describe(`Repository`, () => {
   let datastore: Datastore;
@@ -20,7 +22,7 @@ describe(`Repository`, () => {
 
     @Entity({ datastore, key: `SingletonEntity` })
     class SingletonEntity {
-      @Column({ key: `myProperty` })
+      @Column({ key: `myProperty`, isIndexable: true })
       public myProperty = `initial value`;
     }
 
@@ -32,14 +34,29 @@ describe(`Repository`, () => {
       @Column({ key: `primaryProperty`, isPrimary: true })
       public primaryProperty: number;
 
-      @Column({ key: `indexableProperty`, isIndexable: true })
+      @Column({
+        key: `indexableUniqueProperty`,
+        isIndexable: true,
+        isUnique: true,
+      })
+      public indexableUniqueProperty: string;
+
+      @Column({
+        key: `indexableProperty`,
+        isIndexable: true,
+      })
       public indexableProperty: string;
 
       @Column()
       public arrayProperty: number[] = [];
 
-      constructor(primaryProperty: number, indexableProperty: string) {
+      constructor(
+        primaryProperty: number,
+        indexableUniqueProperty: string,
+        indexableProperty: string
+      ) {
         this.primaryProperty = primaryProperty;
+        this.indexableUniqueProperty = indexableUniqueProperty;
         this.indexableProperty = indexableProperty;
       }
     }
@@ -48,7 +65,7 @@ describe(`Repository`, () => {
     singletonInstance = new SingletonEntity();
 
     complexRepository = getRepository(ComplexEntity);
-    complexInstance = new ComplexEntity(12345, `abc@xyz.com`);
+    complexInstance = new ComplexEntity(12345, `abc@xyz.com`, `blue`);
   });
 
   it(`can be initialized with a default value`, async () => {
@@ -68,10 +85,13 @@ describe(`Repository`, () => {
       12345
     );
     expect(
-      await datastore.read(`ComplexEntity:12345:indexableProperty`)
+      await datastore.read(`ComplexEntity:12345:indexableUniqueProperty`)
     ).toEqual(`abc@xyz.com`);
     expect(
-      await datastore.read(`ComplexEntity:indexableProperty:abc@xyz.com`)
+      await datastore.read(`ComplexEntity:indexableUniqueProperty:abc@xyz.com`)
+    ).toEqual(12345);
+    expect(
+      await datastore.read(`ComplexEntity:indexableProperty:blue:12345`)
     ).toEqual(12345);
   });
 
@@ -111,31 +131,37 @@ describe(`Repository`, () => {
     expect(await loadedInstance.myProperty).toEqual(`new value`);
   });
 
-  it(`can search for an instance`, async () => {
+  it(`can find an instance`, async () => {
     await complexRepository.save(complexInstance);
     const loadedInstance = await complexRepository.load(12345);
-    const searchedInstance = (await complexRepository.search(
-      `indexableProperty`,
+    const foundInstance = (await complexRepository.find(
+      `indexableUniqueProperty`,
       `abc@xyz.com`
     )) as BaseEntity;
-    expect(await searchedInstance.myProperty).toEqual(
+    expect(await foundInstance.myProperty).toEqual(
       await loadedInstance.myProperty
     );
-    expect(await searchedInstance.primaryProperty).toEqual(
+    expect(await foundInstance.primaryProperty).toEqual(
       await loadedInstance.primaryProperty
     );
-    expect(await searchedInstance.indexableProperty).toEqual(
-      await loadedInstance.indexableProperty
+    expect(await foundInstance.indexableUniqueProperty).toEqual(
+      await loadedInstance.indexableUniqueProperty
     );
   });
 
-  it(`returns null when searching for a non-existent instance`, async () => {
+  it("throws an error when finding a non-unique column", () => {
+    expect(
+      complexRepository.find("indexableProperty", "")
+    ).rejects.toThrowError();
+  });
+
+  it(`returns null when finding for a non-existent instance`, async () => {
     await complexRepository.save(complexInstance);
-    const searchedInstance = await complexRepository.search(
-      `indexableProperty`,
+    const foundInstance = await complexRepository.find(
+      `indexableUniqueProperty`,
       `non-existent@email.com`
     );
-    expect(searchedInstance).toBeNull();
+    expect(foundInstance).toBeNull();
   });
 
   it(`can save and load a Column with an array type`, async () => {
@@ -146,6 +172,21 @@ describe(`Repository`, () => {
 
     const loadedInstance = await complexRepository.load(12345);
     expect(await loadedInstance.arrayProperty).toEqual(values);
+  });
+
+  it("can search", async () => {
+    await complexRepository.save(complexInstance);
+    const searchResults = await complexRepository.search(
+      "indexableProperty",
+      "blue"
+    );
+    const expectedIDs = [12345];
+    let i = 0;
+    for await (const searchResult of searchResults) {
+      expect(await searchResult.primaryProperty).toEqual(expectedIDs[i]);
+      i++;
+    }
+    expect(i).toBe(expectedIDs.length);
   });
 
   describe(`RepositoryLoadError`, () => {
@@ -165,17 +206,37 @@ describe(`Repository`, () => {
     });
   });
 
+  describe("RepositoryFindError", () => {
+    it(`is thrown when loading a singleton Entity without an identifier`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await singletonRepository.find("myProperty", "someValue");
+        })()
+      ).rejects.toThrow(RepositoryFindError);
+    });
+  });
+
   describe(`ColumnLookupError`, () => {
     it(`is thrown when searching a non-existent property`, async () => {
       await expect(
         (async (): Promise<void> => {
-          await complexRepository.search(`fakeProperty`, 1);
+          await complexRepository.find(`fakeProperty`, 1);
         })()
       ).rejects.toThrow(ColumnLookupError);
     });
   });
 
-  describe(`ColumnNotSearchableError`, () => {
+  describe(`ColumnNotFindableError`, () => {
+    it(`is thrown when searching a non isIndexable Column`, async () => {
+      await expect(
+        (async (): Promise<void> => {
+          await complexRepository.find(`myProperty`, `value`);
+        })()
+      ).rejects.toThrow(ColumnNotFindableError);
+    });
+  });
+
+  describe(`ColumnNotFindableError`, () => {
     it(`is thrown when searching a non isIndexable Column`, async () => {
       await expect(
         (async (): Promise<void> => {

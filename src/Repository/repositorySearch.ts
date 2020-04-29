@@ -2,16 +2,16 @@ import { EntityConstructor, BaseEntity } from "../Entity/Entity";
 import { Value } from "../Datastore/Datastore";
 import { getColumnMetadata } from "../utils/columns";
 import { PropertyKey } from "../Entity/Entity";
-import { generateIndexablePropertyKey } from "../utils/keyGeneration";
-import { repositoryLoad } from "./repositoryLoad";
+import { getIndexableSearchKey } from "../utils/keyGeneration";
 import { getDatastore } from "../utils/datastore";
 import { ColumnNotSearchableError } from "./ColumnNotSearchableError";
+import { getHydrator, hydrateMany } from "../utils/hydrate";
 
-export const repositorySearch = async <T extends BaseEntity>(
-  constructor: EntityConstructor<T>,
+export const repositorySearch = <T extends BaseEntity>(
+  constructor: EntityConstructor,
   property: PropertyKey,
   identifier: Value
-): Promise<T | null> => {
+): AsyncGenerator<T> => {
   const datastore = getDatastore(constructor);
   const columnMetadata = getColumnMetadata(constructor, property);
 
@@ -22,16 +22,11 @@ export const repositorySearch = async <T extends BaseEntity>(
       `Column is not set as isIndexable`
     );
 
-  const key = generateIndexablePropertyKey(
+  const searchKey = getIndexableSearchKey(
     constructor,
     columnMetadata,
     identifier
   );
-  const primaryIdentifier = await datastore.read(key);
-
-  if (primaryIdentifier !== null) {
-    return await repositoryLoad(constructor, primaryIdentifier);
-  } else {
-    return null;
-  }
+  const hydrator = getHydrator(constructor);
+  return hydrateMany(datastore, searchKey, hydrator);
 };

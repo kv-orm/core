@@ -1,7 +1,7 @@
 import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
-import { getHydrator } from "./hydrate";
+import { getHydrator } from "../utils/hydrate";
 import { getConstructor } from "../utils/entities";
 import { oneToOneSet } from "./oneToOneSet";
 import { createRelationshipMetadata } from "./relationshipMetadata";
@@ -16,15 +16,12 @@ interface OneToOneOptions {
   key?: Key;
   type: EntityConstructor;
 }
-export function OneToOne(options: OneToOneOptions, plugins = {}) {
+export function OneToOne(options: OneToOneOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata(
-      {
-        options,
-        property,
-      },
-      plugins
-    );
+    const relationshipMetadata = createRelationshipMetadata({
+      options,
+      property,
+    });
 
     const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, relationshipMetadata, {

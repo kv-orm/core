@@ -8,21 +8,16 @@ export interface RelationshipMetadata {
   key: Key;
   property: PropertyKey;
   type: EntityConstructor;
-  plugins: {};
 }
 
-export const createRelationshipMetadata = (
-  {
-    options: { key, type },
-    property,
-  }: {
-    options: { key?: string; type: EntityConstructor };
-    property: PropertyKey;
-  },
-  plugins = {}
-): RelationshipMetadata => ({
+export const createRelationshipMetadata = ({
+  options: { key, type },
+  property,
+}: {
+  options: { key?: string; type: EntityConstructor };
+  property: PropertyKey;
+}): RelationshipMetadata => ({
   key: key || property.toString(),
   property,
   type,
-  plugins,
 });

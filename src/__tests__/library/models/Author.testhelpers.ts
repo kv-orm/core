@@ -1,7 +1,7 @@
-import { libraryDatastore } from "../datastores/libraryDatastore.testhelpers";
 import { Entity } from "../../../Entity/Entity";
 import { Column } from "../../../Column/Column";
 import { columnType } from "../../../types/columnType";
+import { libraryDatastore } from "../datastores/libraryDatastore.testhelpers";
 
 const serialize = (value: columnType<Date>): string => {
   if (!(value instanceof Date)) throw new Error(`Value must be a date`);
@@ -24,8 +24,11 @@ export class Author {
   @Column({ isPrimary: true })
   public emailAddress: columnType<string>;
 
-  @Column({ isIndexable: true })
+  @Column({ isIndexable: true, isUnique: true })
   public phoneNumber: columnType<string>;
+
+  @Column({ isIndexable: true })
+  public birthYear: columnType<number>;
 
   public someUnsavedProperty: any;
 
@@ -45,15 +48,18 @@ export class Author {
     lastName,
     emailAddress,
     phoneNumber,
+    birthYear,
   }: {
     firstName: string;
     lastName: string;
     emailAddress: string;
     phoneNumber: string;
+    birthYear: number;
   }) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.emailAddress = emailAddress;
     this.phoneNumber = phoneNumber;
+    this.birthYear = birthYear;
   }
 }

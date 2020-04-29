@@ -47,16 +47,51 @@ export const generatePropertyKey = (
   return keys.join(datastore.keySeparator);
 };
 
-// Author:email:abc@xyz.com
+// Author:email:abc@xyz.com:UUID-HERE
+// or, if isUnique, Author:email:abc@xyz.com
 export const generateIndexablePropertyKey = (
-  constructor: EntityConstructor,
+  instance: BaseEntity,
   columnMetadata: ColumnMetadata,
   value: Value
 ): Key => {
+  const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
+
   const keys = [getEntityKey(constructor), columnMetadata.key, value];
+
+  if (!columnMetadata.isUnique) {
+    keys.push(generateRelationshipKey(instance));
+  }
+
   assertKeysDoNotContainSeparator(datastore, keys);
   return keys.join(datastore.keySeparator);
+};
+
+// Author:email:abc@xyz.com
+export const getUniqueSearchKey = (
+  constructor: EntityConstructor,
+  columnMetadata: ColumnMetadata,
+  value: Value
+) => {
+  const datastore = getDatastore(constructor);
+
+  const keys = [getEntityKey(constructor), columnMetadata.key, value];
+
+  assertKeysDoNotContainSeparator(datastore, keys);
+  return keys.join(datastore.keySeparator);
+};
+
+export const getIndexableSearchKey = (
+  constructor: EntityConstructor,
+  columnMetadata: ColumnMetadata,
+  value: Value
+) => {
+  const datastore = getDatastore(constructor);
+
+  return (
+    getUniqueSearchKey(constructor, columnMetadata, value) +
+    datastore.keySeparator
+  );
 };
 
 // UUID-HERE
@@ -110,7 +145,7 @@ export const generateManyRelationshipSearchKey = (
   );
 };
 
-export const extractManyRelationshipValueKey = (
+export const extractValueFromSearchKey = (
   datastore: Datastore,
   key: Key,
   searchKey: Key

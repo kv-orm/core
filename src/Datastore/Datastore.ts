@@ -2,7 +2,7 @@ import { Cache } from "../Cache/Cache";
 import { SearchStrategyError } from "./SearchStrategyError";
 import { EntityConstructor } from "../Entity/Entity";
 
-export type Value = any; // eslint-disable-line @typescript-eslint/no-explicit-any
+export type Value = any;
 export type Key = string;
 
 interface DatastoreOptions {

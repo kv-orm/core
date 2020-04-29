@@ -38,8 +38,11 @@ const loadNonSingleton = async (
 ): Promise<void> => {
   setPrimaryColumnValue(instance, identifier);
   const key = generatePropertyKey(instance, primaryColumnMetadata);
-  if ((await datastore.read(key)) !== identifier)
+  const loadedIdentifier = await datastore.read(key);
+  if (String(loadedIdentifier) !== identifier.toString())
     throw new EntityNotFoundError(constructor, identifier);
+
+  setPrimaryColumnValue(instance, loadedIdentifier);
 };
 
 export const repositoryLoad = async <T extends BaseEntity>(
