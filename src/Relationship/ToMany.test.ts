@@ -42,7 +42,7 @@ describe(`ToMany`, () => {
 
     @Entity({ datastore })
     class ParentEntity {
-      @ToMany({ type: () => ChildEntity })
+      @ToMany({ type: () => ChildEntity, cascade: true })
       public myProperty: ChildEntity[] = [];
     }
 
@@ -65,8 +65,6 @@ describe(`ToMany`, () => {
 
     childInstance = new ChildEntity(`abc`);
     otherChildInstance = new ChildEntity(`def`);
-    await childRepository.save(childInstance);
-    await childRepository.save(otherChildInstance);
     parentInstance = new ParentEntity();
     await parentRepository.save(parentInstance);
     singletonInstance = new SingletonEntity();

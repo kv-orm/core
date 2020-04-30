@@ -36,7 +36,7 @@ describe(`ToOne`, () => {
 
     @Entity({ datastore })
     class ParentEntity {
-      @ToOne({ type: () => ChildEntity })
+      @ToOne({ type: () => ChildEntity, cascade: true })
       public myProperty: ChildEntity | undefined = undefined;
     }
 
@@ -60,7 +60,6 @@ describe(`ToOne`, () => {
     childInstance = new ChildEntity(`abc`);
     await childRepository.save(childInstance);
     parentInstance = new ParentEntity();
-    await parentRepository.save(parentInstance);
     singletonInstance = new SingletonEntity();
     await singletonRepository.save(singletonInstance);
     singletonParentInstance = new SingletonParentEntity();

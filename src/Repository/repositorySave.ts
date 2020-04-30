@@ -1,9 +1,6 @@
 import { BaseEntity } from "../Entity/Entity";
 import { getConstructorDatastoreCache } from "../utils/entities";
-import { getDatastore } from "../utils/datastore";
 import { getRepository } from "./Repository";
-import { toOneGet } from "../Relationship/toOneGet";
-import { toManyGet } from "../Relationship/toManyGet";
 import {
   getToOneRelationshipMetadatas,
   getToManyRelationshipMetadatas,
@@ -19,26 +16,40 @@ export const repositorySave = async (
     constructor
   );
 
-  // // TODO: Not quite. This will load up all instances. We only care about those in the cache, as those are the only ones that possibly need updating.
-  // for (const relationshipMetadata of relationshipMetadatas) {
-  //   if (relationshipMetadata.cascade) {
-  //     const relationshipRepository = getRepository(relationshipMetadata.type);
+  let updatedRelation = false;
 
-  //     switch (relationshipMetadata.cardinality) {
-  //       case "ToOne":
-  //         const relationInstance = toOneGet(instance, relationshipMetadata);
-  //         break;
-  //       case "ToMany":
-  //         const relationInstances = toManyGet(instance, relationshipMetadata);
+  for (const toOneRelationshipMetadata of toOneRelationshipMetadatas) {
+    if (toOneRelationshipMetadata.cascade) {
+      const relationshipRepository = getRepository(
+        toOneRelationshipMetadata.type()
+      );
 
-  //         for await (const relationInstance of relationInstances) {
-  //         }
-  //         break;
-  //     }
+      const cachedRelationInstance = toOneRelationshipMetadata.instance.get(
+        instance
+      );
+      if (cachedRelationInstance) {
+        updatedRelation =
+          (await relationshipRepository.save(cachedRelationInstance)) ||
+          updatedRelation;
+      }
+    }
+  }
 
-  //     // relationshipRepository.save();
-  //   }
-  // }
+  for (const toManyRelationshipMetadata of toManyRelationshipMetadatas) {
+    if (toManyRelationshipMetadata.cascade) {
+      const relationshipRepository = getRepository(
+        toManyRelationshipMetadata.type()
+      );
 
-  return cache.sync(instance);
+      const cachedRelationInstances =
+        toManyRelationshipMetadata.instances.get(instance) || [];
+      for (const cachedRelationInstance of cachedRelationInstances) {
+        updatedRelation =
+          (await relationshipRepository.save(cachedRelationInstance)) ||
+          updatedRelation;
+      }
+    }
+  }
+
+  return cache.sync(instance) || updatedRelation;
 };
