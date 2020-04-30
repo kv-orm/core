@@ -1,7 +1,8 @@
 import { Key } from "../Datastore/Datastore";
 import { PropertyKey } from "../Entity/Entity";
+import { Metadata } from "../utils/metadata";
 
-export interface ColumnMetadata {
+export interface ColumnMetadata extends Metadata {
   key: Key;
   property: PropertyKey;
   isPrimary?: boolean;
@@ -14,7 +15,7 @@ export const createColumnMetadata = ({
   property,
 }: {
   options: {
-    key?: string;
+    key?: Key;
     isIndexable?: boolean;
     isPrimary?: boolean;
     isUnique?: boolean;

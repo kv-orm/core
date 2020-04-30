@@ -7,7 +7,7 @@ import { getConstructor } from "../utils/entities";
 import { columnGet } from "./columnGet";
 import { columnSet } from "./columnSet";
 import { createColumnMetadata } from "./columnMetadata";
-import { assertKeyNotInUse } from "../utils/metadata";
+import { assertKeyNotInUse, getPropertyMetadatas } from "../utils/metadata";
 
 export const COLUMN_KEY = Symbol(`Column`);
 
@@ -27,7 +27,7 @@ export const Column = <T extends BaseEntity>(options: ColumnOptions = {}) => {
 
     const constructor = getConstructor(instance);
     assertKeyNotInUse(constructor, columnMetadata, {
-      getMetadatas: getColumnMetadatas,
+      getMetadatas: getPropertyMetadatas,
     });
     setColumnMetadata(constructor, columnMetadata);
 

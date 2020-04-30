@@ -17,7 +17,7 @@ describe(`toOneType`, () => {
 
     @Entity({ datastore })
     class WithColumnType {
-      @ToOne({ type: Child })
+      @ToOne({ type: () => Child })
       relation: toOneType<Child>;
 
       constructor() {
@@ -27,7 +27,7 @@ describe(`toOneType`, () => {
 
     @Entity({ datastore })
     class WithoutColumnType {
-      @ToOne({ type: Child })
+      @ToOne({ type: () => Child })
       relation: Child;
 
       constructor() {

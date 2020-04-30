@@ -243,7 +243,7 @@ An example of a singleton class where you do not need a PrimaryColumn, might be 
 
 ### Indexable Columns
 
-An IndexableColumn can be used to mark a property as one which you may wish to later lookup with. For example, in SQL, you might perform the following query: `SELECT * FROM Author WHERE birthYear = 1564`. In [kv-orm], you can lookup Entity instances with a given IndexableColumn value with a repository's [search](#search) method
+An IndexableColumn can be used to mark a property as one which you may wish to later lookup with. For example, in SQL, you might perform the following query: `SELECT * FROM Author WHERE birthYear = 1564`. In [kv-orm], you can lookup Entity instances with a given IndexableColumn value with a repository's [search](#Search) method
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -261,7 +261,7 @@ IndexableColumn types should be used to store non-unique values.
 
 ### Unique Columns
 
-Columns with unique values can be setup with UniqueColumn. This is more efficient that an IndexableColumn, and the [loading mechanism](#find) is simpler.
+Columns with unique values can be setup with UniqueColumn. This is more efficient that an IndexableColumn, and the [loading mechanism](#Find) is simpler.
 
 ```typescript
 @Entity({ datastore: libraryDatastore })
@@ -476,10 +476,18 @@ class MyClass {
 }
 ```
 
-# Upgrading from alpha (0.0.X)
+## How can I upgrade from the alpha (0.0.X)?
 
 Thank you for trying out kv-orm in it's alpha period! Thanks to a generous sponsor, I have been able to complete work to elevate [kv-orm] to a more featureful beta. Unfortunately, this has meant a couple of minor breaking changes.
 
-- `PrimaryColumn`, `IndexableColumn`
+- [`PrimaryColumn`](#Primary-Column), [`IndexableColumn`](#Indexable-Column) and [`UniqueColumn`](#Unique-Column) have been introduced to deprecate the `isPrimary`, `isIndexable` and `isUnique` options on the `Column` decorator.
+
+- `Repository`'s `find` method has been renamted to [`search`](#Search), and a different, new function [`find`](#Find) been added.
+
+  This is probably the most confusing and frustrating breaking change (apologies—I will take efforts to make sure this doesn't happen again). With the introduction of `UniqueColumn` as a more specific type of `IndexableColumn`, we needed a way to take advantage of its simpler loading mechanism. Since `UniqueColumn` has unique-values, there should be only ever one instance with a given value (or none), and so `find` seemed a more appropriate verb for its loading. Whereas `IndexableColumn` can have non-unique values, `search` seemed more appropriate a verb when returning an `AsyncGenerator` of instances.
+
+- [`ToOne`](#To-One) & [`ToMany`](#To-Many) have been formally introduced (renamed from their drafted `ManyToOne` & `ManyToMany` names—the parent's cardinality does not matter).
+
+- Various bugfixes and improvements. None should have unexpected breaking changes, but if I've missed a use-case, please file a [GitHub Issue](https://github.com/kv-orm/core/issues) and tell me about it.
 
 [kv-orm]: https://github.com/kv-orm/core

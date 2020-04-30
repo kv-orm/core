@@ -3,6 +3,7 @@ import { Entity } from "../Entity/Entity";
 import { Datastore } from "../Datastore/Datastore";
 import { MemoryDatastore } from "../MemoryDatastore/MemoryDatastore";
 import { toManyType } from "./toManyType";
+import { PrimaryColumn } from "../Column/PrimaryColumn";
 
 describe(`toManyType`, () => {
   let datastore: Datastore;
@@ -13,11 +14,14 @@ describe(`toManyType`, () => {
 
   it(`helps`, async () => {
     @Entity({ datastore })
-    class Child {}
+    class Child {
+      @PrimaryColumn()
+      id: string = "child";
+    }
 
     @Entity({ datastore })
     class WithColumnType {
-      @ToMany({ type: Child })
+      @ToMany({ type: () => Child })
       relation: toManyType<Child>;
 
       constructor() {
@@ -27,7 +31,7 @@ describe(`toManyType`, () => {
 
     @Entity({ datastore })
     class WithoutColumnType {
-      @ToMany({ type: Child })
+      @ToMany({ type: () => Child })
       relation: Child[];
 
       constructor() {
