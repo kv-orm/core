@@ -3,10 +3,7 @@ import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
 import { getConstructor } from "../utils/entities";
 import { toManySet } from "./toManySet";
-import {
-  createToManyRelationshipMetadata,
-  RelationshipOptions,
-} from "./relationshipMetadata";
+import { createToManyRelationshipMetadata } from "./relationshipMetadata";
 import { setToManyRelationshipMetadata } from "../utils/relationships";
 import { toManyGet } from "./toManyGet";
 import { assertKeyNotInUse, getPropertyMetadatas } from "../utils/metadata";
@@ -15,7 +12,7 @@ interface ToManyOptions {
   key?: Key;
   type: () => EntityConstructor;
   cascade?: boolean;
-  backRef?: PropertyKey;
+  backRef: PropertyKey;
 }
 
 export function ToMany(options: ToManyOptions) {

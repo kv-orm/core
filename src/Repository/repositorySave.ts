@@ -19,7 +19,7 @@ export const repositorySave = async (
   let updatedRelation = false;
 
   for (const toOneRelationshipMetadata of toOneRelationshipMetadatas) {
-    if (toOneRelationshipMetadata.cascade) {
+    if (toOneRelationshipMetadata.cascade.onUpdate) {
       const relationshipRepository = getRepository(
         toOneRelationshipMetadata.type()
       );
@@ -36,7 +36,7 @@ export const repositorySave = async (
   }
 
   for (const toManyRelationshipMetadata of toManyRelationshipMetadatas) {
-    if (toManyRelationshipMetadata.cascade) {
+    if (toManyRelationshipMetadata.cascade.onUpdate) {
       const relationshipRepository = getRepository(
         toManyRelationshipMetadata.type()
       );

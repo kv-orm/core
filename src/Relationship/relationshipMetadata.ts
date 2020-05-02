@@ -10,8 +10,8 @@ export interface RelationshipMetadata extends Metadata {
   key: Key;
   property: PropertyKey;
   type: () => EntityConstructor;
-  cascade: boolean;
-  backRef?: PropertyKey;
+  cascade: { onUpdate: boolean; onDelete: boolean };
+  backRef: PropertyKey;
   cardinality: "ToOne" | "ToMany";
 }
 
@@ -29,7 +29,7 @@ export interface RelationshipOptions {
   key?: Key;
   type: () => EntityConstructor;
   cascade?: boolean;
-  backRef?: PropertyKey;
+  backRef: PropertyKey;
 }
 
 export const createToOneRelationshipMetadata = ({
@@ -42,7 +42,9 @@ export const createToOneRelationshipMetadata = ({
   key: key || property.toString(),
   property,
   type,
-  cascade: !!cascade,
+  cascade: cascade
+    ? { onUpdate: true, onDelete: true }
+    : { onUpdate: false, onDelete: false },
   backRef,
   instance: new Map(),
   cardinality: "ToOne",
@@ -58,7 +60,9 @@ export const createToManyRelationshipMetadata = ({
   key: key || property.toString(),
   property,
   type,
-  cascade: !!cascade,
+  cascade: cascade
+    ? { onUpdate: true, onDelete: true }
+    : { onUpdate: false, onDelete: false },
   backRef,
   instances: new Map(),
   cardinality: "ToMany",

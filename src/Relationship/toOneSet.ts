@@ -34,7 +34,7 @@ export const toOneSet = (
   toOneRelationshipMetadata.instance.set(instance, value);
   setToOneRelationshipMetadata(constructor, toOneRelationshipMetadata);
 
-  if (toOneRelationshipMetadata.backRef && !skipBackRef) {
+  if (!skipBackRef) {
     const relationshipConstructor = toOneRelationshipMetadata.type();
     const relationshipRelationshipMetadata = getRelationshipMetadata(
       relationshipConstructor,

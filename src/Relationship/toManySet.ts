@@ -1,9 +1,6 @@
 import { BaseEntity } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
-import {
-  getConstructorDatastoreCache,
-  getConstructor,
-} from "../utils/entities";
+import { getConstructorDatastoreCache } from "../utils/entities";
 import {
   generateManyRelationshipKey,
   generateRelationshipKey,
@@ -36,7 +33,7 @@ export const toManySet = async (
   toManyRelationshipMetadata.instances.set(instance, values);
   setToManyRelationshipMetadata(constructor, toManyRelationshipMetadata);
 
-  if (toManyRelationshipMetadata.backRef && !skipBackRef) {
+  if (!skipBackRef) {
     const relationshipConstructor = toManyRelationshipMetadata.type();
     const relationshipRelationshipMetadata = getRelationshipMetadata(
       relationshipConstructor,

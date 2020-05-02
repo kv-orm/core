@@ -38,7 +38,7 @@ describe(`keyGeneration`, () => {
       @Column()
       public myProperty = `initial value`;
 
-      @ToOne({ type: () => SingletonEntity })
+      @ToOne({ type: () => SingletonEntity, backRef: "" })
       public relationshipProperty: undefined;
     }
 
@@ -52,6 +52,7 @@ describe(`keyGeneration`, () => {
       @ToOne({
         type: () => SingletonEntityWithCustomKeys,
         key: `CustomRelationshipKey`,
+        backRef: "",
       })
       public relationshipProperty: undefined;
     }
@@ -69,7 +70,7 @@ describe(`keyGeneration`, () => {
       @Column({ isIndexable: true, isUnique: true })
       public indexable = `abc@xyz.com`;
 
-      @ToOne({ type: () => ComplexEntity })
+      @ToOne({ type: () => ComplexEntity, backRef: "" })
       public relationshipProperty: undefined;
     }
 
@@ -89,6 +90,7 @@ describe(`keyGeneration`, () => {
       @ToOne({
         type: () => ComplexEntityWithCustomKeys,
         key: `CustomRelationshipKey`,
+        backRef: "",
       })
       public relationshipProperty: undefined;
     }

@@ -10,60 +10,19 @@ import { ToManyParent } from "./toManyParent.testhelpers";
 import { ToManyChild } from "./toManyChild.testhelpers";
 
 describe(`ToOne`, () => {
-  let datastore: Datastore;
   let childInstance: BaseEntity;
   let parentInstance: BaseEntity;
-  let singletonInstance: BaseEntity;
-  let singletonParentInstance: BaseEntity;
 
   let childRepository: Repository;
   let parentRepository: Repository;
-  let singletonRepository: Repository;
-  let singletonParentRepository: Repository;
 
   beforeEach(async () => {
-    datastore = new MemoryDatastore();
+    childRepository = getRepository(ToOneChild);
+    parentRepository = getRepository(ToOneParent);
 
-    @Entity({ datastore })
-    class ChildEntity {
-      @Column({ isPrimary: true })
-      public id: string;
-
-      constructor(id: string) {
-        this.id = id;
-      }
-    }
-
-    @Entity({ datastore })
-    class ParentEntity {
-      @ToOne({ type: () => ChildEntity, cascade: true })
-      public myProperty: ChildEntity | undefined = undefined;
-    }
-
-    @Entity({ datastore })
-    class SingletonEntity {
-      @Column()
-      public constantProperty = `Never change!`;
-    }
-
-    @Entity({ datastore })
-    class SingletonParentEntity {
-      @ToOne({ type: () => SingletonEntity })
-      public myProperty: SingletonEntity | undefined = undefined;
-    }
-
-    childRepository = getRepository(ChildEntity);
-    parentRepository = getRepository(ParentEntity);
-    singletonRepository = getRepository(SingletonEntity);
-    singletonParentRepository = getRepository(SingletonParentEntity);
-
-    childInstance = new ChildEntity(`abc`);
+    childInstance = new ToOneChild("child");
     await childRepository.save(childInstance);
-    parentInstance = new ParentEntity();
-    singletonInstance = new SingletonEntity();
-    await singletonRepository.save(singletonInstance);
-    singletonParentInstance = new SingletonParentEntity();
-    await singletonParentRepository.save(singletonParentInstance);
+    parentInstance = new ToOneParent("parent");
   });
 
   it("returns the existing instance on get", async () => {
@@ -77,14 +36,6 @@ describe(`ToOne`, () => {
 
     const loadedRelation = await parentInstance.myProperty;
     expect(await loadedRelation.id).toEqual(await childInstance.id);
-  });
-
-  it(`can save and load a relationship to a singleton entity`, async () => {
-    singletonParentInstance.myProperty = singletonInstance;
-    await singletonParentRepository.save(singletonParentInstance);
-
-    const loadedRelation = await singletonParentInstance.myProperty;
-    expect(await loadedRelation.constantProperty).toEqual(`Never change!`);
   });
 });
 

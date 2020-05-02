@@ -15,7 +15,7 @@ interface ToOneOptions {
   key?: Key;
   type: () => EntityConstructor;
   cascade?: boolean;
-  backRef?: PropertyKey;
+  backRef: PropertyKey;
 }
 export function ToOne(options: ToOneOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
