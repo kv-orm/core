@@ -12,7 +12,10 @@ export interface Repository {
   load(identifier?: Value): Promise<BaseEntity>;
   save(entity: BaseEntity): Promise<boolean>;
   find(property: PropertyKey, identifier: Value): Promise<BaseEntity | null>;
-  search(property: PropertyKey, identifier: Value): AsyncGenerator<BaseEntity>;
+  search(
+    property: PropertyKey,
+    identifier: Value
+  ): Promise<AsyncGenerator<BaseEntity>>;
 }
 
 export const getRepository = <T extends BaseEntity>(
@@ -28,7 +31,10 @@ export const getRepository = <T extends BaseEntity>(
     async find(property: PropertyKey, identifier: Value): Promise<T | null> {
       return await repositoryFind(constructor, property, identifier);
     },
-    search(property: PropertyKey, identifier: Value): AsyncGenerator<T> {
+    search(
+      property: PropertyKey,
+      identifier: Value
+    ): Promise<AsyncGenerator<T>> {
       return repositorySearch(constructor, property, identifier);
     },
   };

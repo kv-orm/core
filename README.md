@@ -107,6 +107,51 @@ If there is any other datastore that you'd like to see supported, please [create
   console.log(await author.lastName); // 1ms - author.lastName is retrieved from memory (no lookup performed)
   ```
 
+- Indexable and Unique Columns allowing quick lookups for specific entity instances:
+
+  ```typescript
+  import { UniqueColumn, IndexableColumn } from "@kv-orm/core";
+
+  @Entity({ datastore: libraryDatastore })
+  class Author {
+    // ...
+
+    @IndexableColumn()
+    public birthYear: number;
+
+    @UniqueColumn()
+    public phoneNumber: string;
+    // ...
+  }
+
+  let authors = await authorRepository.search("birthYear", 1564); // An AsyncGenerator yielding authors born in 1564
+  let author = await authorRepository.find("phoneNumber", "+1234567890"); // A single author with the phone number +1234567890
+  ```
+
+- Relationships (\*-to-one & \*-to-many) with backref support, and on-update & on-delete cascading.
+
+  ```typescript
+  import { ToOne, ToMany } from "@kv-orm/core";
+
+  @Entity({ datastore: libraryDatastore })
+  class Author {
+    // ...
+
+    @ToOne({ type: Book, backRef: "author", cascade: true })
+    public books: Book[];
+
+    // ...
+  }
+
+  @Entity({ datastore: libraryDatastore })
+  class Book {
+    @ToMany({ type: Author, backRef: "books", cascade: true })
+    public author: Author;
+
+    // ...
+  }
+  ```
+
 # Usage
 
 ## Install
@@ -163,6 +208,7 @@ import {
   UniqueColumn,
   IndexableColumn,
 } from "@kv-orm/core";
+import { Book } from "./Book";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
@@ -175,16 +221,19 @@ class Author {
   @Column()
   public nickName: string | undefined;
 
-  @PrimaryColumn() // More on this in a moment
+  @PrimaryColumn()
   public emailAddress: string;
 
-  @IndexableColumn() // More on this in a moment
+  @IndexableColumn()
   public birthYear: number;
 
-  @UniqueColumn() // More on this in a moment
+  @UniqueColumn()
   public phoneNumber: string;
 
   public someUnsavedProperty: any;
+
+  @ToMany({ type: () => Book, backRef: "author", cascade: true }) // More on this later
+  public books: Book[] = [];
 
   public constructor({
     firstName,
@@ -374,13 +423,107 @@ console.log(foundNonexistent); // null
 
 ## Relationships
 
-### \* To One
+All Relationships must supply the `type` of Entity as a function (to allow circular dependencies) and a `backRef` (the property name on the inverse-side of the Relationship).
 
-> TODO: Documentation
+In order to propagate changes automatically on update and on delete, `cascade` can be set to `true`.
 
-### \* To Many
+Note: deleting may be disproportionally intensive as it load, and then must edit or delete every related instance.
 
-> TODO: Documentation
+### One To One / Many To One
+
+For \* to one Relationships, use the ToOne decorator.
+
+```typescript
+import { Author, authorRepository } from "./Author";
+
+@Entity({ datastore: libraryDatastore })
+class Book {
+  // ...
+
+  @ToOne({ type: () => Author, backRef: "books", cascade: true })
+  public author: Author;
+
+  // ...
+}
+
+const bookRepository = getRepository(Book);
+
+const williamShakespeare = await authorRepository.load(
+  "william@shakespeare.com"
+);
+
+const hamlet = new Book({ title: "Hamlet", author: williamShakespeare });
+
+console.log((await hamlet.author) === williamShakespeare); // true
+
+// And because `cascade` was set to `true`, the Author instance has been updated as well
+const books = await williamShakespeare.books;
+for await (const book of books) {
+  console.log(await book.title); // Hamlet
+}
+
+await bookRepository.save(hamlet); // Will also save williamShakespeare
+```
+
+### One To Many / Many To Many
+
+ToMany Relationships are slightly different to how Columns and ToOne Relationships work. Instead of setting its value and awaiting a Promise of its value, ToMany Relationships set an array of values, and await a Promise of an [AsyncGenerator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) which yields its values.
+
+```typescript
+@Entity({ datastore: libraryDatastore })
+class Author {
+  // ...
+
+  @ToMany({ type: () => Book, backRef: "author", cascade: true }) // More on this later
+  public books: Book[] = [];
+
+  // ...
+}
+
+// ...
+
+const hamlet = new Book({ title: "Hamlet" });
+
+williamShakespeare.books = [hamlet];
+
+const books = await williamShakespeare.books;
+for await (const book of books) {
+  console.log(await book.title); // Hamlet
+}
+
+// And because `cascade` was set to `true`, the Book instance has been updated as well
+console.log((await hamlet.author) === williamShakespeare); // true - because `cascade` is set to true
+
+await authorRepository.save(williamShakespeare); // Will also save hamlet
+```
+
+Note: The order of returned Entities by the AsyncGenerator is not guaranteed. In fact, as items are loaded into memory, they will be pushed to the front to ensure tha other Entities are loaded only as needed.
+
+#### Helpers
+
+To simplify interacting with `ToMany` Relationships, some helpers are available.
+
+Note: saving must still be completed afterwards to persist changes.
+
+##### `addTo`
+
+`addTo` simplifies pushing an element to a ToMany relaionship:
+
+```typescript
+import { addTo } from "@kv-orm/core";
+
+addTo(williamShakespeare, "books", hamlet);
+```
+
+##### `removeFrom`
+
+`removeFrom` simplifies splicing an element from a ToMany relaionship:
+
+```typescript
+import { removeFrom } from "@kv-orm/core";
+
+removeFrom(williamShakespeare, "books", hamlet);
+```
 
 # Types
 
@@ -408,7 +551,7 @@ However, when reading these values with kv-orm, in fact a `Promise<string>` is r
 Therefore, to improve the developer experience and prevent TypeScript errors such as `'await' has no effect on the type of this expression. ts(80007)` and `Property 'then' does not exist on type 'T'. ts(2339)`, when declaring the Entity, wrap the property types in the `columnType` helper. In the same example:
 
 ```typescript
-import { Column, Entity, columnType } from "@kv-orm/core";
+import { columnType } from "@kv-orm/core";
 
 @Entity({ datastore: libraryDatastore })
 class Author {
@@ -426,11 +569,39 @@ class Author {
 
 ## `toOneType`
 
-> TODO: Documentation
+Similarly, for ToOne Relationships:
+
+```typescript
+import { toOneType } from "@kv-orm/core";
+
+@Entity({ datastore: libraryDatastore })
+class Book {
+  // ...
+
+  @ToOne({ type: () => Author, backRef: "books", cascade: true })
+  public author: toOneType<Author>;
+
+  // ...
+}
+```
 
 ## `toManyType`
 
-> TODO: Documentation
+And ToMany Relationships:
+
+```typescript
+import { toManyType } from "@kv-orm/core";
+
+@Entity({ datastore: libraryDatastore })
+class Author {
+  // ...
+
+  @ToMany({ type: () => Book, backRef: "author", cascade: true })
+  public books: toManyType<Book>;
+
+  // ...
+}
+```
 
 # Development
 
