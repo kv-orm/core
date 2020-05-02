@@ -6,8 +6,12 @@ import { ColumnMetadata } from "../Column/columnMetadata";
 import { getPrimaryColumnMetadata, getPrimaryColumnValue } from "./columns";
 import { getDatastore } from "./datastore";
 import { getConstructor, getEntityMetadata } from "./entities";
-import { RelationshipMetadata } from "../Relationship/relationshipMetadata";
 import { InvalidKeyError } from "./errors";
+import { Metadata } from "./metadata";
+import {
+  ToOneRelationshipMetadata,
+  ToManyRelationshipMetadata,
+} from "../Relationship/relationshipMetadata";
 
 export const assertKeysDoNotContainSeparator = (
   datastore: Datastore,
@@ -30,7 +34,7 @@ const getEntityKey = (constructor: EntityConstructor): Key => {
 // or, if singleton, ApplicationConfiguration:password
 export const generatePropertyKey = (
   instance: BaseEntity,
-  metadata: ColumnMetadata | RelationshipMetadata
+  metadata: Metadata
 ): Key => {
   const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
@@ -115,19 +119,19 @@ export const generateRelationshipKey = (instance: BaseEntity): Key => {
 // Author:UUID-HERE:passport
 export const generateOneRelationshipKey = (
   instance: BaseEntity,
-  relationshipMetadata: RelationshipMetadata
-): Key => generatePropertyKey(instance, relationshipMetadata);
+  toOneRelationshipMetadata: ToOneRelationshipMetadata
+): Key => generatePropertyKey(instance, toOneRelationshipMetadata);
 
 // Author:UUID-HERE:books:UUID-HERE
 export const generateManyRelationshipKey = (
   instance: BaseEntity,
-  relationshipMetadata: RelationshipMetadata,
+  toManyRelationshipMetadata: ToManyRelationshipMetadata,
   relationshipInstance: BaseEntity
 ): Key => {
   const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
   const keys = [
-    generatePropertyKey(instance, relationshipMetadata),
+    generatePropertyKey(instance, toManyRelationshipMetadata),
     generateRelationshipKey(relationshipInstance),
   ];
   return keys.join(datastore.keySeparator);
@@ -135,13 +139,14 @@ export const generateManyRelationshipKey = (
 
 export const generateManyRelationshipSearchKey = (
   instance: BaseEntity,
-  relationshipMetadata: RelationshipMetadata
+  toManyRelationshipMetadata: ToManyRelationshipMetadata
 ): Key => {
   const constructor = getConstructor(instance);
   const datastore = getDatastore(constructor);
 
   return (
-    generatePropertyKey(instance, relationshipMetadata) + datastore.keySeparator
+    generatePropertyKey(instance, toManyRelationshipMetadata) +
+    datastore.keySeparator
   );
 };
 

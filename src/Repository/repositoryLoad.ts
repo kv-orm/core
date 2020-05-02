@@ -16,12 +16,12 @@ const assertIdentifierValid = (
   primaryColumnMetadata: ColumnMetadata | undefined,
   identifier: Value
 ): void => {
-  if (primaryColumnMetadata === undefined && identifier !== undefined) {
+  if (primaryColumnMetadata === undefined && identifier) {
     throw new RepositoryLoadError(
       constructor,
       `Entity is a singleton, so cannot load with an identifier.`
     );
-  } else if (primaryColumnMetadata !== undefined && identifier === undefined) {
+  } else if (primaryColumnMetadata !== undefined && !identifier) {
     throw new RepositoryLoadError(
       constructor,
       `Entity is not a singleton, and so requires an identifier to load with.`

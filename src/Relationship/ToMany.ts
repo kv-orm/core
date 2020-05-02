@@ -1,45 +1,41 @@
 import { BaseEntity, EntityConstructor } from "../Entity/Entity";
 import { PropertyKey } from "../Entity/Entity";
 import { Key } from "../Datastore/Datastore";
-import { getHydrator } from "../utils/hydrate";
 import { getConstructor } from "../utils/entities";
 import { toManySet } from "./toManySet";
-import { createRelationshipMetadata } from "./relationshipMetadata";
-import {
-  setRelationshipMetadata,
-  getRelationshipMetadatas,
-} from "../utils/relationships";
+import { createToManyRelationshipMetadata } from "./relationshipMetadata";
+import { setToManyRelationshipMetadata } from "../utils/relationships";
 import { toManyGet } from "./toManyGet";
-import { assertKeyNotInUse } from "../utils/metadata";
+import { assertKeyNotInUse, getPropertyMetadatas } from "../utils/metadata";
 
 interface ToManyOptions {
   key?: Key;
-  type: EntityConstructor;
+  type: () => EntityConstructor;
+  cascade?: boolean;
+  backRef: PropertyKey;
 }
 
 export function ToMany(options: ToManyOptions) {
   return (instance: BaseEntity, property: PropertyKey): void => {
-    const relationshipMetadata = createRelationshipMetadata({
+    const toManyRelationshipMetadata = createToManyRelationshipMetadata({
       options,
       property,
     });
 
     const constructor = getConstructor(instance);
-    assertKeyNotInUse(constructor, relationshipMetadata, {
-      getMetadatas: getRelationshipMetadatas,
+    assertKeyNotInUse(constructor, toManyRelationshipMetadata, {
+      getMetadatas: getPropertyMetadatas,
     });
-    setRelationshipMetadata(constructor, relationshipMetadata);
-
-    const hydrator = getHydrator(options.type);
+    setToManyRelationshipMetadata(constructor, toManyRelationshipMetadata);
 
     Reflect.defineProperty(instance, property, {
       enumerable: true,
       configurable: true,
       get: function get(this: BaseEntity) {
-        return toManyGet(this, relationshipMetadata, hydrator);
+        return toManyGet(this, toManyRelationshipMetadata);
       },
       set: function set(this: BaseEntity, values: BaseEntity[]) {
-        if (values) toManySet(this, relationshipMetadata, values);
+        if (values) toManySet(this, toManyRelationshipMetadata, values);
       },
     });
   };

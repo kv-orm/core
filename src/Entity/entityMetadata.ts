@@ -1,10 +1,10 @@
 import { Datastore, Key } from "../Datastore/Datastore";
 import { BaseEntity, EntityConstructor } from "./Entity";
+import { Metadata } from "../utils/metadata";
 
-export interface EntityMetadata {
+export interface EntityMetadata extends Metadata {
   datastore: Datastore;
   key: Key;
-  instances: BaseEntity[];
 }
 
 export const createEntityMetadata = ({
@@ -16,5 +16,4 @@ export const createEntityMetadata = ({
 }): EntityMetadata => ({
   datastore,
   key: key || constructor.name,
-  instances: [], // TODO
 });

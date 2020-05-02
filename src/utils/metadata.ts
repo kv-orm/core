@@ -3,8 +3,13 @@ import "../metadata";
 import { EntityConstructor, BaseEntity } from "../Entity/Entity";
 import { SetupError } from "./errors";
 import { Key } from "../Datastore/Datastore";
+import { getColumnMetadatas } from "./columns";
+import {
+  getToOneRelationshipMetadatas,
+  getToManyRelationshipMetadatas,
+} from "./relationships";
 
-interface Metadata {
+export interface Metadata {
   key: Key;
   property?: PropertyKey; // TODO: Clean-up. Separate Relationship, Column and Entity Metadatas properly
 }
@@ -73,3 +78,9 @@ export const setMetadata = (
   metadatas.push(metadata);
   setMetadatas(key, constructor, metadatas);
 };
+
+export const getPropertyMetadatas = (constructor: EntityConstructor) => [
+  ...getColumnMetadatas(constructor),
+  ...getToOneRelationshipMetadatas(constructor),
+  ...getToManyRelationshipMetadatas(constructor),
+];

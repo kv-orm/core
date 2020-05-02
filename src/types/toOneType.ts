@@ -1,3 +1,1 @@
-import { columnType } from "./columnType";
-
-export type toOneType<T> = columnType<T>;
+export type toOneType<T> = T | Promise<T>;

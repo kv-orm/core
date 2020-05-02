@@ -1,7 +1,7 @@
 import { Entity } from "../Entity/Entity";
 import { Datastore } from "../Datastore/Datastore";
 import { MemoryDatastore } from "../MemoryDatastore/MemoryDatastore";
-import { getRelationshipMetadata } from "./relationships";
+import { getToOneRelationshipMetadata } from "./relationships";
 import { RelationshipLookupError } from "./errors";
 
 describe(`relationships`, () => {
@@ -15,7 +15,7 @@ describe(`relationships`, () => {
       class MyEntity {}
 
       expect(() => {
-        getRelationshipMetadata(MyEntity, `fakeRelationship`);
+        getToOneRelationshipMetadata(MyEntity, `fakeRelationship`);
       }).toThrow(RelationshipLookupError);
     });
   });

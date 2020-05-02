@@ -16,4 +16,6 @@ export { ToOne } from "./Relationship/ToOne";
 export { toOneType } from "./types/toOneType";
 export { ToMany } from "./Relationship/ToMany";
 export { toManyType } from "./types/toManyType";
+export { addTo } from "./Relationship/addTo";
+export { removeFrom } from "./Relationship/removeFrom";
 export { getRepository } from "./Repository/Repository";
