@@ -119,6 +119,7 @@ describe("backRefs on ToMany", () => {
     const toManyChild = new ToManyChild("child");
     const toManyParent = new ToManyParent("parent");
     toManyParent.toManyChild = [toManyChild];
+    await getRepository(ToManyParent).save(toManyParent);
 
     const relationChildInstances = await toManyParent.toManyChild;
     let i = 0;

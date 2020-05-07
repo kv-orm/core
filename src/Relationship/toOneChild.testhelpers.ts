@@ -15,10 +15,10 @@ class ToOneChild {
   @PrimaryColumn()
   public id: string;
 
-  @ToOne({ type: () => ToOneParent, backRef: "toOneChild" })
+  @ToOne({ type: () => ToOneParent, backRef: "toOneChild", cascade: true })
   public toOneParent?: toOneType<ToOneParent> = undefined;
 
-  @ToMany({ type: () => ToManyParent, backRef: "toOneChild" })
+  @ToMany({ type: () => ToManyParent, backRef: "toOneChild", cascade: true })
   public toManyParent: toManyType<ToManyParent> = [];
 
   constructor(id: string) {
